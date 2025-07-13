@@ -19,7 +19,7 @@ type Config struct {
 	}
 }
 
-func Load() (*Config, error) {
+func LoadConfig() (*Config, error) {
 	var config Config
 	if err := envconfig.Process("", &config); err != nil {
 		return nil, err
