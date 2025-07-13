@@ -1,7 +1,7 @@
-package internal
+package app
 
 type State struct {
-	config *Config
+	Config *Config
 	// TODO: Add database, storage, ...
 }
 
@@ -11,5 +11,5 @@ func NewState() *State {
 		panic(err)
 	}
 
-	return &State{config: config}
+	return &State{Config: config}
 }

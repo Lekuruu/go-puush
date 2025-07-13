@@ -1,6 +1,9 @@
 package main
 
-import "github.com/Lekuruu/go-puush/api"
+import (
+	"github.com/Lekuruu/go-puush/api"
+	"github.com/Lekuruu/go-puush/internal/app"
+)
 
 func main() {
 	state := app.NewState()
