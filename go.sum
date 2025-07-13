@@ -2,3 +2,5 @@ github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
 github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
 github.com/kelseyhightower/envconfig v1.4.0 h1:Im6hONhd3pLkfDFsbRgu68RDNkGF1r3dvMUtDTo2cv8=
 github.com/kelseyhightower/envconfig v1.4.0/go.mod h1:cccZRl6mQpaq41TPp5QxidR+Sa3axMbJDNb//FQX6Gg=
+github.com/sytallax/prettylog v0.1.0 h1:T3K6++Hq/jHtWid+t+EAwyvmxarnh3Oi41lis4DYcT8=
+github.com/sytallax/prettylog v0.1.0/go.mod h1:P3o38B+/pF3RsFPPH+6aX+dagiF2yJEREHh58TZo4og=
