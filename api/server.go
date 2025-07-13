@@ -8,6 +8,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type Context struct {
+	Response http.ResponseWriter
+	Request  *http.Request
+	State    *app.State
+}
+
 type Server struct {
 	State  *app.State
 	Router *mux.Router
@@ -32,4 +38,17 @@ func (server *Server) Serve() {
 	server.Router.HandleFunc("/api/thumb", server.ContextMiddleware(PuushThumbnail)).Methods("POST")
 	server.Router.HandleFunc("/api/oshi", server.ContextMiddleware(PuushErrorSubmission)).Methods("POST")
 	http.ListenAndServe(bind, server.Router)
+}
+
+func (server *Server) ContextMiddleware(handler func(*Context)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		context := &Context{
+			Response: w,
+			Request:  r,
+			State:    server.State,
+		}
+
+		w.Header().Set("Server", "puush")
+		handler(context)
+	}
 }
