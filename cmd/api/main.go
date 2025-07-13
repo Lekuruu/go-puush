@@ -7,6 +7,10 @@ import (
 
 func main() {
 	state := app.NewState()
+	if state == nil {
+		return
+	}
+
 	server := api.NewServer(state)
 	server.Serve()
 }

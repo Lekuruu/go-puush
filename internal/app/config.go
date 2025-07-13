@@ -10,12 +10,11 @@ type Config struct {
 		ClientUrl     string `envconfig:"API_CLIENT_URL" default:"http://puush.me/dl/puush-win.zip"`
 	}
 	Database struct {
-		Path       string `envconfig:"DB_PATH" default:"/.data/puush.db"`
-		Migrations string `envconfig:"DB_MIGRATIONS" default:"./migrations"`
+		Path string `envconfig:"DB_PATH" default:"./.data/puush.db"`
 	}
 	Storage struct {
 		Type string `envconfig:"STORAGE_TYPE" default:"local"`
-		Uri  string `envconfig:"STORAGE_URI" default:"/.data/"`
+		Uri  string `envconfig:"STORAGE_URI" default:"./.data/"`
 	}
 }
 

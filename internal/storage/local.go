@@ -15,6 +15,16 @@ func NewFileStorage(dataPath string) Storage {
 	return &FileStorage{dataPath: dataPath}
 }
 
+func (storage *FileStorage) Setup() error {
+	if _, err := os.Stat(storage.dataPath); os.IsNotExist(err) {
+		err := os.MkdirAll(storage.dataPath, os.ModePerm)
+		if err != nil {
+			return fmt.Errorf("failed to create storage directory: %w", err)
+		}
+	}
+	return nil
+}
+
 func (storage *FileStorage) Read(key string, folder string) ([]byte, error) {
 	path := fmt.Sprintf("%s/%s/%s", storage.dataPath, folder, key)
 	return os.ReadFile(path)
