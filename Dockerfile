@@ -26,10 +26,6 @@ FROM alpine:3.19
 # Install runtime dependencies
 RUN apk add --no-cache ca-certificates sqlite-libs
 
-# Run as non‑root
-RUN addgroup -S app && adduser -S -G app app
-USER app
-
 WORKDIR /app
 COPY --from=build /app/puush /app/puush
 
