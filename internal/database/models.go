@@ -10,6 +10,7 @@ type User struct {
 	CreatedAt      time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
 	LatestActivity time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
 	Active         bool      `gorm:"default:true;not null"`
+	ApiKey         string    `gorm:"size:64;not null;unique"`
 
 	Uploads []*Upload `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
 	Pools   []*Pool   `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
