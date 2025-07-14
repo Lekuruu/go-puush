@@ -10,6 +10,43 @@ import (
 	"github.com/Lekuruu/go-puush/internal/database"
 )
 
+// /api/auth handles user authentication for the puush api service.
+// It supports both password & api key authentication and returns
+// the user's account type, api key, disk usage, and subscription expiry.
+func PuushAuthentication(ctx *Context) {
+	request, err := NewAuthenticationRequest(ctx.Request)
+	if err != nil {
+		WritePuushError(ctx, -2, http.StatusBadRequest)
+		return
+	}
+
+	user, success := UserAuthenticationDynamic(
+		request.Username,
+		request.Password,
+		request.Key,
+		ctx.State,
+	)
+
+	if !success {
+		WritePuushError(ctx, -1, http.StatusUnauthorized)
+		return
+	}
+
+	response := &AuthenticationResponse{
+		AccountType:        user.Type,
+		ApiKey:             user.ApiKey,
+		DiskUsage:          user.DiskUsage,
+		SubscriptionExpiry: user.SubscriptionEnd,
+	}
+
+	ctx.Response.WriteHeader(http.StatusOK)
+	_, err = ctx.Response.Write(response.Serialize())
+	if err != nil {
+		WritePuushError(ctx, -3, http.StatusInternalServerError)
+		return
+	}
+}
+
 type AuthenticationRequest struct {
 	Username string
 	Password string
@@ -68,38 +105,4 @@ func (response *AuthenticationResponse) Serialize() []byte {
 		expiry,
 	}
 	return []byte(strings.Join(data, ","))
-}
-
-func PuushAuthentication(ctx *Context) {
-	request, err := NewAuthenticationRequest(ctx.Request)
-	if err != nil {
-		WritePuushError(ctx, -2, http.StatusBadRequest)
-		return
-	}
-
-	user, success := UserAuthenticationDynamic(
-		request.Username,
-		request.Password,
-		request.Key,
-		ctx.State,
-	)
-
-	if !success {
-		WritePuushError(ctx, -1, http.StatusUnauthorized)
-		return
-	}
-
-	response := &AuthenticationResponse{
-		AccountType:        user.Type,
-		ApiKey:             user.ApiKey,
-		DiskUsage:          user.DiskUsage,
-		SubscriptionExpiry: user.SubscriptionEnd,
-	}
-
-	ctx.Response.WriteHeader(http.StatusOK)
-	_, err = ctx.Response.Write(response.Serialize())
-	if err != nil {
-		WritePuushError(ctx, -3, http.StatusInternalServerError)
-		return
-	}
 }
