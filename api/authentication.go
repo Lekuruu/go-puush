@@ -7,9 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
-	"github.com/Lekuruu/go-puush/internal/services"
 )
 
 type AuthenticationRequest struct {
@@ -75,11 +73,11 @@ func (response *AuthenticationResponse) Serialize() []byte {
 func PuushAuthentication(ctx *Context) {
 	request, err := NewAuthenticationRequest(ctx.Request)
 	if err != nil {
-		WriteError(ctx, -2, http.StatusBadRequest)
+		WritePuushError(ctx, -2, http.StatusBadRequest)
 		return
 	}
 
-	user, success := UserDynamicAuthentication(
+	user, success := UserAuthenticationDynamic(
 		request.Username,
 		request.Password,
 		request.Key,
@@ -87,7 +85,7 @@ func PuushAuthentication(ctx *Context) {
 	)
 
 	if !success {
-		WriteError(ctx, -1, http.StatusUnauthorized)
+		WritePuushError(ctx, -1, http.StatusUnauthorized)
 		return
 	}
 
@@ -101,58 +99,7 @@ func PuushAuthentication(ctx *Context) {
 	ctx.Response.WriteHeader(http.StatusOK)
 	_, err = ctx.Response.Write(response.Serialize())
 	if err != nil {
-		WriteError(ctx, -3, http.StatusInternalServerError)
+		WritePuushError(ctx, -3, http.StatusInternalServerError)
 		return
 	}
-}
-
-func WriteError(ctx *Context, errorCode int, statusCode int) {
-	ctx.Response.WriteHeader(statusCode)
-	ctx.Response.Write([]byte(strconv.Itoa(int(errorCode)) + "\n"))
-}
-
-// UserPasswordAuthentication attempts to authenticate a user using their username and password.
-func UserPasswordAuthentication(username string, password string, state *app.State) (*database.User, bool) {
-	user, err := services.FetchUserByName(username, state)
-	if err != nil {
-		return nil, false
-	}
-
-	if !app.VerifyPasswordHash(password, user.Password) {
-		return nil, false
-	}
-
-	if !user.Active {
-		return nil, false
-	}
-
-	return user, true
-}
-
-// UserKeyAuthentication attempts to authenticate a user using an API key.
-func UserKeyAuthentication(username string, key string, state *app.State) (*database.User, bool) {
-	user, err := services.FetchUserByName(username, state)
-	if err != nil {
-		return nil, false
-	}
-
-	if user.ApiKey != key {
-		return nil, false
-	}
-
-	if !user.Active {
-		return nil, false
-	}
-
-	return user, true
-}
-
-// UserDynamicAuthentication attempts to authenticate a user using either a password or an API key.
-func UserDynamicAuthentication(username string, password string, key string, state *app.State) (*database.User, bool) {
-	if password != "" {
-		return UserPasswordAuthentication(username, password, state)
-	} else if key != "" {
-		return UserKeyAuthentication(username, key, state)
-	}
-	return nil, false
 }
