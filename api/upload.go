@@ -46,6 +46,18 @@ func PuushUpload(ctx *Context) {
 		return
 	}
 
+	// Check if another upload with the same checksum already exists
+	existingUpload, err := services.FetchUploadByChecksum(request.FileChecksum, ctx.State, "Pool", "User")
+	if err == nil {
+		placeholderResponse := &UploadResponse{
+			UploadUrl:        ctx.State.Config.Cdn.Domain + existingUpload.Url(),
+			UpdatedDiskUsage: user.DiskUsage,
+		}
+		ctx.Response.WriteHeader(http.StatusOK)
+		ctx.Response.Write(placeholderResponse.Serialize())
+		return
+	}
+
 	if user.DefaultPool == nil {
 		WritePuushError(ctx, ServerError)
 		return
