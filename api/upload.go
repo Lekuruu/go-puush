@@ -19,7 +19,7 @@ func PuushUpload(ctx *Context) {
 	}
 	defer request.File.Close()
 
-	user, err := UserAuthenticationFromKey(request.Key, ctx.State)
+	user, err := UserAuthenticationFromKey(request.Key, ctx.State, "DefaultPool")
 	if err != nil {
 		WritePuushError(ctx, AuthenticationFailure)
 		return
@@ -49,7 +49,7 @@ func PuushUpload(ctx *Context) {
 
 	// TODO: Create upload
 	placeholderResponse := &UploadResponse{
-		UploadUrl:        "https://i.imgur.com/nFfry2P.mp4",
+		UploadUrl:        "http://i.imgur.com/nFfry2P.mp4",
 		UpdatedDiskUsage: user.DiskUsage + request.FileSize,
 	}
 	ctx.Response.WriteHeader(http.StatusOK)
