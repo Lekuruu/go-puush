@@ -1,6 +1,9 @@
 package api
 
-import "net/http"
+import (
+	"mime/multipart"
+	"net/http"
+)
 
 func GetMultipartFormValue(request *http.Request, key string) string {
 	values, ok := request.MultipartForm.Value[key]
@@ -11,22 +14,11 @@ func GetMultipartFormValue(request *http.Request, key string) string {
 	return values[0]
 }
 
-func GetMultipartFormFile(request *http.Request, key string) []byte {
+func GetMultipartFormFile(request *http.Request, key string) *multipart.FileHeader {
 	files, ok := request.MultipartForm.File[key]
 	if !ok || len(files) == 0 {
 		return nil
 	}
 
-	file, err := files[0].Open()
-	if err != nil {
-		return nil
-	}
-
-	fileData := make([]byte, files[0].Size)
-	_, err = file.Read(fileData)
-	if err != nil {
-		return nil
-	}
-
-	return fileData
+	return files[0]
 }
