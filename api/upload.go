@@ -91,6 +91,9 @@ func PuushUpload(ctx *Context) {
 		return
 	}
 
+	// Try to generate a thumbnail - do nothing if it fails
+	services.CreateThumbnail(upload.Key(), fileData, ctx.State)
+
 	user.DiskUsage += upload.Filesize
 	err = services.UpdateUserDiskUsage(user.Id, upload.Filesize, ctx.State)
 	if err != nil {
