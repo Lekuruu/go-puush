@@ -28,11 +28,16 @@ func PuushHistory(ctx *Context) {
 		return
 	}
 
-	history := &HistoryResponse{Uploads: recentUploads, User: user}
+	history := &HistoryResponse{
+		CdnUrl:  ctx.State.Config.Cdn.Url,
+		Uploads: recentUploads,
+		User:    user,
+	}
 	WritePuushResponse(ctx, history)
 }
 
 type HistoryResponse struct {
+	CdnUrl  string
 	Uploads []*database.Upload
 	User    *database.User
 }
@@ -44,7 +49,7 @@ func (r *HistoryResponse) Serialize() []byte {
 		var historyItem = []string{
 			strconv.Itoa(upload.Id),
 			upload.CreatedAt.Format(time.RFC850),
-			upload.Url(),
+			r.CdnUrl + upload.Url(),
 			upload.Filename,
 			strconv.Itoa(upload.Views),
 		}
