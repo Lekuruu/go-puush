@@ -88,8 +88,8 @@ func (response *AuthenticationResponse) Serialize() []byte {
 	var expiry string = ""
 
 	if response.SubscriptionExpiry != nil {
-		// Format in "Mon, 02 Jan 2006 15:04:05 MST" format
-		expiry = response.SubscriptionExpiry.Format(time.RFC822)
+		// Format in "2006-01-02 15:04:05" format
+		expiry = response.SubscriptionExpiry.Format(time.DateTime)
 	}
 
 	data := []string{
