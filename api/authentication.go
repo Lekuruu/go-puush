@@ -19,7 +19,7 @@ type AuthenticationRequest struct {
 }
 
 func NewAuthenticationRequest(request *http.Request) (*AuthenticationRequest, error) {
-	err := request.ParseMultipartForm(10 << 20) // ~10 MB
+	err := request.ParseForm()
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func PuushAuthentication(ctx *Context) {
 	}
 
 	if !success {
-		WriteError(ctx, -1, http.StatusUnauthorized)
+		WriteError(ctx, -1, http.StatusOK)
 		return
 	}
 
