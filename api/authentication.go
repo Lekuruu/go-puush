@@ -79,17 +79,15 @@ func PuushAuthentication(ctx *Context) {
 		return
 	}
 
-	var user *database.User
-	var success bool
-
-	if request.Password != "" {
-		user, success = UserPasswordAuthentication(request.Username, request.Password, ctx.State)
-	} else {
-		user, success = UserKeyAuthentication(request.Username, request.Key, ctx.State)
-	}
+	user, success := UserDynamicAuthentication(
+		request.Username,
+		request.Password,
+		request.Key,
+		ctx.State,
+	)
 
 	if !success {
-		WriteError(ctx, -1, http.StatusOK)
+		WriteError(ctx, -1, http.StatusUnauthorized)
 		return
 	}
 
@@ -108,6 +106,12 @@ func PuushAuthentication(ctx *Context) {
 	}
 }
 
+func WriteError(ctx *Context, errorCode int, statusCode int) {
+	ctx.Response.WriteHeader(statusCode)
+	ctx.Response.Write([]byte(strconv.Itoa(int(errorCode)) + "\n"))
+}
+
+// UserPasswordAuthentication attempts to authenticate a user using their username and password.
 func UserPasswordAuthentication(username string, password string, state *app.State) (*database.User, bool) {
 	user, err := services.FetchUserByName(username, state)
 	if err != nil {
@@ -125,13 +129,14 @@ func UserPasswordAuthentication(username string, password string, state *app.Sta
 	return user, true
 }
 
-func UserKeyAuthentication(username string, token string, state *app.State) (*database.User, bool) {
+// UserKeyAuthentication attempts to authenticate a user using an API key.
+func UserKeyAuthentication(username string, key string, state *app.State) (*database.User, bool) {
 	user, err := services.FetchUserByName(username, state)
 	if err != nil {
 		return nil, false
 	}
 
-	if user.ApiKey != token {
+	if user.ApiKey != key {
 		return nil, false
 	}
 
@@ -142,7 +147,12 @@ func UserKeyAuthentication(username string, token string, state *app.State) (*da
 	return user, true
 }
 
-func WriteError(ctx *Context, errorCode int, statusCode int) {
-	ctx.Response.WriteHeader(statusCode)
-	ctx.Response.Write([]byte(strconv.Itoa(int(errorCode)) + "\n"))
+// UserDynamicAuthentication attempts to authenticate a user using either a password or an API key.
+func UserDynamicAuthentication(username string, password string, key string, state *app.State) (*database.User, bool) {
+	if password != "" {
+		return UserPasswordAuthentication(username, password, state)
+	} else if key != "" {
+		return UserKeyAuthentication(username, key, state)
+	}
+	return nil, false
 }
