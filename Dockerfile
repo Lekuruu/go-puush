@@ -13,7 +13,7 @@ RUN go mod download
 COPY . .
 
 # Build
-RUN CGO_ENABLED=0 go build -o puush_api ./cmd/api/main.go
+RUN CGO_ENABLED=0 go build -o puush ./cmd/api/main.go
 
 FROM gcr.io/distroless/static:nonroot
 
