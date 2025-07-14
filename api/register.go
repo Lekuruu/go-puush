@@ -1,5 +1,7 @@
 package api
 
-func PuushRegistration(ctx *Context) {
+import "github.com/Lekuruu/go-puush/internal/app"
+
+func PuushRegistration(ctx *app.Context) {
 	WritePuushError(ctx, NotImplementedError)
 }

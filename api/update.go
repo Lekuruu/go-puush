@@ -1,8 +1,12 @@
 package api
 
-import "net/http"
+import (
+	"net/http"
 
-func PuushWindowsUpdate(ctx *Context) {
+	"github.com/Lekuruu/go-puush/internal/app"
+)
+
+func PuushWindowsUpdate(ctx *app.Context) {
 	txt, err := ctx.State.Storage.ReadUpdateConfigurationWindows()
 	if err != nil {
 		ctx.Response.WriteHeader(http.StatusInternalServerError)
@@ -18,7 +22,7 @@ func PuushWindowsUpdate(ctx *Context) {
 	}
 }
 
-func PuushMacOSRssFeed(ctx *Context) {
+func PuushMacOSRssFeed(ctx *app.Context) {
 	rss, err := ctx.State.Storage.ReadUpdateConfigurationMacOS()
 	if err != nil {
 		ctx.Response.WriteHeader(http.StatusInternalServerError)

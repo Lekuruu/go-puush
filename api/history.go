@@ -5,12 +5,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
 // /api/hist returns the 5 most recent uploads of the authenticated user.
-func PuushHistory(ctx *Context) {
+func PuushHistory(ctx *app.Context) {
 	user, err := UserAuthenticationFromContext(ctx)
 	if err != nil {
 		WritePuushError(ctx, RequestError)

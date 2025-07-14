@@ -42,7 +42,7 @@ var (
 
 // WritePuushResponse writes a serializable response to the context's response writer.
 // If it fails it proceeds to write a server error.
-func WritePuushResponse(ctx *Context, response Serializable) {
+func WritePuushResponse(ctx *app.Context, response Serializable) {
 	ctx.Response.WriteHeader(http.StatusOK)
 	_, err := ctx.Response.Write(response.Serialize())
 	if err != nil {
@@ -52,7 +52,7 @@ func WritePuushResponse(ctx *Context, response Serializable) {
 }
 
 // WritePuushError writes the given puush error struct to the response.
-func WritePuushError(ctx *Context, error PuushError) {
+func WritePuushError(ctx *app.Context, error PuushError) {
 	ctx.Response.WriteHeader(error.StatusCode)
 	ctx.Response.Write(error.Serialize())
 }
@@ -68,7 +68,7 @@ func UserAuthenticationFromKey(key string, state *app.State, preload ...string) 
 }
 
 // UserAuthenticationFromContext attempts to authenticate a user based on the API key provided in the request.
-func UserAuthenticationFromContext(ctx *Context, preload ...string) (*database.User, error) {
+func UserAuthenticationFromContext(ctx *app.Context, preload ...string) (*database.User, error) {
 	err := ctx.Request.ParseForm()
 	if err != nil {
 		return nil, err

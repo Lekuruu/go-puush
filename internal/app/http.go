@@ -1,4 +1,4 @@
-package api
+package app
 
 import (
 	"fmt"
@@ -6,40 +6,43 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/gorilla/mux"
 )
 
-// Server is the main struct that holds the state for the API server.
+// Server is the main struct that holds the state for an http server.
 type Server struct {
-	State  *app.State
+	Host   string
+	Port   int
+	Name   string
+	State  *State
 	Router *mux.Router
 	Logger *slog.Logger
 }
 
-func NewServer(state *app.State) *Server {
+func NewServer(host string, port int, name string, state *State) *Server {
 	return &Server{
+		Host:   host,
+		Port:   port,
+		Name:   name,
 		State:  state,
 		Logger: state.Logger,
+		Router: mux.NewRouter(),
 	}
 }
 
-// Context is a struct that holds the request context for each API call.
+// Context is a struct that holds the request context for each endpoint call.
 type Context struct {
 	Response http.ResponseWriter
 	Request  *http.Request
-	State    *app.State
+	State    *State
 }
 
 // Serve starts the HTTP server and listens for incoming requests.
 func (server *Server) Serve() {
-	server.Router = mux.NewRouter()
-	server.InitializeRoutes()
-
 	bind := fmt.Sprintf(
 		"%s:%d",
-		server.State.Config.Api.Host,
-		server.State.Config.Api.Port,
+		server.Host,
+		server.Port,
 	)
 	server.Logger.Info(
 		"Starting server",
@@ -51,18 +54,6 @@ func (server *Server) Serve() {
 		slog.Error("Failed to start server", "error", err)
 		return
 	}
-}
-
-func (server *Server) InitializeRoutes() {
-	server.Router.HandleFunc("/api/register", server.ContextMiddleware(PuushRegistration)).Methods("POST")
-	server.Router.HandleFunc("/api/auth", server.ContextMiddleware(PuushAuthentication)).Methods("POST")
-	server.Router.HandleFunc("/api/up", server.ContextMiddleware(PuushUpload)).Methods("POST")
-	server.Router.HandleFunc("/api/del", server.ContextMiddleware(PuushDelete)).Methods("POST")
-	server.Router.HandleFunc("/api/hist", server.ContextMiddleware(PuushHistory)).Methods("POST")
-	server.Router.HandleFunc("/api/thumb", server.ContextMiddleware(PuushThumbnail)).Methods("POST")
-	server.Router.HandleFunc("/api/oshi", server.ContextMiddleware(PuushErrorSubmission)).Methods("POST")
-	server.Router.HandleFunc("/dl/puush-rss.xml", server.ContextMiddleware(PuushMacOSRssFeed)).Methods("GET")
-	server.Router.HandleFunc("/dl/puush-win.txt", server.ContextMiddleware(PuushWindowsUpdate)).Methods("GET")
 }
 
 // ResponseContext is a wrapper around http.ResponseWriter that
@@ -101,7 +92,7 @@ func (server *Server) ContextMiddleware(handler func(*Context)) http.HandlerFunc
 			State:    server.State,
 		}
 
-		w.Header().Set("Server", "puush")
+		w.Header().Set("Server", server.Name)
 		handler(context)
 	}
 }
@@ -115,7 +106,8 @@ func (server *Server) LoggingMiddleware(next http.Handler) http.Handler {
 		time := time.Since(start)
 
 		server.Logger.Info(
-			"API Request",
+			"HTTP Request",
+			"server", server.Name,
 			"method", r.Method,
 			"uri", r.RequestURI,
 			"remote", r.RemoteAddr,

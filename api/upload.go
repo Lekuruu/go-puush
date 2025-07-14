@@ -10,12 +10,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
 // /api/up is the main endpoint for uploading files to the puush service.
-func PuushUpload(ctx *Context) {
+func PuushUpload(ctx *app.Context) {
 	request, err := NewUploadRequest(ctx.Request)
 	if err != nil {
 		WritePuushError(ctx, RequestError)
@@ -146,17 +147,17 @@ func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
 		return nil, err
 	}
 
-	key := GetMultipartFormValue(request, "k")
+	key := app.GetMultipartFormValue(request, "k")
 	if key == "" {
 		return nil, errors.New("missing api key")
 	}
 
-	file := GetMultipartFormFile(request, "f")
+	file := app.GetMultipartFormFile(request, "f")
 	if file == nil {
 		return nil, errors.New("missing file")
 	}
 
-	fileChecksum := GetMultipartFormValue(request, "c")
+	fileChecksum := app.GetMultipartFormValue(request, "c")
 	if fileChecksum == "" {
 		return nil, errors.New("missing file checksum")
 	}

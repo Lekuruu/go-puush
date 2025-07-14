@@ -5,12 +5,13 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
 // /api/thumb returns a thumbnail for the given upload ID.
 // If the thumbnail is not available, it tries to generate one.
-func PuushThumbnail(ctx *Context) {
+func PuushThumbnail(ctx *app.Context) {
 	request, err := NewThumbnailRequest(ctx.Request)
 	if err != nil {
 		ctx.Response.WriteHeader(http.StatusBadRequest)
