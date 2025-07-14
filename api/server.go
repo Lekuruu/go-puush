@@ -119,7 +119,7 @@ func (server *Server) LoggingMiddleware(next http.Handler) http.Handler {
 			"remote", r.RemoteAddr,
 			"user-agent", r.UserAgent(),
 			"status", rc.Status(),
-			"duration", time,
+			"duration", time.String(),
 		)
 	})
 }
