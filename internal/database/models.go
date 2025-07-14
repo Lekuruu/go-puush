@@ -3,14 +3,16 @@ package database
 import "time"
 
 type User struct {
-	Id             int       `gorm:"primaryKey;autoIncrement;not null"`
-	Name           string    `gorm:"size:16;not null"`
-	Email          string    `gorm:"size:256;not null;unique"`
-	Password       string    `gorm:"size:60;not null"`
-	CreatedAt      time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
-	LatestActivity time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
-	Active         bool      `gorm:"default:true;not null"`
-	ApiKey         string    `gorm:"size:64;not null;unique"`
+	Id             int         `gorm:"primaryKey;autoIncrement;not null"`
+	Name           string      `gorm:"size:16;not null"`
+	Email          string      `gorm:"size:256;not null;unique"`
+	Password       string      `gorm:"size:60;not null"`
+	CreatedAt      time.Time   `gorm:"not null;CURRENT_TIMESTAMP"`
+	LatestActivity time.Time   `gorm:"not null;CURRENT_TIMESTAMP"`
+	Active         bool        `gorm:"default:true;not null"`
+	Type           AccountType `gorm:"not null;default:0"`
+	ApiKey         string      `gorm:"size:64;not null;unique"`
+	DiskUsage      int64       `gorm:"default:0;not null"`
 
 	Uploads []*Upload `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
 	Pools   []*Pool   `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
