@@ -13,7 +13,7 @@ func IsImage(data []byte) bool {
 	return strings.HasPrefix(contentType, "image/")
 }
 
-func CreateThumbnail(key string, data []byte, state *app.State) error {
+func CreateThumbnail(key string, data []byte, state *app.State) ([]byte, error) {
 	generator := thumbnail.NewGenerator(thumbnail.Generator{})
 	generator.Scaler = "CatmullRom"
 	generator.Width = 300
@@ -21,15 +21,20 @@ func CreateThumbnail(key string, data []byte, state *app.State) error {
 
 	image, err := generator.NewImageFromByteArray(data)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	thumbnailData, err := generator.CreateThumbnail(image)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return state.Storage.SaveThumbnail(key, thumbnailData)
+	err = state.Storage.SaveThumbnail(key, thumbnailData)
+	if err != nil {
+		return nil, err
+	}
+
+	return thumbnailData, nil
 }
 
 func DeleteThumbnail(key string, state *app.State) error {
