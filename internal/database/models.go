@@ -14,9 +14,11 @@ type User struct {
 	ApiKey          string      `gorm:"size:64;not null;unique"`
 	DiskUsage       int64       `gorm:"default:0;not null"`
 	SubscriptionEnd *time.Time  `gorm:"default:NULL"`
+	DefaultPoolId   int         `gorm:"default:NULL"`
 
-	Uploads []*Upload `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
-	Pools   []*Pool   `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
+	DefaultPool *Pool     `gorm:"foreignKey:DefaultPoolId;constraint:OnDelete:SET NULL"`
+	Pools       []*Pool   `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
+	Uploads     []*Upload `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
 }
 
 type Upload struct {
@@ -37,8 +39,9 @@ type Pool struct {
 	Id         int       `gorm:"primaryKey;autoIncrement;not null"`
 	UserId     int       `gorm:"not null"`
 	Name       string    `gorm:"size:32;not null"`
-	Type       PoolType  `gorm:"not null"`
+	Identifier string    `gorm:"size:8;not null;unique"`
 	Password   *string   `gorm:"size:32;default:NULL"`
+	Type       PoolType  `gorm:"not null"`
 	CreatedAt  time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
 	LastUpload time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
 
