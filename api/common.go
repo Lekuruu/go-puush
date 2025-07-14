@@ -31,6 +31,7 @@ func (e PuushError) Serialize() []byte {
 
 var (
 	AuthenticationFailure    PuushError = PuushError{-1, http.StatusUnauthorized}
+	ForbiddenError           PuushError = PuushError{-1, http.StatusForbidden}
 	RequestError             PuushError = PuushError{-2, http.StatusBadRequest}
 	ServerError              PuushError = PuushError{-2, http.StatusInternalServerError}
 	UnknownError             PuushError = PuushError{-2, http.StatusInternalServerError}
