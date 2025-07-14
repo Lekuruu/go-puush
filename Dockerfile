@@ -12,13 +12,8 @@ RUN go mod download
 # Copy the source code
 COPY . .
 
-# Build flags for cross-compilation
-ENV CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
-
 # Build
-RUN go build -o puush_api ./cmd/api/main.go
+RUN CGO_ENABLED=0 go build -o puush_api ./cmd/api/main.go
 
 FROM gcr.io/distroless/static:nonroot
 
