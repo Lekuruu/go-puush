@@ -1,4 +1,7 @@
 package api
 
-// POST /api/thumb
-func PuushThumbnail(ctx *Context) {}
+import "net/http"
+
+func PuushThumbnail(ctx *Context) {
+	WritePuushError(ctx, -2, http.StatusNotImplemented)
+}

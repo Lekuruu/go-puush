@@ -1,4 +1,7 @@
 package api
 
-// POST /api/oshi
-func PuushErrorSubmission(ctx *Context) {}
+import "net/http"
+
+func PuushErrorSubmission(ctx *Context) {
+	WritePuushError(ctx, -2, http.StatusNotImplemented)
+}

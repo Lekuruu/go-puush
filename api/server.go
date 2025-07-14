@@ -50,7 +50,7 @@ func (server *Server) Serve() {
 }
 
 func (server *Server) InitializeRoutes() {
-	server.Router.HandleFunc("/api/register", server.ContextMiddleware(PuushMacOSRegistration)).Methods("POST")
+	server.Router.HandleFunc("/api/register", server.ContextMiddleware(PuushRegistration)).Methods("POST")
 	server.Router.HandleFunc("/api/auth", server.ContextMiddleware(PuushAuthentication)).Methods("POST")
 	server.Router.HandleFunc("/api/up", server.ContextMiddleware(PuushUpload)).Methods("POST")
 	server.Router.HandleFunc("/api/del", server.ContextMiddleware(PuushDelete)).Methods("POST")

@@ -1,4 +1,7 @@
 package api
 
-// POST /api/del
-func PuushDelete(ctx *Context) {}
+import "net/http"
+
+func PuushDelete(ctx *Context) {
+	WritePuushError(ctx, -2, http.StatusNotImplemented)
+}

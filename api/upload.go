@@ -1,4 +1,7 @@
 package api
 
-// POST /api/up
-func PuushUpload(ctx *Context) {}
+import "net/http"
+
+func PuushUpload(ctx *Context) {
+	WritePuushError(ctx, -2, http.StatusNotImplemented)
+}
