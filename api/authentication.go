@@ -33,6 +33,14 @@ func NewAuthenticationRequest(request *http.Request) (*AuthenticationRequest, er
 		return nil, errors.New("invalid request parameter 'z'")
 	}
 
+	if username == "" {
+		return nil, errors.New("username is required")
+	}
+
+	if password == "" && key == "" {
+		return nil, errors.New("either password or key must be provided")
+	}
+
 	return &AuthenticationRequest{
 		Username: username,
 		Password: password,
