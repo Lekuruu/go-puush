@@ -31,7 +31,7 @@ func UserAuthenticationFromContext(ctx *Context) (*database.User, error) {
 
 // UserPasswordAuthentication attempts to authenticate a user using their username and password.
 func UserPasswordAuthentication(username string, password string, state *app.State) (*database.User, bool) {
-	user, err := services.FetchUserByName(username, state)
+	user, err := services.FetchUserByNameOrEmail(username, state)
 	if err != nil {
 		return nil, false
 	}
@@ -49,7 +49,7 @@ func UserPasswordAuthentication(username string, password string, state *app.Sta
 
 // UserKeyAuthentication attempts to authenticate a user using an API key.
 func UserKeyAuthentication(username string, key string, state *app.State) (*database.User, bool) {
-	user, err := services.FetchUserByName(username, state)
+	user, err := services.FetchUserByNameOrEmail(username, state)
 	if err != nil {
 		return nil, false
 	}
