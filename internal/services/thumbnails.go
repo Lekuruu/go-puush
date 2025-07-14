@@ -16,8 +16,8 @@ func IsImage(data []byte) bool {
 func CreateThumbnail(key string, data []byte, state *app.State) ([]byte, error) {
 	generator := thumbnail.NewGenerator(thumbnail.Generator{})
 	generator.Scaler = "CatmullRom"
-	generator.Width = 300
-	generator.Height = 300
+	generator.Height = 150
+	generator.Width = 150
 
 	image, err := generator.NewImageFromByteArray(data)
 	if err != nil {
