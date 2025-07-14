@@ -75,3 +75,27 @@ func (storage *FileStorage) Download(url string, key string, folder string) erro
 
 	return storage.Save(key, folder, data)
 }
+
+func (storage *FileStorage) SaveUpload(key string, data []byte) error {
+	return storage.Save(key, "uploads", data)
+}
+
+func (storage *FileStorage) ReadUpload(key string) ([]byte, error) {
+	return storage.Read(key, "uploads")
+}
+
+func (storage *FileStorage) RemoveUpload(key string) error {
+	return storage.Remove(key, "uploads")
+}
+
+func (storage *FileStorage) SaveThumbnail(key string, data []byte) error {
+	return storage.Save(key, "thumbnails", data)
+}
+
+func (storage *FileStorage) ReadThumbnail(key string) ([]byte, error) {
+	return storage.Read(key, "thumbnails")
+}
+
+func (storage *FileStorage) RemoveThumbnail(key string) error {
+	return storage.Remove(key, "thumbnails")
+}
