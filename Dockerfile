@@ -17,14 +17,14 @@ RUN CGO_ENABLED=0 go build -o puush_api ./cmd/api/main.go
 
 FROM gcr.io/distroless/static:nonroot
 
+# Set the user to non-root
+USER nonroot:nonroot
+
 WORKDIR /app
-COPY --from=build /app/puush_api /app/puush_api
+COPY --from=build /app/puush /app/puush
 
 # Create data volume
 VOLUME ["/app/.data"]
 
-# Set the user to non-root
-USER nonroot:nonroot
-
 # Run the compiled binary
-ENTRYPOINT ["/app/puush_api"]
+ENTRYPOINT ["/app/puush"]
