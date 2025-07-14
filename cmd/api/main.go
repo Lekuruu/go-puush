@@ -29,5 +29,6 @@ func main() {
 		"puush-api",
 		state,
 	)
+	InitializeRoutes(server)
 	server.Serve()
 }
