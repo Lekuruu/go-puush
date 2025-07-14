@@ -46,6 +46,12 @@ func PuushUpload(ctx *Context) {
 		return
 	}
 
+	err = services.UpdateUserLatestActivity(user.Id, ctx.State)
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
 	// Check if another upload with the same checksum already exists
 	existingUpload, err := services.FetchUploadByChecksum(request.FileChecksum, ctx.State, "Pool", "User")
 	if err == nil {

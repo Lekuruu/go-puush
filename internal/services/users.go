@@ -1,6 +1,8 @@
 package services
 
 import (
+	"time"
+
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
 )
@@ -78,6 +80,19 @@ func UpdateUserDiskUsage(userId int, size int64, state *app.State) error {
 	result := state.Database.Exec(
 		"UPDATE users SET disk_usage = disk_usage + ? WHERE id = ?",
 		size, userId,
+	)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func UpdateUserLatestActivity(userId int, state *app.State) error {
+	result := state.Database.Exec(
+		"UPDATE users SET latest_activity = ? WHERE id = ?",
+		time.Now(), userId,
 	)
 
 	if result.Error != nil {
