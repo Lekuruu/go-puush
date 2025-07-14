@@ -61,6 +61,8 @@ func (server *Server) InitializeRoutes() {
 	server.Router.HandleFunc("/api/hist", server.ContextMiddleware(PuushHistory)).Methods("POST")
 	server.Router.HandleFunc("/api/thumb", server.ContextMiddleware(PuushThumbnail)).Methods("POST")
 	server.Router.HandleFunc("/api/oshi", server.ContextMiddleware(PuushErrorSubmission)).Methods("POST")
+	server.Router.HandleFunc("/dl/puush-rss.xml", server.ContextMiddleware(PuushMacOSRssFeed)).Methods("GET")
+	server.Router.HandleFunc("/dl/puush-win.txt", server.ContextMiddleware(PuushWindowsUpdate)).Methods("GET")
 }
 
 // ResponseContext is a wrapper around http.ResponseWriter that

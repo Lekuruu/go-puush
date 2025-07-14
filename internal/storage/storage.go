@@ -7,6 +7,9 @@ type Storage interface {
 	Remove(key string, bucket string) error
 	Exists(key string, bucket string) bool
 
+	ReadUpdateConfigurationWindows() ([]byte, error)
+	ReadUpdateConfigurationMacOS() ([]byte, error)
+
 	SaveUpload(key string, data []byte) error
 	ReadUpload(key string) ([]byte, error)
 	RemoveUpload(key string) error
