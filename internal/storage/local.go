@@ -16,12 +16,22 @@ func NewFileStorage(dataPath string) Storage {
 }
 
 func (storage *FileStorage) Setup() error {
-	if _, err := os.Stat(storage.dataPath); os.IsNotExist(err) {
-		err := os.MkdirAll(storage.dataPath, os.ModePerm)
+	var folders = []string{
+		fmt.Sprintf("%s/uploads", storage.dataPath),
+		fmt.Sprintf("%s/thumbnails", storage.dataPath),
+	}
+
+	for _, folder := range folders {
+		if _, err := os.Stat(folder); !os.IsNotExist(err) {
+			continue
+		}
+
+		err := os.MkdirAll(folder, 0755)
 		if err != nil {
-			return fmt.Errorf("failed to create storage directory: %w", err)
+			return fmt.Errorf("failed to create storage directory %s: %w", folder, err)
 		}
 	}
+
 	return nil
 }
 
