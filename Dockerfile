@@ -18,7 +18,7 @@ ENV CGO_ENABLED=0 \
     GOARCH=amd64
 
 # Build
-RUN go build -o /app/puush_api ./cmd/api/main.go
+RUN go build -o puush_api ./cmd/api/main.go
 
 FROM gcr.io/distroless/static:nonroot
 
@@ -32,4 +32,4 @@ VOLUME ["/app/.data"]
 USER nonroot:nonroot
 
 # Run the compiled binary
-ENTRYPOINT ["./puush_api"]
+ENTRYPOINT ["/app/puush_api"]
