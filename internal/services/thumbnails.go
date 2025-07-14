@@ -8,12 +8,12 @@ import (
 	"github.com/prplecake/go-thumbnail"
 )
 
-func CreateThumbnail(key string, data []byte, state *app.State) error {
-	if !isImage(data) {
-		// Not an image, no thumbnail created
-		return nil
-	}
+func IsImage(data []byte) bool {
+	contentType := http.DetectContentType(data[:512])
+	return strings.HasPrefix(contentType, "image/")
+}
 
+func CreateThumbnail(key string, data []byte, state *app.State) error {
 	generator := thumbnail.NewGenerator(thumbnail.Generator{})
 	generator.Scaler = "CatmullRom"
 	generator.Width = 300
@@ -34,9 +34,4 @@ func CreateThumbnail(key string, data []byte, state *app.State) error {
 
 func DeleteThumbnail(key string, state *app.State) error {
 	return state.Storage.RemoveThumbnail(key)
-}
-
-func isImage(data []byte) bool {
-	contentType := http.DetectContentType(data[:512])
-	return strings.HasPrefix(contentType, "image/")
 }

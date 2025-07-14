@@ -46,6 +46,7 @@ type Upload struct {
 	Checksum  string    `gorm:"size:32;not null"`
 	CreatedAt time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
 	Views     int       `gorm:"default:0;not null"`
+	IsImage   bool      `gorm:"default:false;not null"`
 
 	User *User `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
 	Pool *Pool `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
