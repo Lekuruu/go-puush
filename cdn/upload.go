@@ -1,3 +1,5 @@
 package cdn
 
-// TODO: ...
+import "github.com/Lekuruu/go-puush/internal/app"
+
+func Upload(ctx *app.Context) {}
