@@ -53,8 +53,7 @@ func PuushUpload(ctx *Context) {
 			UploadUrl:        ctx.State.Config.Cdn.Domain + existingUpload.Url(),
 			UpdatedDiskUsage: user.DiskUsage,
 		}
-		ctx.Response.WriteHeader(http.StatusOK)
-		ctx.Response.Write(placeholderResponse.Serialize())
+		WritePuushResponse(ctx, placeholderResponse)
 		return
 	}
 
@@ -104,12 +103,11 @@ func PuushUpload(ctx *Context) {
 		return
 	}
 
-	placeholderResponse := &UploadResponse{
+	uploadResponse := &UploadResponse{
 		UploadUrl:        ctx.State.Config.Cdn.Domain + upload.Url(),
 		UpdatedDiskUsage: user.DiskUsage,
 	}
-	ctx.Response.WriteHeader(http.StatusOK)
-	ctx.Response.Write(placeholderResponse.Serialize())
+	WritePuushResponse(ctx, uploadResponse)
 }
 
 type UploadRequest struct {

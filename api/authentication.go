@@ -38,13 +38,7 @@ func PuushAuthentication(ctx *Context) {
 		DiskUsage:          user.DiskUsage,
 		SubscriptionExpiry: user.SubscriptionEnd,
 	}
-
-	ctx.Response.WriteHeader(http.StatusOK)
-	_, err = ctx.Response.Write(response.Serialize())
-	if err != nil {
-		WritePuushError(ctx, ServerError)
-		return
-	}
+	WritePuushResponse(ctx, response)
 }
 
 type AuthenticationRequest struct {

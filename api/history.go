@@ -1,9 +1,8 @@
 package api
 
 import (
-	"net/http"
-
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/services"
 )
 
 // /api/hist returns the 5 most recent uploads of the authenticated user.
@@ -19,14 +18,14 @@ func PuushHistory(ctx *Context) {
 		return
 	}
 
-	// TODO: Retrieve user uploads
-	history := &HistoryResponse{Uploads: []*database.Upload{}}
-	ctx.Response.WriteHeader(http.StatusOK)
-	_, err = ctx.Response.Write(history.Serialize())
+	recentUploads, err := services.FetchRecentUploadsByUser(user, ctx.State, 5)
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return
 	}
+
+	history := &HistoryResponse{Uploads: recentUploads}
+	WritePuushResponse(ctx, history)
 }
 
 type HistoryResponse struct {

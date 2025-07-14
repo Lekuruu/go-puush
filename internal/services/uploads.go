@@ -38,6 +38,18 @@ func FetchUploadByChecksum(checksum string, state *app.State, preload ...string)
 	return upload, nil
 }
 
+func FetchRecentUploadsByUser(user *database.User, state *app.State, limit int) ([]*database.Upload, error) {
+	var uploads []*database.Upload
+	query := state.Database.Where("user_id = ?", user.Id).Order("created_at DESC").Limit(limit)
+	result := query.Find(&uploads)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return uploads, nil
+}
+
 func DeleteUpload(upload *database.Upload, state *app.State) error {
 	result := state.Database.Delete(upload)
 

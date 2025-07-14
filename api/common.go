@@ -10,6 +10,11 @@ import (
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
+// Serializable is an interface that requires a "Serialize" method.
+type Serializable interface {
+	Serialize() []byte
+}
+
 // PuushError represents an error that can occur in the Puush API.
 type PuushError struct {
 	PuushCode  int
@@ -18,6 +23,10 @@ type PuushError struct {
 
 func (e PuushError) Error() string {
 	return "PuushError: " + strconv.Itoa(e.PuushCode) + " (HTTP " + strconv.Itoa(e.StatusCode) + ")"
+}
+
+func (e PuushError) Serialize() []byte {
+	return []byte(strconv.Itoa(e.PuushCode) + "\n")
 }
 
 var (
@@ -30,10 +39,21 @@ var (
 	InsufficientStorageError PuushError = PuushError{-4, http.StatusPaymentRequired}
 )
 
+// WritePuushResponse writes a serializable response to the context's response writer.
+// If it fails it proceeds to write a server error.
+func WritePuushResponse(ctx *Context, response Serializable) {
+	ctx.Response.WriteHeader(http.StatusOK)
+	_, err := ctx.Response.Write(response.Serialize())
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+}
+
 // WritePuushError writes the given puush error struct to the response.
 func WritePuushError(ctx *Context, error PuushError) {
 	ctx.Response.WriteHeader(error.StatusCode)
-	ctx.Response.Write([]byte(strconv.Itoa(error.PuushCode) + "\n"))
+	ctx.Response.Write(error.Serialize())
 }
 
 // UserAuthenticationFromKey attempts to authenticate a user using the provided API key.
