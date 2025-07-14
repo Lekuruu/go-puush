@@ -1,5 +1,11 @@
 FROM golang:1.24-alpine AS build
 
+# Install C toolchain + sqlite3 headers
+RUN apk add --no-cache \
+      gcc \
+      musl-dev \
+      sqlite-dev
+
 WORKDIR /app
 
 # Copy module files
@@ -13,12 +19,16 @@ RUN go mod download
 COPY . .
 
 # Build
-RUN CGO_ENABLED=0 go build -o puush ./cmd/api/main.go
+RUN CGO_ENABLED=1 go build -o puush ./cmd/api/main.go
 
-FROM gcr.io/distroless/static:nonroot
+FROM alpine:3.19
 
-# Set the user to non-root
-USER nonroot:nonroot
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates sqlite-libs
+
+# Run as non‑root
+RUN addgroup -S app && adduser -S -G app app
+USER app
 
 WORKDIR /app
 COPY --from=build /app/puush /app/puush
