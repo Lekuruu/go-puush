@@ -2,8 +2,6 @@ package storage
 
 import (
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 )
 
@@ -52,28 +50,18 @@ func (storage *FileStorage) Save(key string, folder string, data []byte) error {
 	return nil
 }
 
+func (storage *FileStorage) Exists(key string, folder string) bool {
+	path := fmt.Sprintf("%s/%s/%s", storage.dataPath, folder, key)
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return err == nil
+}
+
 func (storage *FileStorage) Remove(key string, folder string) error {
 	path := fmt.Sprintf("%s/%s/%s", storage.dataPath, folder, key)
 	return os.Remove(path)
-}
-
-func (storage *FileStorage) Download(url string, key string, folder string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Download failed: %s", resp.Status)
-	}
-
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	return storage.Save(key, folder, data)
 }
 
 func (storage *FileStorage) SaveUpload(key string, data []byte) error {
@@ -88,6 +76,10 @@ func (storage *FileStorage) RemoveUpload(key string) error {
 	return storage.Remove(key, "uploads")
 }
 
+func (storage *FileStorage) UploadExists(key string) bool {
+	return storage.Exists(key, "uploads")
+}
+
 func (storage *FileStorage) SaveThumbnail(key string, data []byte) error {
 	return storage.Save(key, "thumbnails", data)
 }
@@ -98,4 +90,8 @@ func (storage *FileStorage) ReadThumbnail(key string) ([]byte, error) {
 
 func (storage *FileStorage) RemoveThumbnail(key string) error {
 	return storage.Remove(key, "thumbnails")
+}
+
+func (storage *FileStorage) ThumbnailExists(key string) bool {
+	return storage.Exists(key, "thumbnails")
 }
