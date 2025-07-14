@@ -9,6 +9,11 @@ type Config struct {
 		ClientVersion int    `envconfig:"API_CLIENT_VERSION" default:"93"`
 		ClientUrl     string `envconfig:"API_CLIENT_URL" default:"http://puush.me/dl/puush-win.zip"`
 	}
+	Cdn struct {
+		Host   string `envconfig:"CDN_HOST" default:"0.0.0.0"`
+		Port   int    `envconfig:"CDN_PORT" default:"8081"`
+		Domain string `envconfig:"API_DOMAIN" default:"http://cdn.localhost"`
+	}
 	Database struct {
 		Path string `envconfig:"DB_PATH" default:"./.data/puush.db"`
 	}

@@ -8,6 +8,10 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/services"
 )
 
 // /api/up is the main endpoint for uploading files to the puush service.
@@ -47,10 +51,44 @@ func PuushUpload(ctx *Context) {
 		return
 	}
 
-	// TODO: Create upload
+	if request.ExceedsUploadLimit(user) {
+		WritePuushError(ctx, InsufficientStorageError)
+		return
+	}
+
+	upload := &database.Upload{
+		UserId:    user.Id,
+		PoolId:    user.DefaultPoolId,
+		Filename:  request.FileName,
+		Filesize:  request.FileSize,
+		Checksum:  request.FileChecksum,
+		CreatedAt: time.Now(),
+		Pool:      user.DefaultPool,
+		User:      user,
+	}
+
+	err = services.CreateUpload(upload, ctx.State)
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
+	err = ctx.State.Storage.SaveUpload(upload.Key(), fileData)
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
+	user.DiskUsage += upload.Filesize
+	err = services.UpdateUserDiskUsage(user.Id, upload.Filesize, ctx.State)
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
 	placeholderResponse := &UploadResponse{
-		UploadUrl:        "http://i.imgur.com/nFfry2P.mp4",
-		UpdatedDiskUsage: user.DiskUsage + request.FileSize,
+		UploadUrl:        ctx.State.Config.Cdn.Domain + upload.Url(),
+		UpdatedDiskUsage: user.DiskUsage,
 	}
 	ctx.Response.WriteHeader(http.StatusOK)
 	ctx.Response.Write(placeholderResponse.Serialize())
@@ -72,11 +110,12 @@ func (request *UploadRequest) CompareChecksum(data []byte) bool {
 	return checksumHex == request.FileChecksum
 }
 
-func (request *UploadRequest) FilenameChecksum() string {
-	checksum := md5.New()
-	checksum.Write([]byte(request.FileName))
-	checksumBytes := checksum.Sum(nil)
-	return strings.ToLower(hex.EncodeToString(checksumBytes))
+func (request *UploadRequest) ExceedsUploadLimit(user *database.User) bool {
+	if user.UploadLimit() < 0 {
+		// No limit for unlimited accounts
+		return false
+	}
+	return user.DiskUsage+request.FileSize > user.UploadLimit()
 }
 
 func NewUploadRequest(request *http.Request) (*UploadRequest, error) {

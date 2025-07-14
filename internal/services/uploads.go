@@ -38,16 +38,6 @@ func FetchUploadByChecksum(checksum string, state *app.State, preload ...string)
 	return upload, nil
 }
 
-func UpdateUpload(upload *database.Upload, state *app.State) error {
-	result := state.Database.Save(upload)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
-}
-
 func DeleteUpload(upload *database.Upload, state *app.State) error {
 	result := state.Database.Delete(upload)
 

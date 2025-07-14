@@ -1,6 +1,11 @@
 package database
 
-import "time"
+import (
+	"crypto/md5"
+	"fmt"
+	"strconv"
+	"time"
+)
 
 type User struct {
 	Id              int         `gorm:"primaryKey;autoIncrement;not null"`
@@ -21,6 +26,17 @@ type User struct {
 	Uploads     []*Upload `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
 }
 
+func (user *User) UploadLimit() int64 {
+	switch user.Type {
+	case AccountTypeRegular:
+		return UploadLimitRegular
+	case AccountTypePro:
+		return UploadLimitPro
+	default:
+		return -1
+	}
+}
+
 type Upload struct {
 	Id        int       `gorm:"primaryKey;autoIncrement;not null"`
 	UserId    int       `gorm:"not null"`
@@ -35,6 +51,20 @@ type Upload struct {
 	Pool *Pool `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
 }
 
+func (upload *Upload) Key() string {
+	return strconv.Itoa(upload.Id)
+}
+
+func (upload *Upload) Url() string {
+	if upload.Pool == nil {
+		return ""
+	}
+	if upload.Pool.Type == PoolTypePasswordProtected && upload.Pool.Password != nil {
+		return fmt.Sprintf("/%s/%s/%s", upload.Pool.Identifier, upload.Pool.PasswordHash(), upload.Filename)
+	}
+	return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, upload.Filename)
+}
+
 type Pool struct {
 	Id         int       `gorm:"primaryKey;autoIncrement;not null"`
 	UserId     int       `gorm:"not null"`
@@ -46,4 +76,12 @@ type Pool struct {
 	LastUpload time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
 
 	Uploads []*Upload `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
+}
+
+func (pool *Pool) PasswordHash() string {
+	if pool.Password == nil {
+		return "nil"
+	}
+	sum := md5.Sum([]byte(*pool.Password))
+	return fmt.Sprintf("%x", sum)
 }
