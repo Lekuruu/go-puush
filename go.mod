@@ -8,14 +8,12 @@ require (
 )
 
 require (
+	github.com/prplecake/go-thumbnail v0.1.6
 	github.com/sytallax/prettylog v0.1.0
 	gorm.io/gorm v1.30.0
 )
 
-require (
-	github.com/prplecake/go-thumbnail v0.1.6 // indirect
-	golang.org/x/image v0.0.0-20220302094943-723b81ca9867 // indirect
-)
+require golang.org/x/image v0.0.0-20220302094943-723b81ca9867 // indirect
 
 require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
