@@ -25,6 +25,9 @@ FROM gcr.io/distroless/static:nonroot
 WORKDIR /app
 COPY --from=build /app/puush_api /app/puush_api
 
+# Create data volume
+VOLUME ["/app/.data"]
+
 # Set the user to non-root
 USER nonroot:nonroot
 
