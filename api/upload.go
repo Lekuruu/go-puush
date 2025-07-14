@@ -148,8 +148,8 @@ func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
 	}
 
 	file := GetMultipartFormFile(request, "f")
-	if err != nil {
-		return nil, err
+	if file == nil {
+		return nil, errors.New("missing file")
 	}
 
 	fileChecksum := GetMultipartFormValue(request, "c")
