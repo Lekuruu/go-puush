@@ -12,8 +12,8 @@ import (
 
 // PuushError represents an error that can occur in the Puush API.
 type PuushError struct {
-	StatusCode int
 	PuushCode  int
+	StatusCode int
 }
 
 func (e PuushError) Error() string {
