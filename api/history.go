@@ -1,6 +1,10 @@
 package api
 
 import (
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
@@ -18,20 +22,34 @@ func PuushHistory(ctx *Context) {
 		return
 	}
 
-	recentUploads, err := services.FetchRecentUploadsByUser(user, ctx.State, 5)
+	recentUploads, err := services.FetchRecentUploadsByUser(user, ctx.State, 5, "Pool")
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return
 	}
 
-	history := &HistoryResponse{Uploads: recentUploads}
+	history := &HistoryResponse{Uploads: recentUploads, User: user}
 	WritePuushResponse(ctx, history)
 }
 
 type HistoryResponse struct {
 	Uploads []*database.Upload
+	User    *database.User
 }
 
 func (r *HistoryResponse) Serialize() []byte {
-	return []byte("0\n")
+	var data = []string{strconv.Itoa(len(r.Uploads))}
+
+	for _, upload := range r.Uploads {
+		var historyItem = []string{
+			strconv.Itoa(upload.Id),
+			upload.CreatedAt.Format(time.RFC850),
+			upload.Url(),
+			upload.Filename,
+			strconv.Itoa(upload.Views),
+		}
+		data = append(data, strings.Join(historyItem, ","))
+	}
+
+	return []byte(strings.Join(data, "\n"))
 }
