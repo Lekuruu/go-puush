@@ -37,8 +37,8 @@ func WritePuushError(ctx *Context, error PuushError) {
 }
 
 // UserAuthenticationFromKey attempts to authenticate a user using the provided API key.
-func UserAuthenticationFromKey(key string, state *app.State) (*database.User, error) {
-	user, err := services.FetchUserByApiKey(key, state)
+func UserAuthenticationFromKey(key string, state *app.State, preload ...string) (*database.User, error) {
+	user, err := services.FetchUserByApiKey(key, state, preload...)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func UserAuthenticationFromKey(key string, state *app.State) (*database.User, er
 }
 
 // UserAuthenticationFromContext attempts to authenticate a user based on the API key provided in the request.
-func UserAuthenticationFromContext(ctx *Context) (*database.User, error) {
+func UserAuthenticationFromContext(ctx *Context, preload ...string) (*database.User, error) {
 	err := ctx.Request.ParseForm()
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func UserAuthenticationFromContext(ctx *Context) (*database.User, error) {
 		return nil, errors.New("missing api key")
 	}
 
-	return UserAuthenticationFromKey(key, ctx.State)
+	return UserAuthenticationFromKey(key, ctx.State, preload...)
 }
 
 // UserPasswordAuthentication attempts to authenticate a user using their username and password.
