@@ -49,3 +49,15 @@ func FetchUserByEmail(email string, state *app.State, preload ...string) (*datab
 
 	return user, nil
 }
+
+func FetchUserByApiKey(apiKey string, state *app.State, preload ...string) (*database.User, error) {
+	user := &database.User{}
+	query := preloadQuery(state, preload).Where("api_key = ?", apiKey)
+	result := query.First(user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user, nil
+}
