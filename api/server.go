@@ -113,7 +113,7 @@ func (server *Server) LoggingMiddleware(next http.Handler) http.Handler {
 		time := time.Since(start)
 
 		server.Logger.Info(
-			"Request",
+			"API Request",
 			"method", r.Method,
 			"uri", r.RequestURI,
 			"remote", r.RemoteAddr,
