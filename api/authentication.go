@@ -16,7 +16,7 @@ import (
 func PuushAuthentication(ctx *Context) {
 	request, err := NewAuthenticationRequest(ctx.Request)
 	if err != nil {
-		WritePuushError(ctx, -2, http.StatusBadRequest)
+		WritePuushError(ctx, RequestError)
 		return
 	}
 
@@ -28,7 +28,7 @@ func PuushAuthentication(ctx *Context) {
 	)
 
 	if !success {
-		WritePuushError(ctx, -1, http.StatusUnauthorized)
+		WritePuushError(ctx, AuthenticationFailure)
 		return
 	}
 
@@ -42,7 +42,7 @@ func PuushAuthentication(ctx *Context) {
 	ctx.Response.WriteHeader(http.StatusOK)
 	_, err = ctx.Response.Write(response.Serialize())
 	if err != nil {
-		WritePuushError(ctx, -3, http.StatusInternalServerError)
+		WritePuushError(ctx, ServerError)
 		return
 	}
 }

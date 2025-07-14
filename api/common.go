@@ -2,12 +2,49 @@ package api
 
 import (
 	"errors"
+	"net/http"
 	"strconv"
 
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
+
+// PuushError represents an error that can occur in the Puush API.
+type PuushError struct {
+	StatusCode int
+	PuushCode  int
+}
+
+func (e PuushError) Error() string {
+	return "PuushError: " + strconv.Itoa(e.PuushCode) + " (HTTP " + strconv.Itoa(e.StatusCode) + ")"
+}
+
+var (
+	AuthenticationFailure    PuushError = PuushError{-1, http.StatusUnauthorized}
+	RequestError             PuushError = PuushError{-2, http.StatusBadRequest}
+	ServerError              PuushError = PuushError{-2, http.StatusInternalServerError}
+	UnknownError             PuushError = PuushError{-2, http.StatusInternalServerError}
+	NotImplementedError      PuushError = PuushError{-2, http.StatusNotImplemented}
+	ChecksumError            PuushError = PuushError{-3, http.StatusBadRequest}
+	InsufficientStorageError PuushError = PuushError{-4, http.StatusPaymentRequired}
+)
+
+// WritePuushError writes the given puush error struct to the response.
+func WritePuushError(ctx *Context, error PuushError) {
+	ctx.Response.WriteHeader(error.StatusCode)
+	ctx.Response.Write([]byte(strconv.Itoa(error.PuushCode) + "\n"))
+}
+
+// UserAuthenticationFromKey attempts to authenticate a user using the provided API key.
+func UserAuthenticationFromKey(key string, state *app.State) (*database.User, error) {
+	user, err := services.FetchUserByApiKey(key, state)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
 
 // UserAuthenticationFromContext attempts to authenticate a user based on the API key provided in the request.
 func UserAuthenticationFromContext(ctx *Context) (*database.User, error) {
@@ -21,12 +58,7 @@ func UserAuthenticationFromContext(ctx *Context) (*database.User, error) {
 		return nil, errors.New("missing api key")
 	}
 
-	user, err := services.FetchUserByApiKey(key, ctx.State)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
+	return UserAuthenticationFromKey(key, ctx.State)
 }
 
 // UserPasswordAuthentication attempts to authenticate a user using their username and password.
@@ -73,10 +105,4 @@ func UserAuthenticationDynamic(username string, password string, key string, sta
 		return UserKeyAuthentication(username, key, state)
 	}
 	return nil, false
-}
-
-// WritePuushError writes the given status/error code to the response.
-func WritePuushError(ctx *Context, errorCode int, statusCode int) {
-	ctx.Response.WriteHeader(statusCode)
-	ctx.Response.Write([]byte(strconv.Itoa(int(errorCode)) + "\n"))
 }

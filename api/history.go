@@ -6,23 +6,16 @@ import (
 	"github.com/Lekuruu/go-puush/internal/database"
 )
 
-type HistoryResponse struct {
-	Uploads []*database.Upload
-}
-
-func (r *HistoryResponse) Serialize() []byte {
-	return []byte("0\n")
-}
-
+// /api/hist returns the 5 most recent uploads of the authenticated user.
 func PuushHistory(ctx *Context) {
 	user, err := UserAuthenticationFromContext(ctx)
 	if err != nil {
-		WritePuushError(ctx, -1, http.StatusUnauthorized)
+		WritePuushError(ctx, RequestError)
 		return
 	}
 
 	if user == nil {
-		WritePuushError(ctx, -2, http.StatusInternalServerError)
+		WritePuushError(ctx, RequestError)
 		return
 	}
 
@@ -31,7 +24,15 @@ func PuushHistory(ctx *Context) {
 	ctx.Response.WriteHeader(http.StatusOK)
 	_, err = ctx.Response.Write(history.Serialize())
 	if err != nil {
-		WritePuushError(ctx, -2, http.StatusInternalServerError)
+		WritePuushError(ctx, ServerError)
 		return
 	}
+}
+
+type HistoryResponse struct {
+	Uploads []*database.Upload
+}
+
+func (r *HistoryResponse) Serialize() []byte {
+	return []byte("0\n")
 }
