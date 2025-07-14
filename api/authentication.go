@@ -56,7 +56,7 @@ type AuthenticationResponse struct {
 }
 
 func (response *AuthenticationResponse) Serialize() []byte {
-	var expiry string
+	var expiry string = ""
 
 	if response.SubscriptionExpiry != nil {
 		// Format in "Mon, 02 Jan 2006 15:04:05 MST" format

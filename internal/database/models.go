@@ -27,7 +27,7 @@ type Upload struct {
 	Filesize  int64     `gorm:"not null"`
 	Checksum  string    `gorm:"size:32;not null"`
 	CreatedAt time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
-	Downloads int       `gorm:"default:0;not null"`
+	Views     int       `gorm:"default:0;not null"`
 
 	User *User `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
 	Pool *Pool `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
