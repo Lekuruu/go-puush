@@ -21,13 +21,14 @@ COPY . .
 # Build
 RUN CGO_ENABLED=1 go build -o puush ./cmd/api/main.go
 
-FROM alpine:3.19
+FROM alpine
 
 # Install runtime dependencies
 RUN apk add --no-cache ca-certificates sqlite-libs
 
 WORKDIR /app
 COPY --from=build /app/puush /app/puush
+COPY --from=build /app/.github /app/.github
 
 # Create data volume
 VOLUME ["/app/.data"]
