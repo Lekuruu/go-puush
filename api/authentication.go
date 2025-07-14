@@ -101,8 +101,8 @@ func (response *AuthenticationResponse) Serialize() []byte {
 	data := []string{
 		strconv.Itoa(int(response.AccountType)),
 		response.ApiKey,
-		strconv.Itoa(int(response.DiskUsage)),
 		expiry,
+		strconv.Itoa(int(response.DiskUsage)),
 	}
 	return []byte(strings.Join(data, ","))
 }
