@@ -18,12 +18,8 @@ RUN go mod download
 # Copy the source code
 COPY . .
 
-# Set the application type
-ARG APPLICATION_TYPE=api
-ENV APPLICATION_TYPE=${APPLICATION_TYPE}
-
 # Build
-RUN CGO_ENABLED=1 go build -o puush ./cmd/${APPLICATION_TYPE}/main.go
+RUN CGO_ENABLED=1 go build -o puush ./cmd/api/main.go
 
 FROM alpine
 
