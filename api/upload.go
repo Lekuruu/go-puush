@@ -168,9 +168,10 @@ func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
 		return nil, err
 	}
 
-	// Replace commas with underscores in the filename
+	// Replace commas & slashes with underscores in the filename
 	// to avoid issues in history response parsing
 	fileName = strings.ReplaceAll(fileName, ",", "_")
+	fileName = strings.ReplaceAll(fileName, "/", "_")
 
 	return &UploadRequest{
 		Key:          key,
