@@ -19,16 +19,31 @@ RUN go mod download
 COPY . .
 
 # Build
-RUN CGO_ENABLED=1 go build -o puush ./cmd/api/main.go
+RUN CGO_ENABLED=1 go build -o puush-api ./cmd/api/main.go
+RUN CGO_ENABLED=1 go build -o puush-cdn ./cmd/cdn/main.go
 
-FROM alpine
+FROM alpine AS api
 
 # Install runtime dependencies
 RUN apk add --no-cache ca-certificates sqlite-libs
 
 WORKDIR /app
-COPY --from=build /app/puush /app/puush
+COPY --from=build /app/puush-api /app/puush
 COPY --from=build /app/.github /app/.github
+
+# Create data volume
+VOLUME ["/app/.data"]
+
+# Run the compiled binary
+ENTRYPOINT ["/app/puush"]
+
+FROM alpine AS cdn
+
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates sqlite-libs
+
+WORKDIR /app
+COPY --from=build /app/puush-cdn /app/puush
 
 # Create data volume
 VOLUME ["/app/.data"]
