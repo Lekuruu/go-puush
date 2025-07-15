@@ -50,6 +50,18 @@ func FetchRecentUploadsByUser(user *database.User, state *app.State, limit int, 
 	return uploads, nil
 }
 
+func FetchUploadByFilenameAndPool(filename string, poolId int, state *app.State, preload ...string) (*database.Upload, error) {
+	upload := &database.Upload{}
+	query := preloadQuery(state, preload).Where("filename = ? AND pool_id = ?", filename, poolId)
+	result := query.First(upload)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return upload, nil
+}
+
 func DeleteUpload(upload *database.Upload, state *app.State) error {
 	result := state.Database.Delete(upload)
 
