@@ -47,6 +47,7 @@ func (server *Server) Serve() {
 	)
 	server.Logger.Info(
 		"Starting server",
+		"name", server.Name,
 		"bind", bind,
 	)
 
