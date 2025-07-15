@@ -32,6 +32,11 @@ func Thumbnail(ctx *app.Context) {
 		return
 	}
 
+	if !upload.IsImage {
+		WriteResponse(415, "", ctx)
+		return
+	}
+
 	data, err := ctx.State.Storage.ReadThumbnail(upload.Key())
 	if err == nil {
 		thumbnailFilename := fmt.Sprintf("thumbnail_%s", upload.Filename)
