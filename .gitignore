@@ -122,5 +122,6 @@ fabric.properties
 .history
 .ionide
 
-# Data folder
+# Application data
 .data
+.env
