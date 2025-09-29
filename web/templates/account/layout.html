@@ -1,1 +1,18 @@
-<!-- TODO -->
+{{ define "account/header" }}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=1024" />
+    <title>{{ .Config.Service.Name }} / {{ .Title }}</title>
+    <link type="text/css" href="/css/user.css" rel="stylesheet">
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="/js/pi.imgloaded.js"></script>
+    <script type="text/javascript" src="/js/jquery.scrollTo-1.4.2-min.js"></script>
+    <script type="text/javascript" src="/js/gallery.js"></script>
+</head>
+{{ end }}
+{{ define "account/footer" }}
+</html>
+{{ end }}
