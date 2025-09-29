@@ -9,6 +9,7 @@ import (
 
 func InitializeRoutes(server *app.Server) {
 	server.Router.HandleFunc("/", server.ContextMiddleware(routes.Home)).Methods("GET")
+	server.Router.HandleFunc("/about", server.ContextMiddleware(routes.About)).Methods("GET")
 	server.Router.HandleFunc("/login", server.ContextMiddleware(routes.Login)).Methods("GET")
 	server.Router.HandleFunc("/account", server.ContextMiddleware(routes.Account)).Methods("GET")
 	server.Router.HandleFunc("/register", server.ContextMiddleware(routes.Register)).Methods("GET")
