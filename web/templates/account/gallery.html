@@ -1,7 +1,7 @@
 {{ define "account/gallery" }}
 {{ template "account/header" . }}
 <script type="text/javascript" charset="utf-8">
-    var feed = "/{{ .User.Name }}/Gallery/feed";
+    var feed = "/{{ .User.Name }}/{{ .Pool.Name }}/feed";
     var base_img_url = "{{ .Config.Cdn.Url }}";
 </script>
 <script id="galleryThumbs" type="text/x-jquery-text">
@@ -16,7 +16,7 @@
         <div id="gallery_pane">
             <div id="gallery_header">
                 <div id="puush_logo"><a href="{{ .Config.Service.Url }}"></a></div>
-                <div id="gallery_meta"><b>Gallery</b> ({{ .User.Name }})</div>
+                <div id="gallery_meta"><b>{{ .Pool.Name }}</b> ({{ .User.Name }})</div>
             </div>
             <div class="clear"></div>
             <div id="gallery_image"><a href="#" target="_blank"></a></div>
