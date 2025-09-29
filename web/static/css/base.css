@@ -1,0 +1,136 @@
+*                       { margin:0; padding:0; border: 0px; }
+html                    { height:100%; }
+body                    { font-family:'Helvetica', Arial, sans-serif; font-size:9pt; margin:0; padding:0; color: #FFF; background: #515151; height: 100%; min-width: 760px; }
+
+a:link                  { color: #eae5e1; text-decoration: underline; }
+a:visited               { color: #eae5e1; text-decoration: underline; }
+a:hover                 { color: #ffffff; text-decoration: underline; }
+a:active                { color: #eae5e1; text-decoration: underline; }
+a.last-page             { color: #eae5e1; text-decoration: underline; }
+
+.hidden                 { display: none; }
+.clear                  { clear: both; }
+.center                 { margin: auto; text-align: center; }
+/* menu */
+#menu                   { padding: 0px; margin: 0px; width: 100%; text-align: center; }
+#menu ul                { padding: 0px; margin: 0px; border: 0px; list-style-type: none; }
+#menu ul li             { display: inline-block; }
+#menu ul li a           {
+    display: block;
+    padding: 10px 0px 10px 0px;
+    text-transform: none;
+    text-decoration: none;
+    font-size: 150%;
+    color: #9e9e9e;
+    height: 18px;
+    line-height: 18px;
+    width: 110px;
+    text-align: center;
+}
+#menu ul li a:hover     { color: #fff; }
+
+#header                 { position: relative; background-image: url('/img/toplogo.png'); background-position:center top; background-repeat: no-repeat; overflow: hidden; margin: 10px auto 0 auto; color: black; cursor: pointer; }
+#header > .content      { margin-top: 138px; }
+
+#header .twitter       { position: absolute; left: 12px; width: 200px; height: 58px; background-image: url('/img/twitter.png'); top: 50px; }
+#header .twitter:hover { background-position: -210px 0px; }
+
+#header .download       { position: absolute; right: 10px; width: 181px; height: 49px; }
+#header .download:hover { background-position: -181px 0px; }
+
+#header .download#win   { background-image: url('/img/download-win.png'); top: 15px; }
+#header .download#osx   { background-image: url('/img/download-osx.png'); top: 65px; }
+#header .download#ios   { background-image: url('/img/download-ios.png'); top: 115px; }
+
+/* high dpi support */
+@media (min--moz-device-pixel-ratio: 1.4), (-o-min-device-pixel-ratio: 7/5), (-webkit-min-device-pixel-ratio: 1.4), (min-device-pixel-ratio: 1.4), (min-resolution: 134dpi)
+{
+	#header .download#win   { background-image: url('/img/download-win@2x.png'); background-size: 362px 49px; }
+	#header .download#osx   { background-image: url('/img/download-osx@2x.png'); background-size: 362px 49px; }
+	#header .download#ios   { background-image: url('/img/download-ios@2x.png'); background-size: 362px 49px; }
+
+	#header                 { background-image: url('/img/toplogo@2x.png'); background-size: 340px 138px; }
+}
+
+#footer                 { position: fixed; right: 0; bottom: 0; margin: 3px; text-align: right; }
+
+/* main page boxes */
+#box                    { overflow: hidden; margin: 0 auto;  }
+#box > .content         { padding: 0px 125px 0px 115px; position: relative; margin-top: 10px; color:#eae5e1; }
+#box h1                 { font-size: 140%; padding-top: 15px; color:#e3e5ee; font-weight: normal; /*text-shadow:#A5CCE3 1px 1px 10px;*/ }
+#box .padded            { font-size: 100%; padding: 15px; line-height: 15px; }
+#box .icon-space        { margin: 5px; width: 96px; height: 96px; float: left; }
+#box .icon-space-r      { margin: 5px; width: 96px; height: 96px; float: right; }
+
+.eyecatch               { min-width: 500px; background: #303030; color: #d2dadf; margin: 20px; padding: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px;  }
+.eyecatch h1            { text-align:center; }
+
+/* myaccount section */
+#account                { width: 100%; background: #FFF; overflow: hidden; min-height: 100%;}
+#account > .content     { color: black; margin-left: 10px; min-height: 100%; }
+
+/* faq section */
+#comparison             { }
+#comparison td          { background-color: #F1F1F1; padding: 10px; }
+#comparison .answer     { text-align: center; }
+#comparison .checked    { background-image: url('/img/tick.png'); background-repeat: no-repeat; background-position: center center; height: 40px; }
+
+/* forms */
+input                   { border: 1px solid black; background-color: white; padding: 5px; }
+input[type="radio"]     { border: none; }
+
+#rego_form              { width: 350px; margin: 0 auto; text-align: right; padding-top: 30px; }
+#rego_form table        { width: 300px;  }
+
+#login_form             { width: 350px; margin: 0 auto; text-align: right; padding-top: 30px; }
+#login_form table       { width: 300px;  }
+
+#login_form p           { line-height: 16px; padding-right: 55px; }
+
+/* about page */
+.about-box              { width: 50%; float: left; }
+.photo-space            { margin: 5px; width: 85px; height: 128px; float: left; }
+.photo-space img        { -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px; }
+.about-meta h1          { margin-top: -10px; }
+.email                  { font-size: 10px; margin-bottom: 10px; }
+
+/* iphone+ipod, 'kinda' looks ok on android >.> */
+@media screen and (max-device-width: 480px)
+{
+	#content{ width: 600px; overflow:hidden; }
+
+	#header { width: 600px; margin: -50px 0px 0px 0px; padding-left: 16px; }
+	#box    { width: 600px; margin: 0px auto; }
+	#footer { width: 600px; margin: 0px auto; margin-top: -5px; height: 70px; }
+
+	#header > .content { right: 10px; }
+
+	#menu { margin-left: -100px; width: 600px; overflow: hidden;}
+	#menu ul li a { width: 100px; text-align: center; }
+
+	#win { right: 0px; }
+	#osx { right: 0px; }
+	#header .twitter { right: 12px;}
+
+	#box > .content { padding: 0px; }
+
+	#box .padded    { font-size: 75%; padding: 10px; line-height: 12px; }
+	#box h1         { font-size: 100%; padding-top: 0px; }
+
+	.eyecatch       { margin-top: -15px; margin-bottom: 10px; padding-left: 10px; padding-right: 10px; }
+	.eyecatch h1    { margin-top: 15px; }
+
+	.content > h1		{ padding-left: 10px; }
+	.content > div.padded	{ padding-left: 50px; }
+
+	.about-meta { padding-top: 30px; font-size: 130%;  }
+	.about-meta p { font-size: 95%; }
+	.email      { font-size: 100%; }
+
+	#comparison { font-size: 150%; }
+	#rego_form { font-size: 150%; }
+	#login_form { font-size: 150%; }
+	#login_form p { font-size: 50%; padding-bottom: 5px;}
+
+	#box .content p { padding-left: 20px; }
+}
