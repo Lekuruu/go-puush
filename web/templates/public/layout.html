@@ -1,0 +1,25 @@
+{{ define "public/header" }}
+{{ template "header" . }}
+<div id="home">
+    <div id="header" onclick="window.location = '/'">
+        <div class="content">
+            <a href="{{ .ServiceDownloadWindows }}" class="download" id="win"></a>
+            <a href="{{ .ServiceDownloadMac }}" class="download" id="osx"></a>
+            <a href="{{ .ServiceDownloadIOS }}" class="download" id="ios"></a>
+            <div id="menu">
+                <ul>
+                    <li><a href="/account">manage</a></li>
+                    <li><a href="/register">register</a></li>
+                    <li><a href="{{ .ServiceTwitterUrl }}">twitter</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{{ end }}
+{{ define "public/footer" }}
+    <div id="footer">
+        <div><a href='/tos'>Terms of Service</a> <a href='/dmca'>DMCA</a></div>
+    </div>
+</div>
+{{ template "footer" . }}
+{{ end }}

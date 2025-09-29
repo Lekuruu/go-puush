@@ -1,0 +1,33 @@
+{{ define "public/login" }}
+{{ template "public/header" . }}
+<div id="box">
+    <div class="content">
+        <h1>Login to manage your files</h1>
+        <div id="login_form">
+            <form action="/login/go" method="post">
+                <table border="0" cellspacing="5" cellpadding="5">
+                    <tbody>
+                        <tr>
+                            <td><label for="email">email:</label></td>
+                            <td><input type="text" name="email" value="" id="email"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="password">password:</label></td>
+                            <td><input type="password" name="password" value="" id="password"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><input type="submit" name="login" value="Login →"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+            <br>
+            <p>
+                <a href="/register">New user?</a>&nbsp;&nbsp;<a href="/reset_password">Forgotten password?</a>
+            </p>
+        </div>
+    </div>
+</div>
+{{ template "public/footer" . }}
+{{ end }}

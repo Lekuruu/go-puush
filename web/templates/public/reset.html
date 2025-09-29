@@ -1,0 +1,29 @@
+{{ define "public/reset" }}
+{{ template "public/header" . }}
+<div id="box">
+    <div class="content">
+        <h1>Reset Password</h1>
+        <div id="login_form">
+            <form action="/reset_password" method="post">
+                <table border="0" cellspacing="5" cellpadding="5">
+                    <tbody>
+                        <tr>
+                            <td><label for="email">email</label></td>
+                            <td><input type="text" name="email" value="" id="email"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><input type="submit" value="Continue →"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+            <br>
+            <p>
+                Are you a new user? <a href="/register">Register here.</a><br>
+            </p>
+        </div>
+    </div>
+</div>
+{{ template "public/footer" . }}
+{{ end }}

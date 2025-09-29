@@ -1,0 +1,36 @@
+{{ define "public/register" }}
+{{ template "public/header" . }}
+<div id="box">
+    <div class="content">
+        <h1>Excellent! Let's get you started.</h1><br>
+        <p>Just fill out the simple form below and you'll be <strong>{{ .ServiceName }}ing</strong> files around in no time!</p><br>
+        <p>Make sure your email is correct!</p><br>
+        <p>By signing up for <strong>{{ .ServiceName }}</strong>, you acknowledge that you have read and will abide by our <a href="/tos">Terms of Service</a>.</p>
+        <div id="rego_form">
+            <form action="/register/go" method="post" accept-charset="utf-8">
+                <table border="0" cellspacing="5" cellpadding="5">
+                    <tbody>
+                        <tr>
+                            <td><label for="email">email</label></td>
+                            <td><input type="text" name="email" value="" id="email"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="password">password</label></td>
+                            <td><input type="password" name="password" value="" id="password"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="confirm_password">confirm password</label></td>
+                            <td><input type="password" name="confirm_password" value="" id="confirm_password"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><input type="submit" value="Continue →"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+{{ template "public/footer" . }}
+{{ end }}
