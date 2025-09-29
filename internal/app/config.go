@@ -20,6 +20,7 @@ type Config struct {
 		Uri  string `envconfig:"STORAGE_URI" default:"./.data/"`
 	}
 	Service struct {
+		Url                 string `envconfig:"SERVICE_URL" default:"http://puush.me"`
 		Name                string `envconfig:"SERVICE_NAME" default:"puush"`
 		Email               string `envconfig:"SERVICE_EMAIL" default:"puush@puush.me"`
 		TwitterHandle       string `envconfig:"TWITTER_HANDLE" default:"@puushme"`
