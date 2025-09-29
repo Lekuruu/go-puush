@@ -125,3 +125,6 @@ fabric.properties
 # Application data
 .data
 .env
+
+# Client data
+web/static/dl/*
