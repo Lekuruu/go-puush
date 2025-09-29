@@ -21,6 +21,8 @@ type Config struct {
 	}
 	Service struct {
 		Name                string `envconfig:"SERVICE_NAME" default:"puush"`
+		Email               string `envconfig:"SERVICE_EMAIL" default:"puush@puush.me"`
+		TwitterHandle       string `envconfig:"TWITTER_HANDLE" default:"@puushme"`
 		TwitterUrl          string `envconfig:"TWITTER_URL" default:"https://twitter.com/puushme"`
 		DownloadWindows     string `envconfig:"DOWNLOAD_WINDOWS" default:"/dl/puush-win.zip"`
 		DownloadMac         string `envconfig:"DOWNLOAD_MAC" default:"/dl/puush.zip"`
