@@ -20,6 +20,6 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-sqlite3 v1.14.28 // indirect
 	golang.org/x/crypto v0.40.0
-	golang.org/x/text v0.27.0 // indirect
+	golang.org/x/text v0.27.0
 	gorm.io/driver/sqlite v1.6.0
 )
