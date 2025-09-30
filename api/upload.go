@@ -172,6 +172,12 @@ func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
 	// to avoid issues in history response parsing
 	fileName = strings.ReplaceAll(fileName, ",", "_")
 	fileName = strings.ReplaceAll(fileName, "/", "_")
+	fileName = strings.Trim(fileName, " ")
+
+	// Ensure filename is not empty
+	if fileName == "" {
+		return nil, errors.New("filename cannot be empty")
+	}
 
 	return &UploadRequest{
 		Key:          key,
