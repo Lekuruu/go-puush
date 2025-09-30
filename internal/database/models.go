@@ -57,6 +57,10 @@ func (upload *Upload) Key() string {
 	return strconv.Itoa(upload.Id)
 }
 
+func (upload *Upload) FilenameEncoded() string {
+	return url.QueryEscape(upload.Filename)
+}
+
 func (upload *Upload) Url() string {
 	if upload.Pool == nil {
 		return ""
@@ -68,7 +72,13 @@ func (upload *Upload) Url() string {
 }
 
 func (upload *Upload) UrlEncoded() string {
-	return url.QueryEscape(upload.Url())
+	if upload.Pool == nil {
+		return ""
+	}
+	if upload.Pool.Type == PoolTypePasswordProtected && upload.Pool.Password != nil {
+		return fmt.Sprintf("/%s/%s/%s", upload.Pool.Identifier, upload.Pool.PasswordHash(), upload.FilenameEncoded())
+	}
+	return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, upload.FilenameEncoded())
 }
 
 type Pool struct {
