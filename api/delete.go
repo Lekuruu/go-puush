@@ -99,11 +99,6 @@ func NewDeleteRequest(request *http.Request) (*DeleteRequest, error) {
 		return nil, errors.New("invalid upload ID")
 	}
 
-	junk := request.FormValue("z")
-	if junk != "poop" {
-		return nil, errors.New("invalid request parameter 'z'")
-	}
-
 	return &DeleteRequest{
 		Key:      key,
 		UploadId: uploadId,

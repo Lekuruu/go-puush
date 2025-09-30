@@ -57,11 +57,6 @@ func NewAuthenticationRequest(request *http.Request) (*AuthenticationRequest, er
 	username := request.FormValue("e")
 	password := request.FormValue("p")
 	key := request.FormValue("k")
-	poop := request.FormValue("z")
-
-	if poop != "poop" {
-		return nil, errors.New("invalid request parameter 'z'")
-	}
 
 	if username == "" {
 		return nil, errors.New("username is required")
