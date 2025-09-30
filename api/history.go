@@ -50,7 +50,7 @@ func (r *HistoryResponse) Serialize() []byte {
 		var historyItem = []string{
 			strconv.Itoa(upload.Id),
 			upload.CreatedAt.Format(time.DateTime),
-			r.CdnUrl + upload.Url(),
+			r.CdnUrl + upload.UrlEncoded(),
 			upload.Filename,
 			strconv.Itoa(upload.Views),
 		}

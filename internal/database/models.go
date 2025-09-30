@@ -3,6 +3,7 @@ package database
 import (
 	"crypto/md5"
 	"fmt"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -64,6 +65,10 @@ func (upload *Upload) Url() string {
 		return fmt.Sprintf("/%s/%s/%s", upload.Pool.Identifier, upload.Pool.PasswordHash(), upload.Filename)
 	}
 	return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, upload.Filename)
+}
+
+func (upload *Upload) UrlEncoded() string {
+	return url.QueryEscape(upload.Url())
 }
 
 type Pool struct {

@@ -57,7 +57,7 @@ func PuushUpload(ctx *app.Context) {
 	existingUpload, err := services.FetchUploadByChecksum(request.FileChecksum, ctx.State, "Pool", "User")
 	if err == nil {
 		response := &UploadResponse{
-			UploadUrl:        ctx.State.Config.Cdn.Url + existingUpload.Url(),
+			UploadUrl:        ctx.State.Config.Cdn.Url + existingUpload.UrlEncoded(),
 			UpdatedDiskUsage: user.DiskUsage,
 		}
 		WritePuushResponse(ctx, response)
@@ -111,7 +111,7 @@ func PuushUpload(ctx *app.Context) {
 	}
 
 	uploadResponse := &UploadResponse{
-		UploadUrl:        ctx.State.Config.Cdn.Url + upload.Url(),
+		UploadUrl:        ctx.State.Config.Cdn.Url + upload.UrlEncoded(),
 		UpdatedDiskUsage: user.DiskUsage,
 	}
 	WritePuushResponse(ctx, uploadResponse)
