@@ -9,6 +9,9 @@ import (
 )
 
 func IsImage(data []byte) bool {
+	if len(data) < 512 {
+		return false
+	}
 	contentType := http.DetectContentType(data[:512])
 	return strings.HasPrefix(contentType, "image/")
 }
