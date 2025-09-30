@@ -58,7 +58,7 @@ func (upload *Upload) Key() string {
 }
 
 func (upload *Upload) FilenameEncoded() string {
-	return url.QueryEscape(upload.Filename)
+	return url.PathEscape(upload.Filename)
 }
 
 func (upload *Upload) Url() string {
