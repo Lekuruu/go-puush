@@ -63,11 +63,11 @@ func (upload *Upload) FilenameEncoded() string {
 }
 
 func (upload *Upload) IsImage() bool {
-	return strings.HasPrefix(upload.MimeType, "image/")
+	return strings.HasPrefix(upload.MimeType, "image")
 }
 
 func (upload *Upload) IsVideo() bool {
-	return strings.HasPrefix(upload.MimeType, "video/")
+	return strings.HasPrefix(upload.MimeType, "video")
 }
 
 func (upload *Upload) Url() string {
