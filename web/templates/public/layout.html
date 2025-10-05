@@ -1,0 +1,49 @@
+{{ define "public/header" }}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=600">
+    <title>{{ .Config.Service.Name }} / {{ .Title }}</title>
+	<link rel="stylesheet" media="screen" type="text/css" href="/css/base.css">
+	<meta name="description" content="{{ .Config.Service.Name }} is a super-quick way to share screenshots. Quickly capture any portion of your screen, upload any file, and share them with a short URL automatically placed in your clipboard. Share them with the world or make them private, for your eyes only.">
+</head>
+<body>
+	<div id="content">
+        <div id="home">
+            <div id="header" onclick="window.location = '/'">
+                <div class="content">
+                    <a href="{{ .Config.Service.DownloadWindows }}" class="download" id="win"></a>
+                    <a href="{{ .Config.Service.DownloadMac }}" class="download" id="osx"></a>
+                    <a href="{{ .Config.Service.DownloadIOS }}" class="download" id="ios"></a>
+                    <div id="menu">
+                        <ul>
+                            <li><a href="/account">manage</a></li>
+                            <li><a href="/register">register</a></li>
+                            <li><a href="{{ .Config.Service.TwitterUrl }}">twitter</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+{{ end }}
+{{ define "public/footer" }}
+            <div id="footer">
+                <div><a href='/tos'>Terms of Service</a> <a href='/dmca'>DMCA</a></div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" charset="utf-8">
+    if (navigator.userAgent.toLowerCase().indexOf('iphone') == -1)
+    {
+        var feedback_widget_options = {};
+        feedback_widget_options.display = "overlay";
+        feedback_widget_options.company = "puush";
+        feedback_widget_options.placement = "left";
+        feedback_widget_options.color = "#434D54";
+        feedback_widget_options.style = "idea";
+        var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
+    }
+</script>
+</html>
+{{ end }}

@@ -1,0 +1,14 @@
+{{ define "public/home" }}
+{{ template "public/header" . }}
+<div id="box">
+    <div class="content">
+        <div class="eyecatch">
+            <h1><strong>{{ .Config.Service.Name }}</strong> is a quick and simple way to share screenshots.</h1>
+            <div class="center"><img src="/img/diagram.png"></div>
+            <div class="padded">Use keyboard shortcuts or drag-drop gestures to quickly capture any portion of your screen. These screenshots are near-instantly <strong>{{ .Config.Service.Name }}'d</strong>, leaving behind a short URL in your clipboard, perfect for sharing. Paste these easily into your Twitter, IRC or IM clients. Share them with the world or make them private, for your eyes only.</div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+{{ template "public/footer" . }}
+{{ end }}

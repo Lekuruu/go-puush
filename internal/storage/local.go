@@ -3,7 +3,6 @@ package storage
 import (
 	"fmt"
 	"os"
-	"strings"
 )
 
 type FileStorage struct {
@@ -29,35 +28,6 @@ func (storage *FileStorage) Setup() error {
 		err := os.MkdirAll(folder, 0755)
 		if err != nil {
 			return fmt.Errorf("failed to create storage directory %s: %w", folder, err)
-		}
-
-		if !strings.HasSuffix(folder, "update") {
-			continue
-		}
-
-		// Copy required files for updates
-		if _, err := os.Stat(fmt.Sprintf("%s/puush-rss.xml", folder)); os.IsNotExist(err) {
-			data, err := os.ReadFile("./.github/puush-rss.xml")
-			if err != nil {
-				return fmt.Errorf("failed to write puush-rss.xml: %w", err)
-			}
-
-			err = os.WriteFile(fmt.Sprintf("%s/puush-rss.xml", folder), data, 0644)
-			if err != nil {
-				return fmt.Errorf("failed to write puush-rss.xml: %w", err)
-			}
-		}
-
-		if _, err := os.Stat(fmt.Sprintf("%s/puush-win.txt", folder)); os.IsNotExist(err) {
-			data, err := os.ReadFile("./.github/puush-win.txt")
-			if err != nil {
-				return fmt.Errorf("failed to write puush-win.txt: %w", err)
-			}
-
-			err = os.WriteFile(fmt.Sprintf("%s/puush-win.txt", folder), data, 0644)
-			if err != nil {
-				return fmt.Errorf("failed to write puush-win.txt: %w", err)
-			}
 		}
 	}
 
@@ -93,14 +63,6 @@ func (storage *FileStorage) Exists(key string, folder string) bool {
 func (storage *FileStorage) Remove(key string, folder string) error {
 	path := fmt.Sprintf("%s/%s/%s", storage.dataPath, folder, key)
 	return os.Remove(path)
-}
-
-func (storage *FileStorage) ReadUpdateConfigurationWindows() ([]byte, error) {
-	return storage.Read("puush-win.txt", "update")
-}
-
-func (storage *FileStorage) ReadUpdateConfigurationMacOS() ([]byte, error) {
-	return storage.Read("puush-rss.xml", "update")
 }
 
 func (storage *FileStorage) SaveUpload(key string, data []byte) error {

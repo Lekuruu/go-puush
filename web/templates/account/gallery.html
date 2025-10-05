@@ -1,0 +1,30 @@
+{{ define "account/gallery" }}
+{{ template "account/header" . }}
+<script type="text/javascript" charset="utf-8">
+    var feed = "/{{ .User.Name }}/{{ .Pool.Name }}/feed";
+    var base_img_url = "{{ .Config.Cdn.Url }}";
+</script>
+<script id="galleryThumbs" type="text/x-jquery-text">
+    <div id="thumb_${index}" class="puush_tile unselected">
+        <div class="thumb" style="background-image: url({{ .Config.Cdn.Url }}/t/${id});">
+            <a href="#" onclick="return galleries.view(${index})" title="${name} (${size})"></a>
+        </div>
+    </div>
+</script>
+<body>
+    <div id="content">
+        <div id="gallery_pane">
+            <div id="gallery_header">
+                <div id="puush_logo"><a href="{{ .Config.Service.Url }}"></a></div>
+                <div id="gallery_meta"><b>{{ .Pool.Name }}</b> ({{ .User.Name }})</div>
+            </div>
+            <div class="clear"></div>
+            <div id="gallery_image"><a href="#" target="_blank"></a></div>
+        </div>
+        <div id="gallery_sidebar">
+            <div id="gallery_thumbs"></div>
+        </div>
+    </div>
+</body>
+{{ template "account/footer" . }}
+{{ end }}
