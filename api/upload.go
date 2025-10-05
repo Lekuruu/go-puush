@@ -13,6 +13,7 @@ import (
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/services"
+	"github.com/gabriel-vasile/mimetype"
 )
 
 // /api/up is the main endpoint for uploading files to the puush service.
@@ -80,7 +81,7 @@ func PuushUpload(ctx *app.Context) {
 		Filename:  request.FileName,
 		Filesize:  request.FileSize,
 		Checksum:  request.FileChecksum,
-		IsImage:   services.IsImage(fileData),
+		MimeType:  mimetype.Detect(fileData).String(),
 		CreatedAt: time.Now(),
 		Pool:      user.DefaultPool,
 		User:      user,
@@ -98,7 +99,7 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
-	if upload.IsImage {
+	if upload.IsImage() {
 		// Try to generate a thumbnail & do nothing if it fails
 		services.CreateThumbnail(upload.Key(), fileData, ctx.State)
 	}

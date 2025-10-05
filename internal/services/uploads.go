@@ -62,6 +62,16 @@ func FetchUploadByFilenameAndPool(filename string, poolId int, state *app.State,
 	return upload, nil
 }
 
+func UpdateUpload(upload *database.Upload, state *app.State) error {
+	result := state.Database.Save(upload)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func DeleteUpload(upload *database.Upload, state *app.State) error {
 	result := state.Database.Delete(upload)
 

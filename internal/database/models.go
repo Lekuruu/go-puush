@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -47,7 +48,7 @@ type Upload struct {
 	Checksum  string    `gorm:"size:32;not null"`
 	CreatedAt time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
 	Views     int       `gorm:"default:0;not null"`
-	IsImage   bool      `gorm:"default:false;not null"`
+	MimeType  string    `gorm:"size:64;default:''"`
 
 	User *User `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
 	Pool *Pool `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
@@ -59,6 +60,14 @@ func (upload *Upload) Key() string {
 
 func (upload *Upload) FilenameEncoded() string {
 	return url.PathEscape(upload.Filename)
+}
+
+func (upload *Upload) IsImage() bool {
+	return strings.HasPrefix(upload.MimeType, "image/")
+}
+
+func (upload *Upload) IsVideo() bool {
+	return strings.HasPrefix(upload.MimeType, "video/")
 }
 
 func (upload *Upload) Url() string {

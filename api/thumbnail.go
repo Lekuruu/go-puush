@@ -35,7 +35,7 @@ func PuushThumbnail(ctx *app.Context) {
 		return
 	}
 
-	if !upload.IsImage {
+	if !upload.IsImage() {
 		ctx.Response.WriteHeader(http.StatusNotFound)
 		return
 	}

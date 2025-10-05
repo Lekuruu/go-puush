@@ -32,7 +32,7 @@ func Thumbnail(ctx *app.Context) {
 		return
 	}
 
-	if !upload.IsImage {
+	if !upload.IsImage() {
 		WriteResponse(415, "", ctx)
 		return
 	}

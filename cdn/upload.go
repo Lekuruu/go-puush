@@ -2,12 +2,12 @@ package cdn
 
 import (
 	"fmt"
-	"net/http"
 	"strconv"
 
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/services"
+	"github.com/gabriel-vasile/mimetype"
 )
 
 func Upload(ctx *app.Context) {
@@ -39,7 +39,26 @@ func Upload(ctx *app.Context) {
 		return
 	}
 
-	ctx.Response.Header().Set("Content-Type", http.DetectContentType(data))
+	// Check if mime type is set, if not, detect it
+	if upload.MimeType == "" {
+		upload.MimeType = mimetype.Detect(data).String()
+		err = services.UpdateUpload(upload, ctx.State)
+
+		if err != nil {
+			ctx.State.Logger.Error("Failed to update upload mime type", "error", err)
+			WriteResponse(500, "An error occurred while updating the upload.", ctx)
+			return
+		}
+	}
+
+	// Avoid xss attacks by sandboxing html files
+	if !upload.IsImage() && !upload.IsVideo() {
+		ctx.Response.Header().Set("Content-Security-Policy", "default-src 'none'; sandbox")
+		ctx.Response.Header().Set("X-Content-Type-Options", "nosniff")
+		ctx.Response.Header().Set("X-Frame-Options", "DENY")
+	}
+
+	ctx.Response.Header().Set("Content-Type", upload.MimeType)
 	ctx.Response.Header().Set("Content-Length", strconv.Itoa(int(upload.Filesize)))
 	ctx.Response.Header().Set("Content-Disposition", fmt.Sprintf("filename=\"%s\"", upload.Filename))
 	ctx.Response.WriteHeader(200)
