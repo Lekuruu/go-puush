@@ -120,10 +120,10 @@ func UserKeyAuthentication(username string, key string, state *app.State) (*data
 
 // UserAuthenticationDynamic attempts to authenticate a user using either a password or an API key.
 func UserAuthenticationDynamic(username string, password string, key string, state *app.State) (*database.User, bool) {
-	if password != "" {
-		return UserPasswordAuthentication(username, password, state)
-	} else if key != "" {
+	if key != "" {
 		return UserKeyAuthentication(username, key, state)
+	} else if password != "" {
+		return UserPasswordAuthentication(username, password, state)
 	}
 	return nil, false
 }
