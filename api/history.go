@@ -23,7 +23,7 @@ func PuushHistory(ctx *app.Context) {
 		return
 	}
 
-	recentUploads, err := services.FetchRecentUploadsByUser(user, ctx.State, 5, "Pool")
+	recentUploads, err := services.FetchRecentUploadsByUser(user, ctx.State, 5, "Pool", "Link")
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return
@@ -47,10 +47,17 @@ func (r *HistoryResponse) Serialize() []byte {
 	var data = []string{strconv.Itoa(len(r.Uploads))}
 
 	for _, upload := range r.Uploads {
+		uploadUrl := r.CdnUrl + upload.UrlEncoded()
+
+		if upload.Link != nil {
+			// We have a short link for this upload, use it instead
+			uploadUrl = r.CdnUrl + upload.Link.UrlEncoded()
+		}
+
 		var historyItem = []string{
 			strconv.Itoa(upload.Id),
 			upload.CreatedAt.Format(time.DateTime),
-			r.CdnUrl + upload.UrlEncoded(),
+			uploadUrl,
 			upload.Filename,
 			strconv.Itoa(upload.Views),
 		}

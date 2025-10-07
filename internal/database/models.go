@@ -50,8 +50,9 @@ type Upload struct {
 	Views     int       `gorm:"default:0;not null"`
 	MimeType  string    `gorm:"size:64;default:''"`
 
-	User *User `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
-	Pool *Pool `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
+	User *User      `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
+	Pool *Pool      `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
+	Link *ShortLink `gorm:"foreignKey:UploadId;constraint:OnDelete:CASCADE"`
 }
 
 func (upload *Upload) Key() string {
