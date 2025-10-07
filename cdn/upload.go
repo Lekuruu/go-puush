@@ -1,10 +1,15 @@
 package cdn
 
 import (
+	"time"
+
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
+
+// This will limit the view count increase to once per minute per IP
+var uploadViewCooldowns = app.NewCooldownManager(time.Minute)
 
 func Upload(ctx *app.Context) {
 	poolPassword := ctx.Vars["password"]
@@ -33,6 +38,12 @@ func Upload(ctx *app.Context) {
 		// TODO: Original file was not found, queue for deletion
 		WriteResponse(404, "That puush could not be found.", ctx)
 		return
+	}
+
+	// Try to increase views, if cooldown is not active
+	if uploadViewCooldowns.Allow(ctx.IP()) {
+		upload.Views += 1
+		services.UpdateUpload(upload, ctx.State)
 	}
 
 	if !upload.IsImage() && !upload.IsVideo() {
