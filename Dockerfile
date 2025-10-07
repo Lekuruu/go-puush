@@ -59,6 +59,7 @@ RUN apk add --no-cache ca-certificates sqlite-libs
 
 WORKDIR /app
 COPY --from=build /app/puush-web /app/puush
+COPY --from=build /app/web /app/web
 
 # Create data volume
 VOLUME ["/app/.data"]
