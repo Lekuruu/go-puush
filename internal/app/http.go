@@ -38,6 +38,10 @@ type Context struct {
 	Vars     map[string]string
 }
 
+func (ctx *Context) IP() string {
+	return GetRequestIP(ctx.Request)
+}
+
 // Serve starts the HTTP server and listens for incoming requests.
 func (server *Server) Serve() {
 	bind := fmt.Sprintf(
