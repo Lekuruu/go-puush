@@ -38,8 +38,8 @@ func main() {
 	}
 
 	server := app.NewServer(
-		state.Config.Cdn.Host,
-		state.Config.Cdn.Port,
+		state.Config.Web.Host,
+		state.Config.Web.Port,
 		"puush-web",
 		state,
 	)

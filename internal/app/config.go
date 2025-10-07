@@ -12,12 +12,16 @@ type Config struct {
 		Port int    `envconfig:"CDN_PORT" default:"8081"`
 		Url  string `envconfig:"CDN_URL" default:"http://puu.sh"`
 	}
-	Database struct {
-		Path string `envconfig:"DB_PATH" default:"./.data/puush.db"`
+	Web struct {
+		Host string `envconfig:"WEB_HOST" default:"0.0.0.0"`
+		Port int    `envconfig:"WEB_PORT" default:"8082"`
 	}
 	Storage struct {
 		Type string `envconfig:"STORAGE_TYPE" default:"local"`
 		Uri  string `envconfig:"STORAGE_URI" default:"./.data/"`
+	}
+	Database struct {
+		Path string `envconfig:"DB_PATH" default:"./.data/puush.db"`
 	}
 	Service struct {
 		Url                 string `envconfig:"SERVICE_URL" default:"http://puush.me"`
