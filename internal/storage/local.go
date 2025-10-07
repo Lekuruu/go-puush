@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -39,6 +40,11 @@ func (storage *FileStorage) Read(key string, folder string) ([]byte, error) {
 	return os.ReadFile(path)
 }
 
+func (storage *FileStorage) ReadStream(key string, folder string) (io.ReadCloser, error) {
+	path := fmt.Sprintf("%s/%s/%s", storage.dataPath, folder, key)
+	return os.Open(path)
+}
+
 func (storage *FileStorage) Save(key string, folder string, data []byte) error {
 	path := fmt.Sprintf("%s/%s", storage.dataPath, folder)
 	err := os.MkdirAll(path, 0755)
@@ -73,6 +79,10 @@ func (storage *FileStorage) ReadUpload(key string) ([]byte, error) {
 	return storage.Read(key, "uploads")
 }
 
+func (storage *FileStorage) ReadUploadStream(key string) (io.ReadCloser, error) {
+	return storage.ReadStream(key, "uploads")
+}
+
 func (storage *FileStorage) RemoveUpload(key string) error {
 	return storage.Remove(key, "uploads")
 }
@@ -87,6 +97,10 @@ func (storage *FileStorage) SaveThumbnail(key string, data []byte) error {
 
 func (storage *FileStorage) ReadThumbnail(key string) ([]byte, error) {
 	return storage.Read(key, "thumbnails")
+}
+
+func (storage *FileStorage) ReadThumbnailStream(key string) (io.ReadCloser, error) {
+	return storage.ReadStream(key, "thumbnails")
 }
 
 func (storage *FileStorage) RemoveThumbnail(key string) error {
