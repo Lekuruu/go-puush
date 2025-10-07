@@ -7,8 +7,8 @@ import (
 )
 
 func Thumbnail(ctx *app.Context) {
-	poolIdentifier := ctx.Vars["identifier"]
 	poolPassword := ctx.Vars["password"]
+	poolIdentifier := ctx.Vars["pool"]
 	filename := ctx.Vars["filename"]
 
 	pool, err := services.FetchPoolByIdentifier(poolIdentifier, ctx.State)
