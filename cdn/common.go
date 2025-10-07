@@ -2,6 +2,7 @@ package cdn
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -22,7 +23,7 @@ func WriteXssHeaders(ctx *app.Context) {
 	ctx.Response.Header().Set("X-Frame-Options", "DENY")
 }
 
-func WriteUpload(ctx *app.Context, upload *database.Upload, data []byte) {
+func WriteUpload(ctx *app.Context, upload *database.Upload, stream io.ReadCloser) {
 	ctx.Response.Header().Set("Content-Type", upload.MimeType)
 	ctx.Response.Header().Set("Content-Length", strconv.Itoa(int(upload.Filesize)))
 	ctx.Response.Header().Set("Content-Disposition", fmt.Sprintf("filename=\"%s\"", upload.Filename))
@@ -30,7 +31,9 @@ func WriteUpload(ctx *app.Context, upload *database.Upload, data []byte) {
 	ctx.Response.Header().Set("Date", time.Now().Format(http.TimeFormat))
 	ctx.Response.Header().Set("ETag", fmt.Sprintf(`"%s"`, upload.Checksum))
 	ctx.Response.WriteHeader(200)
-	ctx.Response.Write(data)
+
+	// Stream the file to the response
+	io.Copy(ctx.Response, stream)
 }
 
 func WriteThumbnail(ctx *app.Context, upload *database.Upload, thumbnail []byte) {

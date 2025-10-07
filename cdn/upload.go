@@ -33,12 +33,13 @@ func Upload(ctx *app.Context) {
 		return
 	}
 
-	data, err := ctx.State.Storage.ReadUpload(upload.Key())
+	stream, err := ctx.State.Storage.ReadUploadStream(upload.Key())
 	if err != nil {
 		// TODO: Original file was not found, queue for deletion
 		WriteResponse(404, "That puush could not be found.", ctx)
 		return
 	}
+	defer stream.Close()
 
 	// Try to increase views, if cooldown is not active
 	if uploadViewCooldowns.Allow(ctx.IP()) {
@@ -51,5 +52,5 @@ func Upload(ctx *app.Context) {
 		WriteXssHeaders(ctx)
 	}
 
-	WriteUpload(ctx, upload, data)
+	WriteUpload(ctx, upload, stream)
 }
