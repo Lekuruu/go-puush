@@ -15,6 +15,7 @@ func CreateSession(path string) (*gorm.DB, error) {
 		&User{},
 		&Upload{},
 		&Pool{},
+		&ShortLink{},
 	}
 
 	err = db.AutoMigrate(models...)

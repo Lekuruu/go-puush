@@ -4,7 +4,7 @@ import "math/rand"
 
 const Charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-func randomString(length int) string {
+func RandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	result := make([]byte, length)
 	for i := range result {
@@ -14,13 +14,13 @@ func randomString(length int) string {
 }
 
 func GenerateApiKey() string {
-	return randomString(32)
+	return RandomString(32)
 }
 
 func GeneratePoolPassword() string {
-	return randomString(32)
+	return RandomString(32)
 }
 
 func GeneratePoolIdentifier() string {
-	return randomString(8)
+	return RandomString(8)
 }

@@ -110,3 +110,12 @@ func (pool *Pool) PasswordHash() string {
 	sum := md5.Sum([]byte(*pool.Password))
 	return fmt.Sprintf("%x", sum)
 }
+
+type ShortLink struct {
+	Identifier string     `gorm:"primaryKey;size:16;not null"`
+	CreatedAt  time.Time  `gorm:"not null;CURRENT_TIMESTAMP"`
+	ExpiresAt  *time.Time `gorm:"default:NULL"`
+	UploadId   int        `gorm:"not null;unique"`
+
+	Upload *Upload `gorm:"foreignKey:UploadId;constraint:OnDelete:CASCADE"`
+}
