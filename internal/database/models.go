@@ -119,3 +119,11 @@ type ShortLink struct {
 
 	Upload *Upload `gorm:"foreignKey:UploadId;constraint:OnDelete:CASCADE"`
 }
+
+func (shortlink *ShortLink) Url() string {
+	return fmt.Sprintf("/%s", shortlink.Identifier)
+}
+
+func (shortlink *ShortLink) UrlEncoded() string {
+	return fmt.Sprintf("/%s", url.PathEscape(shortlink.Identifier))
+}

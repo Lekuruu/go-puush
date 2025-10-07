@@ -111,8 +111,15 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
+	// TODO: Add expiration time to config
+	shortlink, err := services.CreateShortLink(upload.Id, nil, ctx.State)
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
 	uploadResponse := &UploadResponse{
-		UploadUrl:        ctx.State.Config.Cdn.Url + upload.UrlEncoded(),
+		UploadUrl:        ctx.State.Config.Cdn.Url + shortlink.UrlEncoded(),
 		UpdatedDiskUsage: user.DiskUsage,
 	}
 	WritePuushResponse(ctx, uploadResponse)
