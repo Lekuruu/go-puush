@@ -1,9 +1,14 @@
 package services
 
 import (
+	"errors"
+
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
 )
+
+const minimumPoolIdentifierLength = 8
+const maximumPoolIdentifierLength = 16
 
 func CreatePool(pool *database.Pool, state *app.State) error {
 	result := state.Database.Create(pool)
@@ -36,4 +41,39 @@ func FetchPoolByIdentifier(identifier string, state *app.State, preload ...strin
 	}
 
 	return pool, nil
+}
+
+func PoolExists(identifier string, state *app.State) (bool, error) {
+	var count int64
+	result := state.Database.Model(&database.Pool{}).Where("identifier = ?", identifier).Count(&count)
+
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	return count > 0, nil
+}
+
+func UpdatePool(pool *database.Pool, state *app.State) error {
+	result := state.Database.Save(pool)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func GeneratePoolIdentifier(state *app.State) (string, error) {
+	for i := minimumPoolIdentifierLength; i <= maximumPoolIdentifierLength; i++ {
+		identifier := app.RandomString(i)
+		exists, err := PoolExists(identifier, state)
+		if err != nil {
+			return "", err
+		}
+		if !exists {
+			return identifier, nil
+		}
+	}
+	return "", errors.New("could not generate unique identifier")
 }

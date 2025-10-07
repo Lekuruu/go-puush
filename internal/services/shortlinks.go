@@ -8,8 +8,8 @@ import (
 	"github.com/Lekuruu/go-puush/internal/database"
 )
 
-var minimumIdentifierLength = 3
-var maximumIdentifierLength = 16
+const minimumLinkIdentifierLength = 3
+const maximumLinkIdentifierLength = 16
 
 func CreateShortLink(uploadId int, expiresAt *time.Time, state *app.State) (*database.ShortLink, error) {
 	identifier, err := GenerateShortLinkIdentifier(state)
@@ -55,7 +55,7 @@ func ShortLinkExists(identifier string, state *app.State) (bool, error) {
 }
 
 func GenerateShortLinkIdentifier(state *app.State) (string, error) {
-	for i := minimumIdentifierLength; i <= maximumIdentifierLength; i++ {
+	for i := minimumLinkIdentifierLength; i <= maximumLinkIdentifierLength; i++ {
 		identifier := app.RandomString(i)
 		exists, err := ShortLinkExists(identifier, state)
 		if err != nil {
