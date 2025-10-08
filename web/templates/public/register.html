@@ -1,8 +1,8 @@
 {{ define "public/register" }}
 {{ template "public/header" . }}
 <div id="box">
-    {{ if .Config.Service.RegistrationEnabled }}
     <div class="content">
+    {{ if .Config.Service.RegistrationEnabled }}
         <h1>Excellent! Let's get you started.</h1><br>
         <p>Just fill out the simple form below and you'll be <strong>{{ .Config.Service.Name }}ing</strong> files around in no time!</p><br>
         <p>Make sure your email is correct!</p><br>
@@ -31,16 +31,16 @@
                 </table>
             </form>
         </div>
-    </div>
     {{ else }}
-    <p>{{ .Config.Service.Name }} has been running out of our pockets since 2014 (since paypal deactivated our account, classifying us as a "file sharing service", against their terms of service). With an ever-increasing userbase, the costs involved in keeping {{ .Config.Service.Name }} running have escalated beyond $1000/month.</p>
-    <br>
-    <p>We do not have the spare time to maintain this service to a point we would be willing to consider other means of receiving money (such as Patreon), but at the same time are financially unable to continue supporting growth of the service.</p>
-    <br>
-    <p>As such, we have made the decision to disable new user registrations for the time being. <b>Existing users will be unaffected by this change for now</b> (given fair use of the service).</p>
-    <br>
-    <p>Thanks for enjoying {{ .Config.Service.Name }}!</p>
+        <p>{{ .Config.Service.Name }} has been running out of our pockets since 2014 (since paypal deactivated our account, classifying us as a "file sharing service", against their terms of service). With an ever-increasing userbase, the costs involved in keeping {{ .Config.Service.Name }} running have escalated beyond $1000/month.</p>
+        <br>
+        <p>We do not have the spare time to maintain this service to a point we would be willing to consider other means of receiving money (such as Patreon), but at the same time are financially unable to continue supporting growth of the service.</p>
+        <br>
+        <p>As such, we have made the decision to disable new user registrations for the time being. <b>Existing users will be unaffected by this change for now</b> (given fair use of the service).</p>
+        <br>
+        <p>Thanks for enjoying {{ .Config.Service.Name }}!</p>
     {{ end }}
+    </div>
 </div>
 {{ template "public/footer" . }}
 {{ end }}
