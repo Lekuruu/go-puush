@@ -34,7 +34,7 @@ func NewState() *State {
 		return nil
 	}
 
-	db, err := database.CreateSession(config.Database.Path)
+	db, err := database.CreateSession(config.Database)
 	if err != nil {
 		slog.Error("Failed to create database session", "error", err)
 		return nil

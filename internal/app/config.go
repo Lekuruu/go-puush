@@ -1,6 +1,9 @@
 package app
 
-import "github.com/kelseyhightower/envconfig"
+import (
+	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/kelseyhightower/envconfig"
+)
 
 type Config struct {
 	Api struct {
@@ -20,9 +23,6 @@ type Config struct {
 		Type string `envconfig:"STORAGE_TYPE" default:"local"`
 		Uri  string `envconfig:"STORAGE_URI" default:"./.data/"`
 	}
-	Database struct {
-		Path string `envconfig:"DB_PATH" default:"./.data/puush.db"`
-	}
 	Service struct {
 		Url                 string `envconfig:"SERVICE_URL" default:"http://puush.me"`
 		Name                string `envconfig:"SERVICE_NAME" default:"puush"`
@@ -34,6 +34,7 @@ type Config struct {
 		DownloadIOS         string `envconfig:"DOWNLOAD_IOS" default:"https://itunes.apple.com/au/app/puush/id386524126"`
 		RegistrationEnabled bool   `envconfig:"REGISTRATION_ENABLED" default:"true"`
 	}
+	Database database.DatabaseConfig
 }
 
 func LoadConfig() (*Config, error) {
