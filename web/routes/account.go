@@ -15,7 +15,7 @@ func Account(ctx *app.Context) {
 	// http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusTemporaryRedirect)
 
 	// For testing purposes, render the account page with user ID 1
-	user, err := services.FetchUserById(1, ctx.State, "Pools", "Pools.Uploads")
+	user, err := services.FetchUserById(1, ctx.State, "Pools")
 	if err != nil || user == nil {
 		renderText(404, "page not found", ctx)
 		return
