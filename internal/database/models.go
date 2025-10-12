@@ -157,6 +157,20 @@ func (shortlink *ShortLink) UrlEncoded() string {
 	return fmt.Sprintf("/%s", url.PathEscape(shortlink.Identifier))
 }
 
+type Session struct {
+	Id        uint      `gorm:"primaryKey"`
+	Token     string    `gorm:"uniqueIndex;not null"`
+	UserId    int       `gorm:"index;not null"`
+	ExpiresAt time.Time `gorm:"index;not null"`
+	CreatedAt time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
+
+	User *User `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
+}
+
+func (session *Session) IsExpired() bool {
+	return time.Now().After(session.ExpiresAt)
+}
+
 func formatBytes(bytes int64) string {
 	const unit = 1024
 	if bytes < unit {
