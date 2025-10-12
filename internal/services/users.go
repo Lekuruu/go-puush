@@ -102,6 +102,19 @@ func UpdateUserLatestActivity(userId int, state *app.State) error {
 	return nil
 }
 
+func UpdateUserDefaultPool(userId int, poolId int, state *app.State) error {
+	result := state.Database.Exec(
+		"UPDATE users SET default_pool_id = ? WHERE id = ?",
+		poolId, userId,
+	)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func UpdateUser(user *database.User, state *app.State) error {
 	result := state.Database.Save(user)
 

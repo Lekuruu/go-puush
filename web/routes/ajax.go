@@ -152,6 +152,51 @@ func DeleteUpload(ctx *app.Context) {
 	renderRaw(200, "text/html", []byte{}, ctx)
 }
 
+func UpdateDefaultPool(ctx *app.Context) {
+	user, err := GetUserSession(ctx)
+	if err != nil || user == nil {
+		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	err = ctx.Request.ParseForm()
+	if err != nil {
+		renderText(400, "Bad request", ctx)
+		return
+	}
+
+	targetPoolIdStr := ctx.Request.FormValue("p")
+	if targetPoolIdStr == "" {
+		renderText(400, "Bad request", ctx)
+		return
+	}
+
+	targetPoolId, err := strconv.Atoi(targetPoolIdStr)
+	if err != nil {
+		renderText(400, "Bad request", ctx)
+		return
+	}
+
+	targetPool, err := services.FetchPoolById(targetPoolId, ctx.State)
+	if err != nil || targetPool == nil {
+		renderText(400, "Pool was not found", ctx)
+		return
+	}
+	if targetPool.UserId != user.Id {
+		renderText(403, "You do not own that pool", ctx)
+		return
+	}
+
+	user.DefaultPoolId = targetPool.Id
+	err = services.UpdateUserDefaultPool(user.Id, targetPool.Id, ctx.State)
+	if err != nil {
+		renderText(500, "Server error", ctx)
+		return
+	}
+
+	renderTemplate(ctx, "ajax/success", nil)
+}
+
 func resolveTargetUploadsFromQuery(ctx *app.Context) ([]*database.Upload, error) {
 	identifiersString := ctx.Request.URL.Query().Get("i")
 	if identifiersString == "" {
