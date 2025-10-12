@@ -37,7 +37,7 @@ func MoveDialog(ctx *app.Context) {
 }
 
 func MoveUpload(ctx *app.Context) {
-	user, err := GetUserSession(ctx, "Pools")
+	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
 		return
@@ -91,7 +91,7 @@ func MoveUpload(ctx *app.Context) {
 		}
 
 		upload.PoolId = targetPool.Id
-		err = services.UpdateUpload(upload, ctx.State)
+		err = services.UpdateUploadPool(upload.Id, targetPool.Id, ctx.State)
 		if err != nil {
 			renderText(500, "Server error", ctx)
 			return

@@ -107,6 +107,22 @@ func UpdateUpload(upload *database.Upload, state *app.State) error {
 	return nil
 }
 
+func UpdateUploadPool(uploadId int, poolId int, state *app.State) error {
+	upload := &database.Upload{}
+	result := state.Database.First(upload, uploadId)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	upload.PoolId = poolId
+	result = state.Database.Save(upload)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func UpdatePoolUploadCount(poolId int, state *app.State) error {
 	count, err := FetchPoolUploadCount(poolId, state)
 	if err != nil {
