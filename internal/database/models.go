@@ -71,6 +71,10 @@ func (upload *Upload) IsVideo() bool {
 	return strings.HasPrefix(upload.MimeType, "video")
 }
 
+func (upload *Upload) SizeHumanReadable() string {
+	return formatBytes(upload.Filesize)
+}
+
 func (upload *Upload) Url() string {
 	if upload.Pool == nil {
 		return ""
@@ -133,4 +137,20 @@ func (shortlink *ShortLink) UrlEncoded() string {
 		return fmt.Sprintf("/%s/%s", shortlink.Upload.Pool.Identifier, url.PathEscape(shortlink.Identifier))
 	}
 	return fmt.Sprintf("/%s", url.PathEscape(shortlink.Identifier))
+}
+
+func formatBytes(bytes int64) string {
+	const unit = 1024
+	if bytes < unit {
+		return fmt.Sprintf("%dB", bytes)
+	}
+
+	div, exp := int64(unit), 0
+	for n := bytes / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+
+	units := []string{"KB", "MB", "GB", "TB", "PB", "EB"}
+	return fmt.Sprintf("%.2f%s", float64(bytes)/float64(div), units[exp])
 }

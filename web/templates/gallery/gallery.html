@@ -1,5 +1,5 @@
-{{ define "account/gallery" }}
-{{ template "account/header" . }}
+{{ define "gallery" }}
+{{ template "gallery/header" . }}
 <script type="text/javascript" charset="utf-8">
     var feed = "/{{ .User.Name }}/{{ .Pool.Name }}/feed";
     var base_img_url = "{{ .Config.Cdn.Url }}";
@@ -26,5 +26,5 @@
         </div>
     </div>
 </body>
-{{ template "account/footer" . }}
+{{ template "gallery/footer" . }}
 {{ end }}

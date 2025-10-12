@@ -18,6 +18,10 @@ func InitializeRoutes(server *app.Server) {
 	server.Router.HandleFunc("/tos", server.ContextMiddleware(routes.TermsOfService)).Methods("GET")
 	server.Router.HandleFunc("/dmca", server.ContextMiddleware(routes.Dmca)).Methods("GET")
 
+	// Gallery pages
+	server.Router.HandleFunc("/{username}/Gallery", server.ContextMiddleware(routes.Gallery)).Methods("GET")
+	server.Router.HandleFunc("/{username}/Public/feed", server.ContextMiddleware(routes.GalleryFeed)).Methods("GET")
+
 	// Initialize static routes
 	server.Router.PathPrefix("/dl/").Handler(http.StripPrefix("/dl/", http.FileServer(http.Dir("web/static/dl/"))))
 	server.Router.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("web/static/js/"))))

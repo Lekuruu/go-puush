@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -29,6 +30,21 @@ func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]interface
 		// TODO: Error templates
 		http.Error(ctx.Response, "Template execution error", http.StatusInternalServerError)
 		log.Println("Template execution error:", err)
+	}
+}
+
+func renderText(status int, text string, ctx *app.Context) {
+	ctx.Response.WriteHeader(status)
+	ctx.Response.Header().Set("Content-Type", "text/plain")
+	ctx.Response.Write([]byte(text))
+}
+
+func renderJson(status int, object any, ctx *app.Context) {
+	ctx.Response.WriteHeader(status)
+	ctx.Response.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(ctx.Response).Encode(object)
+	if err != nil {
+		log.Println("JSON marshal error:", err)
 	}
 }
 

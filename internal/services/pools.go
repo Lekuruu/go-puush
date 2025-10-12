@@ -43,6 +43,18 @@ func FetchPoolByIdentifier(identifier string, state *app.State, preload ...strin
 	return pool, nil
 }
 
+func FetchPoolByUserAndName(userId int, name string, state *app.State, preload ...string) (*database.Pool, error) {
+	pool := &database.Pool{}
+	query := preloadQuery(state, preload).Where("user_id = ? AND name = ?", userId, name)
+	result := query.First(pool)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return pool, nil
+}
+
 func PoolExists(identifier string, state *app.State) (bool, error) {
 	var count int64
 	result := state.Database.Model(&database.Pool{}).Where("identifier = ?", identifier).Count(&count)

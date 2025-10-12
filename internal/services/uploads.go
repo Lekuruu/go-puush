@@ -62,6 +62,18 @@ func FetchUploadByFilenameAndPool(filename string, poolId int, state *app.State,
 	return upload, nil
 }
 
+func FetchUploadsByPool(poolId int, state *app.State, preload ...string) ([]*database.Upload, error) {
+	var uploads []*database.Upload
+	query := preloadQuery(state, preload).Where("pool_id = ?", poolId).Order("created_at DESC")
+	result := query.Find(&uploads)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return uploads, nil
+}
+
 func UpdateUpload(upload *database.Upload, state *app.State) error {
 	result := state.Database.Save(upload)
 
