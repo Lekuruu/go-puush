@@ -30,5 +30,8 @@ The following features have been implemented or are planned for the future:
     - [x] Serving thumbnails
 - [ ] Web
     - [x] Public pages (Home, Login, Register, About, ...)
-    - [ ] Account page
-    - [ ] Gallery page
+    - [x] Account page(s)
+    - [x] Gallery page
+    - [x] Login functionality
+    - [ ] Registration functionality
+    - [ ] Account page ajax routes
