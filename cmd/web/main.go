@@ -33,6 +33,7 @@ func InitializeRoutes(server *app.Server) {
 	// Account pages
 	server.Router.HandleFunc("/account", server.ContextMiddleware(routes.Account)).Methods("GET")
 	server.Router.HandleFunc("/account/", server.ContextMiddleware(routes.Account)).Methods("GET")
+	server.Router.HandleFunc("/account/go_pro", server.ContextMiddleware(routes.AccountGoPro)).Methods("GET")
 	server.Router.HandleFunc("/account/settings", server.ContextMiddleware(routes.AccountSettings)).Methods("GET")
 	server.Router.HandleFunc("/account/subscription", server.ContextMiddleware(routes.AccountSubscription)).Methods("GET")
 

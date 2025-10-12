@@ -1,0 +1,91 @@
+{{ define "account/pro" }}
+{{ template "account/header" . }}
+<div id="subscription-body">
+	<h1>Why Pro?</h1>
+	<div id="spam">
+		<table id="comparison" width="100%">
+			<tbody>
+				<tr>
+					<th></th>
+					<th width="20%">Free</th>
+					<th width="20%">Pro</th>
+				</tr>
+				<tr>
+					<td><strong>puush</strong> screenshots from Windows, OS X and iOS.</td>
+					<td class="answer checked"></td>
+					<td class="answer checked"></td>
+				</tr>
+				<tr>
+					<td>Ad-free sharing of screenshots.</td>
+					<td class="answer checked"></td>
+					<td class="answer checked"></td>
+				</tr>
+				<tr>
+					<td>Delete and manage <strong>puushed</strong> files using online tools.</td>
+					<td class="answer checked"></td>
+					<td class="answer checked"></td>
+				</tr>
+				<!--
+					<tr>
+						<td>Organize <strong>puushed</strong> files into multiple pools.</td>
+						<td class="answer"></td><td class="answer checked"></td>
+					</tr>
+                -->
+				<tr>
+					<td>That warm and fuzzy feeling from supporting <strong>puush</strong>.</td>
+					<td class="answer"></td>
+					<td class="answer checked"></td>
+				</tr>
+				<tr>
+					<td>Retention period</td>
+					<td class="answer">1 month since last access</td>
+					<td class="answer"><b>Up to 6 months since last access</b></td>
+
+				</tr>
+				<tr>
+					<td>Maximum filesize</td>
+					<td class="answer">20mb</td>
+					<td class="answer"><b>250mb</b></td>
+				</tr>
+				<tr>
+					<td>Total account storage</td>
+
+					<td class="answer"><b>Unlimited</b></td>
+					<td class="answer"><b>Unlimited</b></td>
+				</tr>
+				<tr>
+					<td>Cost</td>
+					<td class="answer"><b>Free</b></td>
+					<td class="answer">US$15/year</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<h1>Subscribe</h1>
+	<div id="subscription-renew">
+		<p>
+            Your account is:
+            <strong>
+                {{ .User.Type.String }} Account
+            </strong><br>
+            Your account expires:
+            <strong>
+                {{ if eq .User.SubscriptionEnd nil }}Never{{ else }}{{ .User.SubscriptionEnd.Format "Jan 2, 2006" }}{{ end }}
+            </strong>
+        </p>
+		<p>
+            The current subscription cost is US$15/year. You will be charged <b>once-off</b> upon purchase, upgrading
+			your account and enabling pro features across all puush clients you use. If you are already pro, your
+			existing subscription will be extended.
+        </p>
+		<p>Please choose your preferred method of payment below:</p>
+		<div class="payment-method">
+			<h3>Paypal</h3>
+			<!-- TODO -->
+            coming soon™
+		</div>
+		<div class="clear"></div>
+	</div>
+</div>
+{{ template "account/footer" . }}
+{{ end }}
