@@ -63,7 +63,9 @@
                     <input type="radio"
                            name="default_pool"
                            value="{{ .Id }}"
-                           id="pool_{{ .Id }}" {{ if eq .Id $.User.DefaultPoolId }}checked="checked"{{ end }}>
+                           id="pool_{{ .Id }}"
+                           {{ if eq .Id $.User.DefaultPoolId }}checked="checked"{{ end }}
+                           onclick="set_default_pool({{ .Id }})">
                 </td>
                 <td>{{ .Name }}</td>
                 <td>
