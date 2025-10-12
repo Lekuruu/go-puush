@@ -37,6 +37,10 @@ func InitializeRoutes(server *app.Server) {
 	server.Router.HandleFunc("/account/settings", server.ContextMiddleware(routes.AccountSettings)).Methods("GET")
 	server.Router.HandleFunc("/account/subscription", server.ContextMiddleware(routes.AccountSubscription)).Methods("GET")
 
+	// AJAX pages
+	server.Router.HandleFunc("/ajax/move_dialog/", server.ContextMiddleware(routes.MoveDialog)).Methods("GET")
+	server.Router.HandleFunc("/ajax/move_upload", server.ContextMiddleware(routes.MoveUpload)).Methods("POST")
+
 	// Thumbnail page
 	server.Router.HandleFunc("/thumb/view/{identifier}", server.ContextMiddleware(routes.Thumbnail)).Methods("GET")
 

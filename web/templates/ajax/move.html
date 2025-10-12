@@ -1,0 +1,16 @@
+{{ define "ajax/move" }}
+<h1 style='color:black; margin-top: -5px;'>Move where?</h1>
+<div id="puush_pools_dialog">
+    {{ range .User.Pools }}
+    <div class="puush_pool">
+        <div class="thumb" style="background-image: url(/thumb/view/{{ index $.PoolThumbnails .Id }});">
+            <a href="#" onclick="puush_do_move({{ .Id }})"><span>{{ .Name }} ({{ .UploadCount }})</span></a>
+        </div>
+    </div>
+    {{ end }}
+</div>
+<div class='clear'></div>
+<p style="padding-top: 5px;">
+    Moving <strong>{{ len .TargetUploads }}</strong> puush'd files... <a href='#' onclick='close_popup()'>cancel</a>
+</p>
+{{ end }}
