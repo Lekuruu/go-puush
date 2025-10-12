@@ -3,6 +3,7 @@ package routes
 import (
 	"errors"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/Lekuruu/go-puush/internal/app"
@@ -32,6 +33,11 @@ func Account(ctx *app.Context) {
 	// Update view type if changed in query
 	user.ViewType = resolveViewTypeFromRequest(user, ctx)
 	services.UpdateUser(user, ctx.State)
+
+	// Sort uploads in selected pool by created descending
+	sort.SliceStable(selectedPool.Uploads, func(i, j int) bool {
+		return selectedPool.Uploads[i].CreatedAt.After(selectedPool.Uploads[j].CreatedAt)
+	})
 
 	renderTemplate(ctx, "account/home", map[string]interface{}{
 		"Title":          "account",
