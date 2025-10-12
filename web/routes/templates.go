@@ -35,6 +35,14 @@ func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]interface
 	}
 }
 
+func renderErrorTemplate(title string, message string, ctx *app.Context) {
+	renderTemplate(ctx, "public/response", map[string]interface{}{
+		"Title":        "error",
+		"ErrorTitle":   title,
+		"ErrorMessage": message,
+	})
+}
+
 func renderRaw(status int, contentType string, data []byte, ctx *app.Context) {
 	ctx.Response.Header().Set("Content-Type", contentType)
 	ctx.Response.WriteHeader(status)
