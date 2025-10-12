@@ -97,6 +97,21 @@ func FetchPoolUploadCount(poolId int, state *app.State) (int64, error) {
 	return count, nil
 }
 
+func SearchUploadsFromPool(queryStr string, poolId int, state *app.State, preload ...string) ([]*database.Upload, error) {
+	var uploads []*database.Upload
+	query := preloadQuery(state, preload).Where("pool_id = ?", poolId).
+		Where("filename LIKE ?", "%"+queryStr+"%").
+		Order("created_at DESC")
+	result := query.Find(&uploads)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	// TODO: Full-text search / fuzzy search
+	return uploads, nil
+}
+
 func UpdateUpload(upload *database.Upload, state *app.State) error {
 	result := state.Database.Save(upload)
 

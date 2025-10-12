@@ -24,9 +24,15 @@ func Account(ctx *app.Context) {
 		return
 	}
 
+	selectedPool.Uploads, err = resolvePoolUploads(selectedPool, ctx)
+	if err != nil {
+		renderText(500, "Server error", ctx)
+		return
+	}
+
 	poolThumbnails, err := resolvePoolThumbnails(user.Pools, ctx)
 	if err != nil {
-		http.Redirect(ctx.Response, ctx.Request, "/account", http.StatusTemporaryRedirect)
+		renderText(500, "Server error", ctx)
 		return
 	}
 
@@ -120,7 +126,7 @@ func resolveViewTypeFromRequest(user *database.User, ctx *app.Context) database.
 func resolvePoolFromRequest(user *database.User, ctx *app.Context) (*database.Pool, error) {
 	poolId := ctx.Request.URL.Query().Get("pool")
 	if poolId == "" {
-		return services.FetchPoolById(user.DefaultPoolId, ctx.State, "Uploads", "Uploads.Link")
+		return services.FetchPoolById(user.DefaultPoolId, ctx.State)
 	}
 
 	id, err := strconv.Atoi(poolId)
@@ -128,7 +134,7 @@ func resolvePoolFromRequest(user *database.User, ctx *app.Context) (*database.Po
 		return nil, err
 	}
 
-	pool, err := services.FetchPoolById(id, ctx.State, "Uploads", "Uploads.Link")
+	pool, err := services.FetchPoolById(id, ctx.State)
 	if err != nil {
 		return nil, err
 	}
@@ -140,6 +146,23 @@ func resolvePoolFromRequest(user *database.User, ctx *app.Context) (*database.Po
 	}
 
 	return pool, nil
+}
+
+func resolvePoolUploads(pool *database.Pool, ctx *app.Context) ([]*database.Upload, error) {
+	searchQuery := ctx.Request.URL.Query().Get("q")
+	if searchQuery != "" {
+		uploads, err := services.SearchUploadsFromPool(searchQuery, pool.Id, ctx.State, "Link")
+		if err != nil {
+			return nil, err
+		}
+		return uploads, nil
+	}
+
+	uploads, err := services.FetchUploadsByPool(pool.Id, ctx.State, "Link")
+	if err != nil {
+		return nil, err
+	}
+	return uploads, nil
 }
 
 func resolvePoolThumbnails(pools []*database.Pool, ctx *app.Context) (map[int]string, error) {
