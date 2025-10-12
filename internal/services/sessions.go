@@ -80,6 +80,16 @@ func ExtendSession(session *database.Session, duration time.Duration, state *app
 	return nil
 }
 
+func CleanupExpiredSessions(state *app.State) error {
+	result := state.Database.Where("expires_at < ?", time.Now()).Delete(&database.Session{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func generateSessionToken() (string, error) {
 	bytes := make([]byte, 32)
 	if _, err := rand.Read(bytes); err != nil {
