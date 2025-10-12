@@ -123,6 +123,9 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
+	// Set upload for link to make url work properly
+	shortlink.Upload = upload
+
 	uploadResponse := &UploadResponse{
 		UploadUrl:        ctx.State.Config.Cdn.Url + shortlink.UrlEncoded(),
 		UpdatedDiskUsage: user.DiskUsage,
