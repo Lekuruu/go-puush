@@ -44,6 +44,19 @@ func AccountSettings(ctx *app.Context) {
 	})
 }
 
+func AccountSubscription(ctx *app.Context) {
+	user, err := GetUserSession(ctx)
+	if err != nil || user == nil {
+		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	renderTemplate(ctx, "account/subscription", map[string]interface{}{
+		"Title": "account - subscription history",
+		"User":  user,
+	})
+}
+
 func resolveViewTypeFromRequest(ctx *app.Context) string {
 	query := ctx.Request.URL.Query()
 

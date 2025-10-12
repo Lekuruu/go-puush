@@ -1,0 +1,34 @@
+{{ define "account/subscription" }}
+{{ template "account/header" . }}
+<div id="my-settings">
+	<div class="content">
+		<div id="settings-wrapper">
+			<div id="myaccount-history">
+				<div id="post-purchase" class="eyecatch hidden">
+					<h1>Thanks for your purchase!</h1><br>
+					Your payment will be processed shortly (if it hasn't already) and your account's pro features will
+					be enabled - you will be emailed when this hapens. If you have any questions or experience any
+					problems, please feel free to contact us.
+				</div>
+				<h1>Subscription History</h1>
+				<div id="subscription-history">
+					<table>
+						<tbody>
+							<tr>
+								<th>Purchase Date</th>
+								<th>Method</th>
+								<th>Plan</th>
+								<th>Starts</th>
+								<th>Expires</th>
+								<th>Status</th>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div>
+{{ template "account/footer" . }}
+{{ end }}

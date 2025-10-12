@@ -34,7 +34,7 @@ func InitializeRoutes(server *app.Server) {
 	server.Router.HandleFunc("/account", server.ContextMiddleware(routes.Account)).Methods("GET")
 	server.Router.HandleFunc("/account/", server.ContextMiddleware(routes.Account)).Methods("GET")
 	server.Router.HandleFunc("/account/settings", server.ContextMiddleware(routes.AccountSettings)).Methods("GET")
-	server.Router.HandleFunc("/account/settings/", server.ContextMiddleware(routes.AccountSettings)).Methods("GET")
+	server.Router.HandleFunc("/account/subscription", server.ContextMiddleware(routes.AccountSubscription)).Methods("GET")
 
 	// Thumbnail page
 	server.Router.HandleFunc("/thumb/view/{identifier}", server.ContextMiddleware(routes.Thumbnail)).Methods("GET")
