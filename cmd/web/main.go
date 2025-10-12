@@ -8,6 +8,7 @@ import (
 )
 
 func InitializeRoutes(server *app.Server) {
+	// Public pages
 	server.Router.HandleFunc("/", server.ContextMiddleware(routes.Home)).Methods("GET")
 	server.Router.HandleFunc("/faq", server.ContextMiddleware(routes.Faq)).Methods("GET")
 	server.Router.HandleFunc("/about", server.ContextMiddleware(routes.About)).Methods("GET")
@@ -24,6 +25,9 @@ func InitializeRoutes(server *app.Server) {
 	// Account pages
 	server.Router.HandleFunc("/account", server.ContextMiddleware(routes.Account)).Methods("GET")
 	server.Router.HandleFunc("/account/", server.ContextMiddleware(routes.Account)).Methods("GET")
+
+	// Thumbnail page
+	server.Router.HandleFunc("/thumb/view/{identifier}", server.ContextMiddleware(routes.Thumbnail)).Methods("GET")
 
 	// Initialize static routes
 	server.Router.PathPrefix("/dl/").Handler(http.StripPrefix("/dl/", http.FileServer(http.Dir("web/static/dl/"))))

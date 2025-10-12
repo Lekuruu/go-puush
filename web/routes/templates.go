@@ -33,6 +33,12 @@ func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]interface
 	}
 }
 
+func renderRaw(status int, contentType string, data []byte, ctx *app.Context) {
+	ctx.Response.WriteHeader(status)
+	ctx.Response.Header().Set("Content-Type", contentType)
+	ctx.Response.Write(data)
+}
+
 func renderText(status int, text string, ctx *app.Context) {
 	ctx.Response.WriteHeader(status)
 	ctx.Response.Header().Set("Content-Type", "text/plain")
