@@ -70,7 +70,7 @@
             </strong><br>
             Your account expires:
             <strong>
-                {{ if eq .User.SubscriptionEnd nil }}Never{{ else }}{{ .User.SubscriptionEnd.Format "Jan 2, 2006" }}{{ end }}
+                {{ if .User.SubscriptionEnd }}{{ .User.SubscriptionEnd.Format "Jan 2, 2006" }}{{ else }}Never{{ end }}
             </strong>
         </p>
 		<p>
