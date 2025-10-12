@@ -5,7 +5,7 @@
         {{ range .User.Pools }}
         <div class="puush_pool {{ if eq .Id $.SelectedPool.Id }}selected {{ end }}{{ .Type.String | lower }}" id="pool_{{ .Id }}">
             <a href="/account/?pool={{ .Id }}" title="{{ .Name }} ({{ .UploadCount }})">
-                <div class="thumb" style="background-image: url(/thumb/view/{{ .Identifier }});"></div>
+                <div class="thumb" style="background-image: url(/thumb/view/{{ index $.PoolThumbnails .Id }});"></div>
                 <span class="{{ .Type.String | lower }} overlay"></span>
                 <span>{{ .Name }} ({{ .UploadCount }})</span>
             </a>

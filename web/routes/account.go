@@ -23,11 +23,18 @@ func Account(ctx *app.Context) {
 		return
 	}
 
+	poolThumbnails, err := resolvePoolThumbnails(user.Pools, ctx)
+	if err != nil {
+		http.Redirect(ctx.Response, ctx.Request, "/account", http.StatusTemporaryRedirect)
+		return
+	}
+
 	renderTemplate(ctx, "account/home", map[string]interface{}{
-		"Title":        "account",
-		"User":         user,
-		"SelectedPool": selectedPool,
-		"ViewType":     resolveViewTypeFromRequest(ctx),
+		"Title":          "account",
+		"User":           user,
+		"SelectedPool":   selectedPool,
+		"PoolThumbnails": poolThumbnails,
+		"ViewType":       resolveViewTypeFromRequest(ctx),
 	})
 }
 
@@ -107,4 +114,17 @@ func resolvePoolFromRequest(user *database.User, ctx *app.Context) (*database.Po
 	}
 
 	return pool, nil
+}
+
+func resolvePoolThumbnails(pools []*database.Pool, ctx *app.Context) (map[int]string, error) {
+	thumbnails := make(map[int]string, len(pools))
+	for _, pool := range pools {
+		lastUpload, err := services.FetchLastPoolUpload(pool.Id, ctx.State, "Link")
+		if err != nil || lastUpload == nil {
+			thumbnails[pool.Id] = pool.Identifier
+			continue
+		}
+		thumbnails[pool.Id] = lastUpload.Link.Identifier
+	}
+	return thumbnails, nil
 }
