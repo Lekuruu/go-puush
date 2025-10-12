@@ -8,6 +8,19 @@ const (
 	AccountTypeUnlimited
 )
 
+func (at AccountType) String() string {
+	switch at {
+	case AccountTypeRegular:
+		return "Free"
+	case AccountTypePro:
+		return "Pro"
+	case AccountTypeUnlimited:
+		return "Haxxor"
+	default:
+		return "Unknown"
+	}
+}
+
 type PoolType int8
 
 const (
