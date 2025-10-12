@@ -66,8 +66,8 @@ func ClearUserSession(ctx *app.Context) error {
 	return nil
 }
 
-func UserPasswordAuthentication(username string, password string, state *app.State) (*database.User, bool) {
-	user, err := services.FetchUserByNameOrEmail(username, state)
+func UserPasswordAuthentication(email string, password string, state *app.State) (*database.User, bool) {
+	user, err := services.FetchUserByNameOrEmail(email, state)
 	if err != nil {
 		return nil, false
 	}
@@ -76,35 +76,23 @@ func UserPasswordAuthentication(username string, password string, state *app.Sta
 		return nil, false
 	}
 
-	if !user.Active {
-		return nil, false
-	}
-
 	return user, true
 }
 
-func UserKeyAuthentication(username string, key string, state *app.State) (*database.User, bool) {
-	user, err := services.FetchUserByNameOrEmail(username, state)
+func UserKeyAuthentication(key string, state *app.State) (*database.User, bool) {
+	user, err := services.FetchUserByApiKey(key, state)
 	if err != nil {
 		return nil, false
 	}
 
-	if user.ApiKey != key {
-		return nil, false
-	}
-
-	if !user.Active {
-		return nil, false
-	}
-
 	return user, true
 }
 
-func UserAuthenticationDynamic(username string, password string, key string, state *app.State) (*database.User, bool) {
+func UserAuthenticationDynamic(email string, password string, key string, state *app.State) (*database.User, bool) {
 	if key != "" {
-		return UserKeyAuthentication(username, key, state)
+		return UserKeyAuthentication(key, state)
 	} else if password != "" {
-		return UserPasswordAuthentication(username, password, state)
+		return UserPasswordAuthentication(email, password, state)
 	}
 	return nil, false
 }

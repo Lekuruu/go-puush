@@ -15,7 +15,7 @@ func Login(ctx *app.Context) {
 }
 
 func PerformLogin(ctx *app.Context) {
-	key := ctx.Request.FormValue("k")
+	key := ctx.Request.URL.Query().Get("k")
 	email := ctx.Request.FormValue("email")
 	password := ctx.Request.FormValue("password")
 

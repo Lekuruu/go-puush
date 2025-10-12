@@ -20,7 +20,8 @@ func InitializeRoutes(server *app.Server) {
 	// Login pages
 	server.Router.HandleFunc("/login", server.ContextMiddleware(routes.Login)).Methods("GET")
 	server.Router.HandleFunc("/login/", server.ContextMiddleware(routes.Login)).Methods("GET")
-	server.Router.HandleFunc("/login/go", server.ContextMiddleware(routes.PerformLogin)).Methods("POST")
+	server.Router.HandleFunc("/login/go", server.ContextMiddleware(routes.PerformLogin)).Methods("GET", "POST")
+	server.Router.HandleFunc("/login/go/", server.ContextMiddleware(routes.PerformLogin)).Methods("GET", "POST")
 	server.Router.HandleFunc("/login/retry", server.ContextMiddleware(routes.Login)).Methods("GET")
 	server.Router.HandleFunc("/login/retry/", server.ContextMiddleware(routes.Login)).Methods("GET")
 	server.Router.HandleFunc("/logout", server.ContextMiddleware(routes.Logout)).Methods("GET")
