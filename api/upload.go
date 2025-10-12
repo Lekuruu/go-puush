@@ -104,8 +104,7 @@ func PuushUpload(ctx *app.Context) {
 		services.CreateThumbnail(upload.Key(), fileData, ctx.State)
 	}
 
-	user.DefaultPool.UploadCount = len(user.DefaultPool.Uploads) + 1
-	err = services.UpdatePool(user.DefaultPool, ctx.State)
+	err = services.UpdatePoolUploadCount(upload.Pool.Id, ctx.State)
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return

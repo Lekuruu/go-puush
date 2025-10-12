@@ -60,8 +60,7 @@ func PuushDelete(ctx *app.Context) {
 	}
 
 	// Update pool upload count
-	upload.Pool.UploadCount = len(upload.Pool.Uploads) - 1
-	err = services.UpdatePool(upload.Pool, ctx.State)
+	err = services.UpdatePoolUploadCount(upload.Pool.Id, ctx.State)
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return

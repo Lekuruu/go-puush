@@ -86,11 +86,65 @@ func FetchUploadsByPool(poolId int, state *app.State, preload ...string) ([]*dat
 	return uploads, nil
 }
 
+func FetchPoolUploadCount(poolId int, state *app.State) (int64, error) {
+	var count int64
+	result := state.Database.Model(&database.Upload{}).Where("pool_id = ?", poolId).Count(&count)
+
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return count, nil
+}
+
 func UpdateUpload(upload *database.Upload, state *app.State) error {
 	result := state.Database.Save(upload)
 
 	if result.Error != nil {
 		return result.Error
+	}
+
+	return nil
+}
+
+func UpdatePoolUploadCount(poolId int, state *app.State) error {
+	count, err := FetchPoolUploadCount(poolId, state)
+	if err != nil {
+		return err
+	}
+
+	pool := &database.Pool{}
+	result := state.Database.First(pool, poolId)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	pool.UploadCount = int(count)
+	err = UpdatePool(pool, state)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdatePoolUploadCounts(user *database.User, state *app.State) error {
+	var pools []*database.Pool
+	result := state.Database.Where("user_id = ?", user.Id).Find(&pools)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	for _, pool := range pools {
+		count, err := FetchPoolUploadCount(pool.Id, state)
+		if err != nil {
+			return err
+		}
+		pool.UploadCount = int(count)
+		err = UpdatePool(pool, state)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
