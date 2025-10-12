@@ -33,6 +33,7 @@ type Config struct {
 		DownloadMac         string `envconfig:"DOWNLOAD_MAC" default:"/dl/puush.zip"`
 		DownloadIOS         string `envconfig:"DOWNLOAD_IOS" default:"https://itunes.apple.com/au/app/puush/id386524126"`
 		RegistrationEnabled bool   `envconfig:"REGISTRATION_ENABLED" default:"true"`
+		RequireActivation   bool   `envconfig:"REQUIRE_ACTIVATION" default:"false"`
 	}
 	Database database.DatabaseConfig
 }

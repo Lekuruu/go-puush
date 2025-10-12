@@ -37,9 +37,17 @@ func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]interface
 
 func renderErrorTemplate(title string, message string, ctx *app.Context) {
 	renderTemplate(ctx, "public/response", map[string]interface{}{
-		"Title":        "error",
-		"ErrorTitle":   title,
-		"ErrorMessage": message,
+		"Title":           "error",
+		"ResponseTitle":   title,
+		"ResponseMessage": message,
+	})
+}
+
+func renderResponseTemplate(title string, message string, siteTitle string, ctx *app.Context) {
+	renderTemplate(ctx, "public/response", map[string]interface{}{
+		"Title":           siteTitle,
+		"ResponseTitle":   title,
+		"ResponseMessage": message,
 	})
 }
 

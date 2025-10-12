@@ -7,14 +7,73 @@ import (
 	"github.com/Lekuruu/go-puush/internal/database"
 )
 
-func CreateUser(user *database.User, state *app.State) error {
-	result := state.Database.Create(user)
-
-	if result.Error != nil {
-		return result.Error
+func CreateUser(email string, password string, state *app.State) (*database.User, error) {
+	passwordHash, err := app.CreatePasswordHash(password)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	user := &database.User{
+		Name:           "",
+		Email:          email,
+		Password:       passwordHash,
+		CreatedAt:      time.Now(),
+		LatestActivity: time.Now(),
+		Active:         !state.Config.Service.RequireActivation,
+		ApiKey:         app.GenerateApiKey(),
+	}
+	result := state.Database.Create(user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	publicPool := &database.Pool{
+		UserId:     user.Id,
+		Name:       "Public",
+		Identifier: app.GeneratePoolIdentifier(),
+		Type:       database.PoolTypePublic,
+		CreatedAt:  time.Now(),
+		LastUpload: time.Now(),
+	}
+	privatePool := &database.Pool{
+		UserId:     user.Id,
+		Name:       "Private",
+		Identifier: app.GeneratePoolIdentifier(),
+		Type:       database.PoolTypePrivate,
+		CreatedAt:  time.Now(),
+		LastUpload: time.Now(),
+	}
+	galleryPool := &database.Pool{
+		UserId:     user.Id,
+		Name:       "Gallery",
+		Identifier: app.GeneratePoolIdentifier(),
+		Type:       database.PoolTypeGallery,
+		CreatedAt:  time.Now(),
+		LastUpload: time.Now(),
+	}
+
+	result = state.Database.Create(publicPool)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	result = state.Database.Create(privatePool)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	result = state.Database.Create(galleryPool)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	user.DefaultPoolId = publicPool.Id
+	result = state.Database.Save(user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user, nil
 }
 
 func FetchUserById(id int, state *app.State, preload ...string) (*database.User, error) {
