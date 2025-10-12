@@ -23,6 +23,8 @@ func InitializeRoutes(server *app.Server) {
 	server.Router.HandleFunc("/login/go", server.ContextMiddleware(routes.PerformLogin)).Methods("POST")
 	server.Router.HandleFunc("/login/retry", server.ContextMiddleware(routes.Login)).Methods("GET")
 	server.Router.HandleFunc("/login/retry/", server.ContextMiddleware(routes.Login)).Methods("GET")
+	server.Router.HandleFunc("/logout", server.ContextMiddleware(routes.Logout)).Methods("GET")
+	server.Router.HandleFunc("/logout/", server.ContextMiddleware(routes.Logout)).Methods("GET")
 
 	// Gallery pages
 	server.Router.HandleFunc("/{username}/Gallery", server.ContextMiddleware(routes.Gallery)).Methods("GET")

@@ -46,6 +46,26 @@ func SetUserSession(user *database.User, ctx *app.Context) error {
 	return nil
 }
 
+func ClearUserSession(ctx *app.Context) error {
+	// Try to get the session token from the cookies
+	sessionToken, err := ctx.Request.Cookie(sessionCookieName)
+	if err != nil {
+		return err
+	}
+
+	// Invalidate the session using the token
+	// We don't need to handle the error here
+	services.DeleteSession(sessionToken.Value, ctx.State)
+
+	// Remove the session cookie from the response
+	http.SetCookie(ctx.Response, &http.Cookie{
+		Name:    sessionCookieName,
+		Value:   "",
+		Expires: time.Unix(0, 0),
+	})
+	return nil
+}
+
 func UserPasswordAuthentication(username string, password string, state *app.State) (*database.User, bool) {
 	user, err := services.FetchUserByNameOrEmail(username, state)
 	if err != nil {
