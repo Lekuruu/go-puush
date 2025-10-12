@@ -8,7 +8,7 @@ import (
 	"github.com/Lekuruu/go-puush/internal/database"
 )
 
-const minimumLinkIdentifierLength = 3
+const minimumLinkIdentifierLength = 5
 const maximumLinkIdentifierLength = 16
 
 func CreateShortLink(uploadId int, expiresAt *time.Time, state *app.State) (*database.ShortLink, error) {
