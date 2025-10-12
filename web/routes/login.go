@@ -25,6 +25,11 @@ func PerformLogin(ctx *app.Context) {
 		return
 	}
 
+	if !user.Active {
+		renderErrorTemplate("Pending Activation", "Please check your email to activate your account.", ctx)
+		return
+	}
+
 	err := SetUserSession(user, ctx)
 	if err != nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login/retry/", http.StatusSeeOther)
