@@ -42,5 +42,5 @@ The following features have been implemented or are planned for the future:
         - [x] Update default pool
         - [x] Reset API key
         - [x] Switch between views
-        - [ ] Search for uploads
+        - [x] Search for uploads
         - [ ] Change password
