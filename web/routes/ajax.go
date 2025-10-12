@@ -82,6 +82,14 @@ func MoveUpload(ctx *app.Context) {
 	}
 
 	for _, upload := range targetUploads {
+		if upload.Pool.UserId != user.Id {
+			renderText(403, "You do not own that upload", ctx)
+			return
+		}
+		if upload.PoolId == targetPool.Id {
+			continue
+		}
+
 		upload.PoolId = targetPool.Id
 		err = services.UpdateUpload(upload, ctx.State)
 		if err != nil {
