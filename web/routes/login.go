@@ -15,10 +15,11 @@ func Login(ctx *app.Context) {
 }
 
 func PerformLogin(ctx *app.Context) {
+	key := ctx.Request.FormValue("k")
 	email := ctx.Request.FormValue("email")
 	password := ctx.Request.FormValue("password")
 
-	user, authenticated := UserPasswordAuthentication(email, password, ctx.State)
+	user, authenticated := UserAuthenticationDynamic(email, password, key, ctx.State)
 	if !authenticated {
 		http.Redirect(ctx.Response, ctx.Request, "/login/retry/", http.StatusSeeOther)
 		return

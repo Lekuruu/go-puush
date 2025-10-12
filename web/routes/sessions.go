@@ -82,3 +82,29 @@ func UserPasswordAuthentication(username string, password string, state *app.Sta
 
 	return user, true
 }
+
+func UserKeyAuthentication(username string, key string, state *app.State) (*database.User, bool) {
+	user, err := services.FetchUserByNameOrEmail(username, state)
+	if err != nil {
+		return nil, false
+	}
+
+	if user.ApiKey != key {
+		return nil, false
+	}
+
+	if !user.Active {
+		return nil, false
+	}
+
+	return user, true
+}
+
+func UserAuthenticationDynamic(username string, password string, key string, state *app.State) (*database.User, bool) {
+	if key != "" {
+		return UserKeyAuthentication(username, key, state)
+	} else if password != "" {
+		return UserPasswordAuthentication(username, password, state)
+	}
+	return nil, false
+}
