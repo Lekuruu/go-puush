@@ -76,6 +76,22 @@ func FetchUserByApiKey(apiKey string, state *app.State, preload ...string) (*dat
 	return user, nil
 }
 
+func RegenerateUserApiKey(userId int, state *app.State) (string, error) {
+	user, err := FetchUserById(userId, state)
+	if err != nil {
+		return "", err
+	}
+
+	user.ApiKey = app.GenerateApiKey()
+	result := state.Database.Save(user)
+
+	if result.Error != nil {
+		return "", result.Error
+	}
+
+	return user.ApiKey, nil
+}
+
 func UpdateUserDiskUsage(userId int, size int64, state *app.State) error {
 	result := state.Database.Exec(
 		"UPDATE users SET disk_usage = disk_usage + ? WHERE id = ?",

@@ -37,6 +37,7 @@ func InitializeRoutes(server *app.Server) {
 	server.Router.HandleFunc("/account/go_pro", server.ContextMiddleware(routes.AccountGoPro)).Methods("GET")
 	server.Router.HandleFunc("/account/settings", server.ContextMiddleware(routes.AccountSettings)).Methods("GET")
 	server.Router.HandleFunc("/account/subscription", server.ContextMiddleware(routes.AccountSubscription)).Methods("GET")
+	server.Router.HandleFunc("/account/reset_api_key", server.ContextMiddleware(routes.AccountResetApiKey)).Methods("GET")
 
 	// AJAX pages
 	server.Router.HandleFunc("/ajax/move_dialog/", server.ContextMiddleware(routes.MoveDialog)).Methods("GET")

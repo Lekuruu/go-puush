@@ -86,6 +86,23 @@ func AccountGoPro(ctx *app.Context) {
 	})
 }
 
+func AccountResetApiKey(ctx *app.Context) {
+	// TODO: Ensure referer is safe before resetting API key
+	user, err := GetUserSession(ctx)
+	if err != nil || user == nil {
+		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	newApiKey, err := services.RegenerateUserApiKey(user.Id, ctx.State)
+	if err != nil {
+		renderText(500, "Server error", ctx)
+		return
+	}
+
+	http.Redirect(ctx.Response, ctx.Request, "/login/go/?k="+newApiKey, http.StatusFound)
+}
+
 func resolveViewTypeFromRequest(user *database.User, ctx *app.Context) database.ViewType {
 	query := ctx.Request.URL.Query()
 
