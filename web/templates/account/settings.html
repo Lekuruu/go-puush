@@ -21,10 +21,10 @@
             </tr>
             <tr class=" hidden">
               <td class="label">Expires:</td>
-              {{ if eq .User.SubscriptionEnd nil }}
-              <td class="value">Never</td>
-              {{ else }}
+              {{ if .User.SubscriptionEnd }}
               <td class="value">{{ .User.SubscriptionEnd.Format "Jan 2, 2006" }}</td>
+              {{ else }}
+              <td class="value">Never</td>
               {{ end }}
               <td class="action">&nbsp;</td>
             </tr>
