@@ -126,5 +126,11 @@ func (shortlink *ShortLink) Url() string {
 }
 
 func (shortlink *ShortLink) UrlEncoded() string {
+	if shortlink.Upload == nil || shortlink.Upload.Pool == nil {
+		return fmt.Sprintf("/%s", url.PathEscape(shortlink.Identifier))
+	}
+	if shortlink.Upload.Pool.Type == PoolTypePrivate {
+		return fmt.Sprintf("/%s/%s", shortlink.Upload.Pool.Identifier, url.PathEscape(shortlink.Identifier))
+	}
 	return fmt.Sprintf("/%s", url.PathEscape(shortlink.Identifier))
 }
