@@ -12,11 +12,17 @@ func InitializeRoutes(server *app.Server) {
 	server.Router.HandleFunc("/", server.ContextMiddleware(routes.Home)).Methods("GET")
 	server.Router.HandleFunc("/faq", server.ContextMiddleware(routes.Faq)).Methods("GET")
 	server.Router.HandleFunc("/about", server.ContextMiddleware(routes.About)).Methods("GET")
-	server.Router.HandleFunc("/login", server.ContextMiddleware(routes.Login)).Methods("GET")
 	server.Router.HandleFunc("/register", server.ContextMiddleware(routes.Register)).Methods("GET")
 	server.Router.HandleFunc("/reset_password", server.ContextMiddleware(routes.ResetPassword)).Methods("GET")
 	server.Router.HandleFunc("/tos", server.ContextMiddleware(routes.TermsOfService)).Methods("GET")
 	server.Router.HandleFunc("/dmca", server.ContextMiddleware(routes.Dmca)).Methods("GET")
+
+	// Login pages
+	server.Router.HandleFunc("/login", server.ContextMiddleware(routes.Login)).Methods("GET")
+	server.Router.HandleFunc("/login/", server.ContextMiddleware(routes.Login)).Methods("GET")
+	server.Router.HandleFunc("/login/go", server.ContextMiddleware(routes.PerformLogin)).Methods("POST")
+	server.Router.HandleFunc("/login/retry", server.ContextMiddleware(routes.Login)).Methods("GET")
+	server.Router.HandleFunc("/login/retry/", server.ContextMiddleware(routes.Login)).Methods("GET")
 
 	// Gallery pages
 	server.Router.HandleFunc("/{username}/Gallery", server.ContextMiddleware(routes.Gallery)).Methods("GET")

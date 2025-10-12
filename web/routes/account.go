@@ -11,13 +11,9 @@ import (
 )
 
 func Account(ctx *app.Context) {
-	// TODO: Implement authentication check
-	// http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusTemporaryRedirect)
-
-	// For testing purposes, render the account page with user ID 1
-	user, err := services.FetchUserById(1, ctx.State, "Pools")
+	user, err := GetUserSession(ctx, "Pools")
 	if err != nil || user == nil {
-		renderText(404, "page not found", ctx)
+		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
 		return
 	}
 

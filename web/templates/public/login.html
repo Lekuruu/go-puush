@@ -3,6 +3,12 @@
 <div id="box">
     <div class="content">
         <h1>Login to manage your files</h1>
+        {{ if .Retry }}
+        <br>
+        <div class="eyecatch">
+            <br><center>Whoops! An account could not be found with those credentials, please check them and try again!</center><br>
+        </div>
+        {{ end }}
         <div id="login_form">
             <form action="/login/go" method="post">
                 <table border="0" cellspacing="5" cellpadding="5">
