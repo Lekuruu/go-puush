@@ -40,6 +40,7 @@ func InitializeRoutes(server *app.Server) {
 	// AJAX pages
 	server.Router.HandleFunc("/ajax/move_dialog/", server.ContextMiddleware(routes.MoveDialog)).Methods("GET")
 	server.Router.HandleFunc("/ajax/move_upload", server.ContextMiddleware(routes.MoveUpload)).Methods("POST")
+	server.Router.HandleFunc("/ajax/delete_upload", server.ContextMiddleware(routes.DeleteUpload)).Methods("POST")
 
 	// Thumbnail page
 	server.Router.HandleFunc("/thumb/view/{identifier}", server.ContextMiddleware(routes.Thumbnail)).Methods("GET")

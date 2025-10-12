@@ -99,6 +99,51 @@ func MoveUpload(ctx *app.Context) {
 	renderRaw(200, "text/html", []byte{}, ctx)
 }
 
+func DeleteUpload(ctx *app.Context) {
+	user, err := GetUserSession(ctx)
+	if err != nil || user == nil {
+		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	err = ctx.Request.ParseForm()
+	if err != nil {
+		renderText(400, "Bad request", ctx)
+		return
+	}
+
+	targetUploads, err := resolveTargetUploadsFromForm(ctx)
+	if err != nil {
+		renderText(500, "Server error", ctx)
+		return
+	}
+	if len(targetUploads) == 0 {
+		renderText(400, "No uploads were specified", ctx)
+		return
+	}
+
+	for _, upload := range targetUploads {
+		if upload.Pool.UserId != user.Id {
+			renderText(403, "You do not own that upload", ctx)
+			return
+		}
+
+		err = services.DeleteUpload(upload, ctx.State)
+		if err != nil {
+			renderText(500, "Server error", ctx)
+			return
+		}
+	}
+
+	err = services.UpdatePoolUploadCounts(user, ctx.State)
+	if err != nil {
+		renderText(500, "Server error", ctx)
+		return
+	}
+
+	renderRaw(200, "text/html", []byte{}, ctx)
+}
+
 func resolveTargetUploadsFromQuery(ctx *app.Context) ([]*database.Upload, error) {
 	identifiersString := ctx.Request.URL.Query().Get("i")
 	if identifiersString == "" {
@@ -125,7 +170,7 @@ func resolveTargetUploadsFromForm(ctx *app.Context) ([]*database.Upload, error) 
 		return []*database.Upload{}, nil
 	}
 
-	links, err := services.FetchManyShortLinksByIdentifiers(identifiers, ctx.State, "Upload")
+	links, err := services.FetchManyShortLinksByIdentifiers(identifiers, ctx.State, "Upload", "Upload.Pool")
 	if err != nil {
 		return nil, err
 	}
