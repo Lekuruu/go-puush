@@ -31,6 +31,19 @@ func Account(ctx *app.Context) {
 	})
 }
 
+func AccountSettings(ctx *app.Context) {
+	user, err := GetUserSession(ctx, "Pools")
+	if err != nil || user == nil {
+		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	renderTemplate(ctx, "account/settings", map[string]interface{}{
+		"Title": "account - settings",
+		"User":  user,
+	})
+}
+
 func resolveViewTypeFromRequest(ctx *app.Context) string {
 	query := ctx.Request.URL.Query()
 

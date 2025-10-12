@@ -1,0 +1,84 @@
+{{ define "account/settings" }}
+{{ template "account/header" . }}
+<div id="my-settings">
+  <div class="content">
+    <div id="settings-wrapper">
+      <div id="myaccount-meta">
+        <h1>Account</h1>
+        <p>
+        </p>
+        <table border="0" cellspacing="5" cellpadding="5" id="myaccount">
+          <tbody>
+            <tr>
+              <td class="label">Username:</td>
+              <td class="value">{{ .User.Name }}</td>
+              <td class="action"></td>
+            </tr>
+            <tr>
+              <td class="label">Type:</td>
+              <td class="value">{{ .User.Type.String }} Account</td>
+              <td class="action">&nbsp;</td>
+            </tr>
+            <tr class=" hidden">
+              <td class="label">Expires:</td>
+              {{ if eq .User.SubscriptionEnd nil }}
+              <td class="value">Never</td>
+              {{ else }}
+              <td class="value">{{ .User.SubscriptionEnd.Format "Jan 2, 2006" }}</td>
+              {{ end }}
+              <td class="action">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="label">API Key:</td>
+              <td class="value">
+                <div class="apikey">
+                  <div class="nothovered">hover to display</div>
+                  <div class="hovered">{{ .User.ApiKey }} <a href="#reset-api-key" rel="facebox">reset</a>
+                  </div>
+                </div>
+              </td>
+              <td class="action"></td>
+            </tr>
+            <tr>
+              <td class="label">Password:</td>
+              <td class="value">****** <a href="#change-password" rel="facebox">change</a></td>
+              <td class="action"></td>
+            </tr>
+          </tbody>
+        </table>
+        <p></p>
+      </div>
+      <div id="myaccount-pools">
+        <h1>Pools</h1>
+        <table border="0" cellspacing="5" cellpadding="5">
+          <tbody>
+            <tr>
+              <th>default</th>
+              <th>name</th>
+              <th>options</th>
+            </tr>
+            {{ range .User.Pools }}
+            <tr>
+                <td>
+                    <input type="radio"
+                           name="default_pool"
+                           value="{{ .Id }}"
+                           id="pool_{{ .Id }}" {{ if eq .Id $.User.DefaultPoolId }}checked="checked"{{ end }}>
+                </td>
+                <td>{{ .Name }}</td>
+                <td>
+                    <a href="#" onclick="return false;">export</a> (temporarily disabled for now, sorry!)
+                </td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+      <div class="clear"></div>
+    </div>
+  </div>
+</div>
+{{ template "account/popups/reset-api-key" . }}
+{{ template "account/popups/change-password" . }}
+{{ template "account/footer" . }}
+{{ end }}

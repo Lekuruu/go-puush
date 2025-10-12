@@ -51,29 +51,53 @@
 
 {{ define "account/popups/facebox" }}
 <div id="facebox" style="display:none;">
-  <div class="popup">
-    <table>
-      <tbody>
-        <tr>
-          <td class="tl"></td>
-          <td class="b"></td>
-          <td class="tr"></td>
-        </tr>
-        <tr>
-          <td class="b"></td>
-          <td class="body">
-            <div class="content"> </div>
-            <div class="footer"> <a href="#" class="close"> <span>cancel</span> </a> </div>
-          </td>
-          <td class="b"></td>
-        </tr>
-        <tr>
-          <td class="bl"></td>
-          <td class="b"></td>
-          <td class="br"></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <div class="popup">
+        <table>
+            <tbody>
+                <tr>
+                    <td class="tl"></td>
+                    <td class="b"></td>
+                    <td class="tr"></td>
+                </tr>
+                <tr>
+                    <td class="b"></td>
+                    <td class="body">
+                        <div class="content"> </div>
+                        <div class="footer"> <a href="#" class="close"> <span>cancel</span> </a> </div>
+                    </td>
+                    <td class="b"></td>
+                </tr>
+                <tr>
+                    <td class="bl"></td>
+                    <td class="b"></td>
+                    <td class="br"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{{ end }}
+
+{{ define "account/popups/reset-api-key" }}
+<div id="reset-api-key" style="display: none; color: black;">
+    <h1>Reset API Key</h1>
+    <p>Warning: Any desktop/iOS/twitter client using your current key will no longer work until re-authenticated!</p><br>
+    <span style="font-size: 14px;margin-top:10px;">
+        <a href="/account/reset_api_key">I'm sure!</a> | <a href="#" onclick="close_facebox()">Uh, no.</a>
+    </span>
+</div>
+{{ end }}
+
+{{ define "account/popups/change-password" }}
+<div id="change-password" style="display: none; color: black;">
+    <h1>Change Password</h1>
+    <form id="change_password_form" name="change_password_form">
+        <table border="0" cellspacing="5" cellpadding="5">
+            <tbody><tr><td><label for="current_password">current password</label></td><td><input type="password" name="current_password" value="" id="current_password"></td></tr>
+            <tr><td><label for="new_password">new password</label></td><td><input type="password" name="new_password" value="" id="new_password"></td></tr>
+            <tr><td><label for="confirm_password">confirm password</label></td><td><input type="password" name="confirm_password" value="" id="confirm_password"></td></tr>
+        </tbody></table>
+        <p><input onclick="puush_change_password()" type="button" value="Change →"></p>
+    </form>
 </div>
 {{ end }}
