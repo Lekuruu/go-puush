@@ -16,6 +16,9 @@ var templates *template.Template
 var printer = message.NewPrinter(language.English)
 
 func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]interface{}) {
+	ctx.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
+	ctx.Response.WriteHeader(http.StatusOK)
+
 	data := map[string]interface{}{
 		"Config":  ctx.State.Config,
 		"Query":   ctx.Request.URL.Query(),
