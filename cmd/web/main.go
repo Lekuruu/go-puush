@@ -28,7 +28,7 @@ func InitializeRoutes(server *app.Server) {
 
 	// Gallery pages
 	server.Router.HandleFunc("/{username}/Gallery", server.ContextMiddleware(routes.Gallery)).Methods("GET")
-	server.Router.HandleFunc("/{username}/Public/feed", server.ContextMiddleware(routes.GalleryFeed)).Methods("GET")
+	server.Router.HandleFunc("/{username}/Gallery/feed", server.ContextMiddleware(routes.GalleryFeed)).Methods("GET")
 
 	// Account pages
 	server.Router.HandleFunc("/account", server.ContextMiddleware(routes.Account)).Methods("GET")
