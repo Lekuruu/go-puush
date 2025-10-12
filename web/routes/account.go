@@ -92,7 +92,7 @@ func resolveViewTypeFromRequest(ctx *app.Context) string {
 }
 
 func resolvePoolFromRequest(user *database.User, ctx *app.Context) (*database.Pool, error) {
-	poolId := ctx.Request.URL.Query().Get("p")
+	poolId := ctx.Request.URL.Query().Get("pool")
 	if poolId == "" {
 		return services.FetchPoolById(user.DefaultPoolId, ctx.State, "Uploads", "Uploads.Link")
 	}
