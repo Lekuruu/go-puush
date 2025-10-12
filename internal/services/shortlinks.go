@@ -43,6 +43,18 @@ func FetchShortLinkByIdentifier(identifier string, state *app.State, preload ...
 	return shortlink, nil
 }
 
+func FetchManyShortLinksByIdentifiers(identifiers []string, state *app.State, preload ...string) ([]*database.ShortLink, error) {
+	var shortlinks []*database.ShortLink
+	query := preloadQuery(state, preload).Where("identifier IN ?", identifiers)
+	result := query.Find(&shortlinks)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return shortlinks, nil
+}
+
 func ShortLinkExists(identifier string, state *app.State) (bool, error) {
 	var count int64
 	result := state.Database.Model(&database.ShortLink{}).Where("identifier = ?", identifier).Count(&count)
