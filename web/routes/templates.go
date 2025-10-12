@@ -30,8 +30,7 @@ func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]interface
 
 	err := templates.ExecuteTemplate(ctx.Response, tmpl, data)
 	if err != nil {
-		// TODO: Error templates
-		http.Error(ctx.Response, "Template execution error", http.StatusInternalServerError)
+		http.Error(ctx.Response, "Internal server error", http.StatusInternalServerError)
 		log.Println("Template execution error:", err)
 	}
 }
