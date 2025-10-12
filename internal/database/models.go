@@ -10,22 +10,27 @@ import (
 )
 
 type User struct {
-	Id              int         `gorm:"primaryKey;autoIncrement;not null"`
-	Name            string      `gorm:"size:16;not null"`
-	Email           string      `gorm:"size:256;not null;unique"`
-	Password        string      `gorm:"size:60;not null"`
-	CreatedAt       time.Time   `gorm:"not null;CURRENT_TIMESTAMP"`
-	LatestActivity  time.Time   `gorm:"not null;CURRENT_TIMESTAMP"`
-	Active          bool        `gorm:"default:true;not null"`
-	Type            AccountType `gorm:"not null;default:0"`
-	ApiKey          string      `gorm:"size:64;not null;unique"`
-	DiskUsage       int64       `gorm:"default:0;not null"`
-	SubscriptionEnd *time.Time  `gorm:"default:NULL"`
-	DefaultPoolId   int         `gorm:"default:NULL"`
+	Id                    int         `gorm:"primaryKey;autoIncrement;not null"`
+	Name                  string      `gorm:"size:16;not null"`
+	Email                 string      `gorm:"size:256;not null;unique"`
+	Password              string      `gorm:"size:60;not null"`
+	CreatedAt             time.Time   `gorm:"not null;CURRENT_TIMESTAMP"`
+	LatestActivity        time.Time   `gorm:"not null;CURRENT_TIMESTAMP"`
+	Active                bool        `gorm:"default:true;not null"`
+	Type                  AccountType `gorm:"not null;default:0"`
+	ApiKey                string      `gorm:"size:64;not null;unique"`
+	DiskUsage             int64       `gorm:"default:0;not null"`
+	SubscriptionEnd       *time.Time  `gorm:"default:NULL"`
+	DefaultPoolId         int         `gorm:"default:NULL"`
+	UsernameSetupReminder bool        `gorm:"default:true;not null"`
 
 	DefaultPool *Pool     `gorm:"foreignKey:DefaultPoolId;constraint:OnDelete:SET NULL"`
 	Pools       []*Pool   `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
 	Uploads     []*Upload `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
+}
+
+func (user *User) DiskUsageHumanReadable() string {
+	return formatBytes(user.DiskUsage)
 }
 
 func (user *User) UploadLimit() int64 {
@@ -37,6 +42,17 @@ func (user *User) UploadLimit() int64 {
 	default:
 		return -1
 	}
+}
+
+func (user *User) DisplayName() string {
+	if !user.RequiresUsernameSetup() {
+		return user.Name
+	}
+	return user.Email
+}
+
+func (user *User) RequiresUsernameSetup() bool {
+	return user.Name == ""
 }
 
 type Upload struct {
