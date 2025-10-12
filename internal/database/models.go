@@ -92,34 +92,35 @@ func (upload *Upload) SizeHumanReadable() string {
 }
 
 func (upload *Upload) Url() string {
+	if upload.Link != nil {
+		return upload.Link.Url()
+	}
 	if upload.Pool == nil {
 		return ""
-	}
-	if upload.Pool.Type == PoolTypePasswordProtected && upload.Pool.Password != nil {
-		return fmt.Sprintf("/%s/%s/%s", upload.Pool.Identifier, upload.Pool.PasswordHash(), upload.Filename)
 	}
 	return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, upload.Filename)
 }
 
 func (upload *Upload) UrlEncoded() string {
+	if upload.Link != nil {
+		return upload.Link.UrlEncoded()
+	}
 	if upload.Pool == nil {
 		return ""
-	}
-	if upload.Pool.Type == PoolTypePasswordProtected && upload.Pool.Password != nil {
-		return fmt.Sprintf("/%s/%s/%s", upload.Pool.Identifier, upload.Pool.PasswordHash(), upload.FilenameEncoded())
 	}
 	return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, upload.FilenameEncoded())
 }
 
 type Pool struct {
-	Id         int       `gorm:"primaryKey;autoIncrement;not null"`
-	UserId     int       `gorm:"not null;index"`
-	Name       string    `gorm:"size:32;not null"`
-	Identifier string    `gorm:"size:8;not null;unique"`
-	Password   *string   `gorm:"size:32;default:NULL"`
-	Type       PoolType  `gorm:"not null"`
-	CreatedAt  time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
-	LastUpload time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
+	Id          int       `gorm:"primaryKey;autoIncrement;not null"`
+	UserId      int       `gorm:"not null;index"`
+	Name        string    `gorm:"size:32;not null"`
+	Identifier  string    `gorm:"size:8;not null;unique"`
+	Password    *string   `gorm:"size:32;default:NULL"`
+	Type        PoolType  `gorm:"not null"`
+	CreatedAt   time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
+	LastUpload  time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
+	UploadCount int       `gorm:"default:0;not null"`
 
 	Uploads []*Upload `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
 	User    *User     `gorm:"foreignKey:UserId;references:Id;constraint:OnDelete:CASCADE"`

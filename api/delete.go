@@ -24,7 +24,7 @@ func PuushDelete(ctx *app.Context) {
 		return
 	}
 
-	upload, err := services.FetchUploadById(request.UploadId, ctx.State, "Pool", "User")
+	upload, err := services.FetchUploadById(request.UploadId, ctx.State, "Pool", "Pool.Uploads")
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return
@@ -54,6 +54,14 @@ func PuushDelete(ctx *app.Context) {
 
 	// Update disk usage for user
 	err = services.UpdateUserDiskUsage(user.Id, -upload.Filesize, ctx.State)
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
+	// Update pool upload count
+	upload.Pool.UploadCount = len(upload.Pool.Uploads) - 1
+	err = services.UpdatePool(upload.Pool, ctx.State)
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return

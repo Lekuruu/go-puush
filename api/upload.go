@@ -25,7 +25,7 @@ func PuushUpload(ctx *app.Context) {
 	}
 	defer request.File.Close()
 
-	user, err := UserAuthenticationFromKey(request.Key, ctx.State, "DefaultPool")
+	user, err := UserAuthenticationFromKey(request.Key, ctx.State, "DefaultPool", "DefaultPool.Uploads")
 	if err != nil {
 		WritePuushError(ctx, AuthenticationFailure)
 		return
@@ -55,7 +55,7 @@ func PuushUpload(ctx *app.Context) {
 	}
 
 	// Check if another upload with the same checksum already exists
-	existingUpload, err := services.FetchUploadByChecksum(request.FileChecksum, ctx.State, "Pool", "User")
+	existingUpload, err := services.FetchUploadByChecksum(request.FileChecksum, ctx.State, "Pool")
 	if err == nil {
 		response := &UploadResponse{
 			UploadUrl:        ctx.State.Config.Cdn.Url + existingUpload.UrlEncoded(),
@@ -104,6 +104,13 @@ func PuushUpload(ctx *app.Context) {
 		services.CreateThumbnail(upload.Key(), fileData, ctx.State)
 	}
 
+	user.DefaultPool.UploadCount = len(user.DefaultPool.Uploads) + 1
+	err = services.UpdatePool(user.DefaultPool, ctx.State)
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
 	user.DiskUsage += upload.Filesize
 	err = services.UpdateUserDiskUsage(user.Id, upload.Filesize, ctx.State)
 	if err != nil {
@@ -111,7 +118,6 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
-	// TODO: Add expiration time to config
 	shortlink, err := services.CreateShortLink(upload.Id, nil, ctx.State)
 	if err != nil {
 		WritePuushError(ctx, ServerError)
