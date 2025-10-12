@@ -6,7 +6,7 @@ import (
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
-const GalleryPoolName = "Public"
+const GalleryPoolName = "Gallery"
 
 type GalleryFeedResponse struct {
 	Count   int           `json:"count"`
