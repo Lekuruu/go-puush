@@ -14,7 +14,7 @@
         <div id="puushpool-label">Pools</div>
     </div>
     <div class="clear"></div>
-    <div id="{{ if eq .ViewType "list" }}list-{{ end }}select-bar" class="my-menubar">
+    <div id="{{ if eq .User.ViewType "list" }}list-{{ end }}select-bar" class="my-menubar">
         <ul>
             <li class="select"><a href="#" onclick="puush_select_all()">All</a></li>
             <li class="select"><a href="#" onclick="puush_clear_selection()">None</a></li>
@@ -28,7 +28,7 @@
     <div id="hist_result"></div>
     <div id="puush_history">
         <div id="pool_info">{{ .SelectedPool.Name }} ({{ .SelectedPool.Type.String | lower }}) - {{ .SelectedPool.UploadCount }} files</div>
-        {{ if eq .ViewType "list" }}
+        {{ if eq .User.ViewType "list" }}
         <form id="puush-select">
             <table>
                 <tbody>

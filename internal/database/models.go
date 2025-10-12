@@ -20,6 +20,7 @@ type User struct {
 	Type                  AccountType `gorm:"not null;default:0"`
 	ApiKey                string      `gorm:"size:64;not null;unique"`
 	DiskUsage             int64       `gorm:"default:0;not null"`
+	ViewType              ViewType    `gorm:"size:16;default:'list';not null"`
 	SubscriptionEnd       *time.Time  `gorm:"default:NULL"`
 	DefaultPoolId         int         `gorm:"default:NULL"`
 	UsernameSetupReminder bool        `gorm:"default:true;not null"`

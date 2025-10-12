@@ -29,12 +29,15 @@ func Account(ctx *app.Context) {
 		return
 	}
 
+	// Update view type if changed in query
+	user.ViewType = resolveViewTypeFromRequest(user, ctx)
+	services.UpdateUser(user, ctx.State)
+
 	renderTemplate(ctx, "account/home", map[string]interface{}{
 		"Title":          "account",
 		"User":           user,
 		"SelectedPool":   selectedPool,
 		"PoolThumbnails": poolThumbnails,
-		"ViewType":       resolveViewTypeFromRequest(ctx),
 	})
 }
 
@@ -77,18 +80,18 @@ func AccountGoPro(ctx *app.Context) {
 	})
 }
 
-func resolveViewTypeFromRequest(ctx *app.Context) string {
+func resolveViewTypeFromRequest(user *database.User, ctx *app.Context) database.ViewType {
 	query := ctx.Request.URL.Query()
 
 	if query.Has("list") {
-		return "list"
+		return database.ViewTypeList
 	}
 	if query.Has("grid") {
-		return "grid"
+		return database.ViewTypeGrid
 	}
 
 	// Default to grid view
-	return "grid"
+	return user.ViewType
 }
 
 func resolvePoolFromRequest(user *database.User, ctx *app.Context) (*database.Pool, error) {

@@ -49,3 +49,10 @@ const (
 	UploadLimitRegular = 200 * 1024 * 1024       // 200 MB
 	UploadLimitPro     = 15 * 1000 * 1024 * 1024 // 15 GB
 )
+
+type ViewType string
+
+const (
+	ViewTypeGrid ViewType = "grid"
+	ViewTypeList ViewType = "list"
+)
