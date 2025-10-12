@@ -4,10 +4,10 @@
     <div id="puush_pools">
         {{ range .User.Pools }}
         <div class="puush_pool {{ if eq .Id $.SelectedPool.Id }}selected {{ end }}{{ .Type.String | lower }}" id="pool_{{ .Id }}">
-            <a href="/account/?pool={{ .Id }}" title="{{ .Name }} ({{ len .Uploads }})">
+            <a href="/account/?pool={{ .Id }}" title="{{ .Name }} ({{ .UploadCount }})">
                 <div class="thumb" style="background-image: url(/thumb/view/{{ .Identifier }});"></div>
                 <span class="{{ .Type.String | lower }} overlay"></span>
-                <span>{{ .Name }} ({{ len .Uploads }})</span>
+                <span>{{ .Name }} ({{ .UploadCount }})</span>
             </a>
         </div>
         {{ end }}
@@ -27,7 +27,7 @@
     </div>
     <div id="hist_result"></div>
     <div id="puush_history">
-        <div id="pool_info">{{ .SelectedPool.Name }} ({{ .SelectedPool.Type.String | lower }}) - {{ len .SelectedPool.Uploads }} files</div>
+        <div id="pool_info">{{ .SelectedPool.Name }} ({{ .SelectedPool.Type.String | lower }}) - {{ .SelectedPool.UploadCount }} files</div>
         {{ if eq .ViewType "list" }}
         <form id="puush-select">
             <table>
