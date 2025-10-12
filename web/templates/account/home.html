@@ -14,7 +14,7 @@
         <div id="puushpool-label">Pools</div>
     </div>
     <div class="clear"></div>
-    <div id="{{ if eq .User.ViewType "list" }}list-{{ end }}select-bar" class="my-menubar">
+    <div id="{{ if eq .ViewType "list" }}list-{{ end }}select-bar" class="my-menubar">
         <ul>
             <li class="select"><a href="#" onclick="puush_select_all()">All</a></li>
             <li class="select"><a href="#" onclick="puush_clear_selection()">None</a></li>
@@ -27,8 +27,16 @@
     </div>
     <div id="hist_result"></div>
     <div id="puush_history">
-        <div id="pool_info">{{ .SelectedPool.Name }} ({{ .SelectedPool.Type.String | lower }}) - {{ .SelectedPool.UploadCount }} files</div>
-        {{ if eq .User.ViewType "list" }}
+        {{ if .SearchQuery }}
+        <div style="width: 100%; background-color: #697175; padding: 5px; margin-left: -10px; text-align: right; color: white; text-shadow: #424B51 1px 1px 1px;">
+            <em>{{ .SearchQuery }}</em> - Showing results {{ min 1 (len .SelectedPool.Uploads) }} - {{ len .SelectedPool.Uploads }} from <em>{{ .SelectedPool.Name }}</em>
+        </div>
+        {{ else }}
+        <div id="pool_info">
+            {{ .SelectedPool.Name }} ({{ .SelectedPool.Type.String | lower }}) - {{ .SelectedPool.UploadCount }} files
+        </div>
+        {{ end }}
+        {{ if eq .ViewType "list" }}
         <form id="puush-select">
             <table>
                 <tbody>

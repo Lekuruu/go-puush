@@ -64,8 +64,21 @@ func init() {
 		"mod":   func(a, b int) int { return a % b },
 		"mul":   func(a, b int) int { return a * b },
 		"div":   func(a, b int) int { return a / b },
+		"eq":    func(a, b any) bool { return a == b },
 		"lower": func(s string) string { return strings.ToLower(s) },
 		"upper": func(s string) string { return strings.ToUpper(s) },
+		"min": func(a, b int) int {
+			if a < b {
+				return a
+			}
+			return b
+		},
+		"max": func(a, b int) int {
+			if a > b {
+				return a
+			}
+			return b
+		},
 	}
 
 	var err error

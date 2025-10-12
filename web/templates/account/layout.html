@@ -58,7 +58,11 @@
 				<li id="search">
 					<form method="get" name="search" action="/account/search/">
 						<input type="hidden" name="pool" value="{{ .SelectedPool.Id }}">
-						<input type="text" id="search-box" name="q" value="Search...">
+                        {{ if .SearchQuery }}
+						<input type="text" id="search-box" name="q" value="{{ .SearchQuery }}">
+                        {{ else }}
+                        <input type="text" id="search-box" name="q" placeholder="Search...">
+                        {{ end }}
 						<span id="search_clear"></span>
 					</form>
 				</li>

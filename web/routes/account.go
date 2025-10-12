@@ -45,11 +45,19 @@ func Account(ctx *app.Context) {
 		return selectedPool.Uploads[i].CreatedAt.After(selectedPool.Uploads[j].CreatedAt)
 	})
 
+	searchQuery := ctx.Request.URL.Query().Get("q")
+	if searchQuery != "" {
+		// Always switch to view type when searching
+		user.ViewType = database.ViewTypeList
+	}
+
 	renderTemplate(ctx, "account/home", map[string]interface{}{
 		"Title":          "account",
 		"User":           user,
+		"SearchQuery":    searchQuery,
 		"SelectedPool":   selectedPool,
 		"PoolThumbnails": poolThumbnails,
+		"ViewType":       string(user.ViewType),
 	})
 }
 
