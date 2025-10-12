@@ -131,6 +131,19 @@ func UpdateUserDefaultPool(userId int, poolId int, state *app.State) error {
 	return nil
 }
 
+func UpdateUserPassword(userId int, passwordHash string, state *app.State) error {
+	result := state.Database.Exec(
+		"UPDATE users SET password = ? WHERE id = ?",
+		passwordHash, userId,
+	)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func UpdateUser(user *database.User, state *app.State) error {
 	result := state.Database.Save(user)
 

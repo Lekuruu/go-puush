@@ -10,6 +10,15 @@ import (
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
+type AjaxError struct {
+	Error   bool   `json:"error"`
+	Message string `json:"message"`
+}
+
+var ErrorPasswordIncorrect = AjaxError{Error: true, Message: "Current password incorrect."}
+var ErrorServerError = AjaxError{Error: true, Message: "An internal server error occurred."}
+var ErrorBadRequest = AjaxError{Error: true, Message: "Bad request."}
+
 func MoveDialog(ctx *app.Context) {
 	user, err := GetUserSession(ctx, "Pools")
 	if err != nil || user == nil {
@@ -195,6 +204,47 @@ func UpdateDefaultPool(ctx *app.Context) {
 	}
 
 	renderTemplate(ctx, "ajax/success", nil)
+}
+
+func ChangePassword(ctx *app.Context) {
+	user, err := GetUserSession(ctx)
+	if err != nil || user == nil {
+		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	err = ctx.Request.ParseForm()
+	if err != nil {
+		renderJson(200, ErrorBadRequest, ctx)
+		return
+	}
+
+	currentPassword := ctx.Request.FormValue("c")
+	newPassword := ctx.Request.FormValue("p")
+
+	if currentPassword == "" || newPassword == "" {
+		renderJson(200, ErrorBadRequest, ctx)
+		return
+	}
+
+	if !app.VerifyPasswordHash(currentPassword, user.Password) {
+		renderJson(200, ErrorPasswordIncorrect, ctx)
+		return
+	}
+
+	newPasswordHash, err := app.CreatePasswordHash(newPassword)
+	if err != nil {
+		renderJson(200, ErrorServerError, ctx)
+		return
+	}
+
+	err = services.UpdateUserPassword(user.Id, newPasswordHash, ctx.State)
+	if err != nil {
+		renderJson(200, ErrorServerError, ctx)
+		return
+	}
+
+	renderRaw(200, "text/html", []byte{}, ctx)
 }
 
 func resolveTargetUploadsFromQuery(ctx *app.Context) ([]*database.Upload, error) {
