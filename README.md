@@ -33,5 +33,14 @@ The following features have been implemented or are planned for the future:
     - [x] Account page(s)
     - [x] Gallery page
     - [x] Login functionality
+    - [x] Logout functionality
+    - [ ] Password reset functionality
     - [ ] Registration functionality
-    - [ ] Account page ajax routes
+    - [ ] Account page functionality
+        - [x] Move uploads
+        - [x] Delete uploads
+        - [x] Update default pool
+        - [x] Reset API key
+        - [x] Switch between views
+        - [ ] Search for uploads
+        - [ ] Change password
