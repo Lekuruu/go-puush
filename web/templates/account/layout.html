@@ -1,18 +1,79 @@
 {{ define "account/header" }}
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=1024" />
-    <title>{{ .Config.Service.Name }} / {{ .Title }}</title>
-    <link type="text/css" href="/css/user.css" rel="stylesheet">
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
-    <script type="text/javascript" src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
-    <script type="text/javascript" src="/js/pi.imgloaded.js"></script>
-    <script type="text/javascript" src="/js/jquery.scrollTo-1.4.2-min.js"></script>
-    <script type="text/javascript" src="/js/gallery.js"></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=1024">
+  <title>{{ .Config.Service.Name }} / {{ .Title }}</title>
+  <link type="text/css" href="/css/myaccount.css" rel="stylesheet">
+  <link type="text/css" href="/css/facebox.css" rel="stylesheet">
+  <link type="text/css" href="/css/nivo-slider.css" rel="stylesheet">
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+  <script src="/js/jquery.nivo.slider.pack.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/js/facebox-min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/js/puush.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
+    var new_username_prompt = {{ .User.RequiresUsernameSetup }};
+    var new_username_nag = {{ .User.UsernameSetupReminder }};
+    var base_url = '{{ .Config.Cdn.Url }}';
+  </script>
 </head>
+<body>
+<div id="content">
+	<div id="my-menubox">
+		<div id="puush_button">
+            <a href="/"></a>
+        </div>
+		<div id="header-meta">
+            {{ .User.DisplayName }}<br>{{ .User.Type.String }} Account<br>{{ .User.DiskUsageHumanReadable }}
+        </div>
+		<div class="clear"></div>
+		<div class="my-menubar">
+			<ul>
+				<li class="left notlink">
+                    <span class="notlink">View:</span>
+                </li>
+				<li class="left buttan">
+                    <a href="/account/?grid"><img src="/img/menu/grid.png">Grid</a>
+                </li>
+				<li class="left buttan">
+                    <a href="/account/?list"><img src="/img/menu/list.png">List</a>
+                </li>
+				<li class="right">
+                    <a href="/logout/"><img src="/img/menu/logout.png">Logout</a>
+                </li>
+				<li id="my-settings-button" class="right">
+                    <a href="/account/settings">
+                        Account <img src="/img/menu/dropdown.png">
+                    </a>
+					<ul>
+						<li>
+                            <a href="/account/settings"><img src="/img/menu/settings.png">Settings</a>
+                        </li>
+						<li class="last">
+                            <a href="/account/subscription"><img src="/img/menu/history.png">Subscription History</a>
+                        </li>
+					</ul>
+				</li>
+				<li id="search">
+					<form method="get" name="search" action="/account/search/">
+						<input type="hidden" name="pool" value="{POOL_ID}">
+						<input type="text" id="search-box" name="q" value="Search...">
+						<span id="search_clear"></span>
+					</form>
+				</li>
+			</ul>
+		</div>
+	</div>
 {{ end }}
 {{ define "account/footer" }}
+</div>
+{{ template "account/popups/blinds" . }}
+{{ template "account/popups/throbber" . }}
+{{ template "account/popups/move" . }}
+{{ template "account/popups/welcome" . }}
+{{ template "account/popups/delete" . }}
+{{ template "account/popups/facebox" . }}
+</body>
 </html>
 {{ end }}

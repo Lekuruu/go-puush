@@ -113,7 +113,7 @@ func (upload *Upload) UrlEncoded() string {
 
 type Pool struct {
 	Id         int       `gorm:"primaryKey;autoIncrement;not null"`
-	UserId     int       `gorm:"not null"`
+	UserId     int       `gorm:"not null;index"`
 	Name       string    `gorm:"size:32;not null"`
 	Identifier string    `gorm:"size:8;not null;unique"`
 	Password   *string   `gorm:"size:32;default:NULL"`
@@ -122,6 +122,7 @@ type Pool struct {
 	LastUpload time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
 
 	Uploads []*Upload `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
+	User    *User     `gorm:"foreignKey:UserId;references:Id;constraint:OnDelete:CASCADE"`
 }
 
 func (pool *Pool) PasswordHash() string {

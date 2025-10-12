@@ -1,0 +1,75 @@
+{{ define "account/home" }}
+{{ template "account/header" . }}
+<div class="content">
+    <div id="puush_pools">
+        {{ range .User.Pools }}
+        <div class="puush_pool {{ if eq .Id $.SelectedPool.Id }}selected {{ end }}{{ .Type.String | lower }}" id="pool_{{ .Id }}">
+            <a href="/account/?pool={{ .Id }}" title="{{ .Name }} ({{ len .Uploads }})">
+                <div class="thumb" style="background-image: url(/thumb/view/{{ .Identifier }});"></div>
+                <span class="{{ .Type.String | lower }} overlay"></span>
+                <span>{{ .Name }} ({{ len .Uploads }})</span>
+            </a>
+        </div>
+        {{ end }}
+        <div id="puushpool-label">Pools</div>
+    </div>
+    <div class="clear"></div>
+    <div id="{{ if eq .ViewType "list" }}list-{{ end }}select-bar" class="my-menubar">
+        <ul>
+            <li class="select"><a href="#" onclick="puush_select_all()">All</a></li>
+            <li class="select"><a href="#" onclick="puush_clear_selection()">None</a></li>
+            <li class="select"><a id="rm-link" href="#" onclick="puush_confirm_delete()">Delete</a></li>
+            <li class="select"><a id="mv-link" href="#" onclick="puush_confirm_move()">Move</a></li>
+            <li id="select-button" class="right">
+                <a href="#" onclick="puush_toggle_mode()"><img src="/img/menu/select.png"><span class="label">Select</span></a>
+            </li>
+        </ul>
+    </div>
+    <div id="hist_result"></div>
+    <div id="puush_history">
+        <div id="pool_info">{{ .SelectedPool.Name }} ({{ .SelectedPool.Type.String | lower }}) - {{ len .SelectedPool.Uploads }} files</div>
+        {{ if eq .ViewType "list" }}
+        <form id="puush-select">
+            <table>
+                <tbody>
+                    <tr>
+                        <th><input name="everything" type="checkbox" value="everything" onclick="return toggleEverything(this);"></th>
+                        <th>&nbsp;</th>
+                        <th>Description</th>
+                        <th>Size</th>
+                        <th>Hits</th>
+                    </tr>
+                    {{ range .SelectedPool.Uploads }}
+                    {{ if eq .Link nil }}
+                        {{ continue }}
+                    {{ end }}
+                    <tr class="r{{ mod .Id 2 }}" id="tr-{{ .Link.Identifier }}" onclick="puush_hist_select('{{ .Link.Identifier }}');">
+                        <td class="td-ck"><input name="i" type="checkbox" value="{{ .Link.Identifier }}"></td>
+                        <td class="td-th"><img src="/thumb/view/{{ .Link.Identifier }}" width="16" height="16"></td>
+                        <td><a href="{{ $.Config.Cdn.Url }}/{{ .Link.Identifier }}" target="_blank" onclick="puush_hist_select('{{ .Link.Identifier }}');">{{ .Filename }}</a></td>
+                        <td>{{ .SizeHumanReadable }}</td>
+                        <td>{{ .Views }} hits</td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </form>
+        {{ else }}
+            {{ range .SelectedPool.Uploads }}
+            {{ if eq .Link nil }}
+                {{ continue }}
+            {{ end }}
+            <div class="puush_tile unselected" id="puush_{{ .Link.Identifier }}">
+                <div class="thumb" style="background-image: url(/thumb/view/{{ .Link.Identifier }});">
+                    <a onclick="return puush_click('{{ .Link.Identifier }}')" href="{{ $.Config.Cdn.Url }}/{{ .Link.Identifier }}" target="_blank" title="{{ .Filename }} ({{ .Views }} hits)"></a>
+                    <input name="i" type="checkbox" value="{{ .Link.Identifier }}">
+                </div>
+            </div>
+            {{ end }}
+        {{ end }}
+    </div>
+    <div class="clear"></div>
+    <div id="pagination"></div>
+</div>
+{{ template "account/footer" . }}
+{{ end }}

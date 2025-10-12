@@ -12,7 +12,6 @@ func InitializeRoutes(server *app.Server) {
 	server.Router.HandleFunc("/faq", server.ContextMiddleware(routes.Faq)).Methods("GET")
 	server.Router.HandleFunc("/about", server.ContextMiddleware(routes.About)).Methods("GET")
 	server.Router.HandleFunc("/login", server.ContextMiddleware(routes.Login)).Methods("GET")
-	server.Router.HandleFunc("/account", server.ContextMiddleware(routes.Account)).Methods("GET")
 	server.Router.HandleFunc("/register", server.ContextMiddleware(routes.Register)).Methods("GET")
 	server.Router.HandleFunc("/reset_password", server.ContextMiddleware(routes.ResetPassword)).Methods("GET")
 	server.Router.HandleFunc("/tos", server.ContextMiddleware(routes.TermsOfService)).Methods("GET")
@@ -21,6 +20,10 @@ func InitializeRoutes(server *app.Server) {
 	// Gallery pages
 	server.Router.HandleFunc("/{username}/Gallery", server.ContextMiddleware(routes.Gallery)).Methods("GET")
 	server.Router.HandleFunc("/{username}/Public/feed", server.ContextMiddleware(routes.GalleryFeed)).Methods("GET")
+
+	// Account pages
+	server.Router.HandleFunc("/account", server.ContextMiddleware(routes.Account)).Methods("GET")
+	server.Router.HandleFunc("/account/", server.ContextMiddleware(routes.Account)).Methods("GET")
 
 	// Initialize static routes
 	server.Router.PathPrefix("/dl/").Handler(http.StripPrefix("/dl/", http.FileServer(http.Dir("web/static/dl/"))))

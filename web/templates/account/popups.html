@@ -1,0 +1,79 @@
+{{ define "account/popups/blinds" }}
+<div id="blinds"></div>
+{{ end }}
+
+{{ define "account/popups/throbber" }}
+<div id="throbber">
+    <h1>Working</h1>
+    <span id="throbber-msg"></span><br><br>
+    <img src="/img/bigspinner.gif">
+</div>
+{{ end }}
+
+{{ define "account/popups/move" }}
+<div class="dialog" id="move-dialog">
+    <span id="move-dialog-msg"></span>
+</div>
+{{ end }}
+
+{{ define "account/popups/welcome" }}
+<div class="dialog" id="welcome-dialog">
+    <h1>Your puush Gallery</h1>
+    <img src="/img/welcome-gallery.png" style="margin-bottom: -10px;">
+    <div id="welcome-dialog-msg">To use your puush gallery, you'll need to select a username.</div>
+    <div id="sample-gallery-url">
+        {{ .Config.Service.Url }}/<span>me</span>/gallery <img id="username-ok" style="display:none;">
+    </div>
+    <div id="username-error-note">&nbsp;</div>
+    <form id="username-form" name="username-form" onsubmit="return puush_claim_username()">
+        <label for="new_username">Username: </label><input type="text" name="new_username" value="" maxlength="16" id="new_username">
+        <input id="username_confirm_button" disabled="disabled" type="submit" value="Confirm →">
+    </form>
+    <div>
+        <a href="#" onclick="close_popup()">skip for now</a>, or <a href="#" onclick="stop_asking_about_username()">stop asking</a>
+    </div>
+    <div>
+        (You can configure this later under account settings if you skip)
+    </div>
+</div>
+{{ end }}
+
+{{ define "account/popups/delete" }}
+<div class="dialog" id="del-dialog">
+    <h1 style="color:black;padding-bottom:10px">Are you sure?</h1>
+    <img src="/img/trashcan.png" alt="trashcan">
+    <p style="padding-bottom: 10px;" id="del-dialog-msg">Deleting <strong>x</strong> puushes...</p>
+    <span style="font-size: 14px;">
+        <a href="#" onclick="puush_do_delete()">I'm sure!</a> | <a href="#" onclick="close_popup()">Uh, no.</a>
+    </span>
+</div>
+{{ end }}
+
+{{ define "account/popups/facebox" }}
+<div id="facebox" style="display:none;">
+  <div class="popup">
+    <table>
+      <tbody>
+        <tr>
+          <td class="tl"></td>
+          <td class="b"></td>
+          <td class="tr"></td>
+        </tr>
+        <tr>
+          <td class="b"></td>
+          <td class="body">
+            <div class="content"> </div>
+            <div class="footer"> <a href="#" class="close"> <span>cancel</span> </a> </div>
+          </td>
+          <td class="b"></td>
+        </tr>
+        <tr>
+          <td class="bl"></td>
+          <td class="b"></td>
+          <td class="br"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{{ end }}
