@@ -54,7 +54,7 @@
                     <tr class="r{{ mod .Id 2 }}" id="tr-{{ .Link.Identifier }}" onclick="puush_hist_select('{{ .Link.Identifier }}');">
                         <td class="td-ck"><input name="i" type="checkbox" value="{{ .Link.Identifier }}"></td>
                         <td class="td-th"><img src="/thumb/view/{{ .Link.Identifier }}" width="16" height="16"></td>
-                        <td><a href="{{ $.Config.Cdn.Url }}/{{ .Link.Identifier }}" target="_blank" onclick="puush_hist_select('{{ .Link.Identifier }}');">{{ .Filename }}</a></td>
+                        <td><a href="{{ $.Config.Cdn.Url }}{{ .Link.UrlEncoded }}" target="_blank" onclick="puush_hist_select('{{ .Link.Identifier }}');">{{ .Filename }}</a></td>
                         <td>{{ .SizeHumanReadable }}</td>
                         <td>{{ .Views }} hits</td>
                     </tr>
@@ -69,7 +69,7 @@
             {{ end }}
             <div class="puush_tile unselected" id="puush_{{ .Link.Identifier }}">
                 <div class="thumb" style="background-image: url(/thumb/view/{{ .Link.Identifier }});">
-                    <a onclick="return puush_click('{{ .Link.Identifier }}')" href="{{ $.Config.Cdn.Url }}/{{ .Link.Identifier }}" target="_blank" title="{{ .Filename }} ({{ .Views }} hits)"></a>
+                    <a onclick="return puush_click('{{ .Link.Identifier }}')" href="{{ $.Config.Cdn.Url }}{{ .Link.UrlEncoded }}" target="_blank" title="{{ .Filename }} ({{ .Views }} hits)"></a>
                     <input name="i" type="checkbox" value="{{ .Link.Identifier }}">
                 </div>
             </div>

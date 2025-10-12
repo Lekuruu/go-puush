@@ -156,19 +156,23 @@ func resolvePoolFromRequest(user *database.User, ctx *app.Context) (*database.Po
 	return pool, nil
 }
 
-func resolvePoolUploads(pool *database.Pool, ctx *app.Context) ([]*database.Upload, error) {
+func resolvePoolUploads(pool *database.Pool, ctx *app.Context) (uploads []*database.Upload, err error) {
 	searchQuery := ctx.Request.URL.Query().Get("q")
 	if searchQuery != "" {
-		uploads, err := services.SearchUploadsFromPool(searchQuery, pool.Id, ctx.State, "Link")
+		uploads, err = services.SearchUploadsFromPool(searchQuery, pool.Id, ctx.State, "Link")
 		if err != nil {
 			return nil, err
 		}
-		return uploads, nil
+	} else {
+		uploads, err = services.FetchUploadsByPool(pool.Id, ctx.State, "Link")
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	uploads, err := services.FetchUploadsByPool(pool.Id, ctx.State, "Link")
-	if err != nil {
-		return nil, err
+	for _, upload := range uploads {
+		upload.Pool = pool
+		upload.Link.Upload = upload
 	}
 	return uploads, nil
 }
