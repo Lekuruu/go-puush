@@ -11,7 +11,7 @@ func Thumbnail(ctx *app.Context) {
 	poolPassword := ctx.Vars["password"]
 	identifier := ctx.Vars["identifier"]
 
-	upload, err := services.FetchUploadByIdentifier(identifier, ctx.State)
+	upload, err := services.FetchUploadByIdentifier(identifier, ctx.State, "Pool")
 	if err != nil {
 		WriteResponse(404, "That puush could not be found.", ctx)
 		return
