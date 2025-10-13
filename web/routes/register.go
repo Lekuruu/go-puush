@@ -33,7 +33,7 @@ func PerformRegistration(ctx *app.Context) {
 	}
 
 	if existingUser, _ := services.FetchUserByEmail(email, ctx.State); existingUser != nil {
-		renderErrorTemplate("Email Taken", "An account with that email address already exists.", ctx)
+		renderErrorTemplate("Email Taken", "Whoops! It appears that there is already an account with that email address.", ctx)
 		return
 	}
 
