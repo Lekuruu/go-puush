@@ -10,9 +10,15 @@
         <table border="0" cellspacing="5" cellpadding="5" id="myaccount">
           <tbody>
             <tr>
+              {{ if eq .User.Name "" }}
+              <td class="label">Username:</td>
+              <td class="value"><a href="#" onclick="new_username_wizard()">setup your username</a></td>
+              <td class="action"></td>
+              {{ else }}
               <td class="label">Username:</td>
               <td class="value">{{ .User.Name }}</td>
               <td class="action"></td>
+              {{ end }}
             </tr>
             <tr>
               <td class="label">Type:</td>
