@@ -296,6 +296,7 @@ func ClaimUsername(ctx *app.Context) {
 		return
 	}
 
+	// TODO: Validate username (allowed characters, length, etc.)
 	user.Name = username
 	user.UsernameSetupReminder = false
 	err = services.UpdateUser(user, ctx.State)
