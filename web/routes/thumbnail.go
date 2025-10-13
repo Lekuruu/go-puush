@@ -1,8 +1,10 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/services"
@@ -48,7 +50,13 @@ func Thumbnail(ctx *app.Context) {
 		return
 	}
 
-	renderRaw(200, http.DetectContentType(image), image, ctx)
+	ctx.Response.Header().Set("Content-Type", http.DetectContentType(image))
+	ctx.Response.Header().Set("Content-Length", fmt.Sprintf("%d", len(image)))
+	ctx.Response.Header().Set("Last-Modified", link.Upload.CreatedAt.Format(http.TimeFormat))
+	ctx.Response.Header().Set("Date", time.Now().Format(http.TimeFormat))
+	ctx.Response.Header().Set("ETag", fmt.Sprintf(`"t%s"`, link.Upload.Checksum))
+	ctx.Response.WriteHeader(200)
+	ctx.Response.Write(image)
 }
 
 func init() {
