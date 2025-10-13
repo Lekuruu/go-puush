@@ -171,6 +171,9 @@ func resolvePoolUploads(pool *database.Pool, ctx *app.Context) (uploads []*datab
 	}
 
 	for _, upload := range uploads {
+		if upload.Link == nil {
+			continue
+		}
 		upload.Pool = pool
 		upload.Link.Upload = upload
 	}
