@@ -48,6 +48,7 @@ func InitializeRoutes(server *app.Server) {
 	server.Router.HandleFunc("/ajax/change_password", server.ContextMiddleware(routes.ChangePassword)).Methods("POST")
 	server.Router.HandleFunc("/ajax/default_puush_pool", server.ContextMiddleware(routes.UpdateDefaultPool)).Methods("POST")
 	server.Router.HandleFunc("/ajax/confirm_username", server.ContextMiddleware(routes.CheckUsername)).Methods("POST")
+	server.Router.HandleFunc("/ajax/claim_username", server.ContextMiddleware(routes.ClaimUsername)).Methods("POST")
 	server.Router.HandleFunc("/ajax/stopnagging", server.ContextMiddleware(routes.StopAskingAboutUsername)).Methods("POST")
 
 	// Thumbnail page

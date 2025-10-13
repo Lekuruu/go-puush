@@ -271,6 +271,42 @@ func CheckUsername(ctx *app.Context) {
 	renderJson(200, NoError, ctx)
 }
 
+func ClaimUsername(ctx *app.Context) {
+	user, err := GetUserSession(ctx)
+	if err != nil || user == nil {
+		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	err = ctx.Request.ParseForm()
+	if err != nil {
+		renderJson(200, ErrorBadRequest, ctx)
+		return
+	}
+
+	username := ctx.Request.FormValue("u")
+	if username == "" {
+		renderJson(200, ErrorBadRequest, ctx)
+		return
+	}
+
+	existingUser, _ := services.FetchUserByName(username, ctx.State)
+	if existingUser != nil {
+		renderJson(200, ErrorUsernameTaken, ctx)
+		return
+	}
+
+	user.Name = username
+	user.UsernameSetupReminder = false
+	err = services.UpdateUser(user, ctx.State)
+	if err != nil {
+		renderJson(200, ErrorServerError, ctx)
+		return
+	}
+
+	renderJson(200, NoError, ctx)
+}
+
 func StopAskingAboutUsername(ctx *app.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
