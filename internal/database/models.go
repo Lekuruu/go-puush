@@ -60,13 +60,13 @@ type Upload struct {
 	Id         int       `gorm:"primaryKey;autoIncrement;not null"`
 	UserId     int       `gorm:"not null"`
 	PoolId     int       `gorm:"not null"`
+	Identifier string    `gorm:"size:16;not null;index"`
 	Filename   string    `gorm:"size:256;not null"`
 	Filesize   int64     `gorm:"not null"`
 	Checksum   string    `gorm:"size:32;not null"`
 	CreatedAt  time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
 	Views      int       `gorm:"default:0;not null"`
 	MimeType   string    `gorm:"size:64;default:''"`
-	Identifier string    `gorm:"size:16;not null;default:'';index"`
 
 	User *User `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
 	Pool *Pool `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
@@ -101,7 +101,7 @@ func (upload *Upload) Url() string {
 
 func (upload *Upload) UrlEncoded() string {
 	if upload.Pool != nil && upload.Pool.Type == PoolTypePrivate {
-		return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, url.PathEscape(upload.Identifier))
+		return fmt.Sprintf("/%s/%s", url.PathEscape(upload.Pool.Identifier), url.PathEscape(upload.Identifier))
 	}
 	return fmt.Sprintf("/%s", url.PathEscape(upload.Identifier))
 }

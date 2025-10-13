@@ -75,16 +75,23 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
+	identifier, err := services.GenerateUploadIdentifier(ctx.State)
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
 	upload := &database.Upload{
-		UserId:    user.Id,
-		PoolId:    user.DefaultPoolId,
-		Filename:  request.FileName,
-		Filesize:  request.FileSize,
-		Checksum:  request.FileChecksum,
-		MimeType:  mimetype.Detect(fileData).String(),
-		CreatedAt: time.Now(),
-		Pool:      user.DefaultPool,
-		User:      user,
+		UserId:     user.Id,
+		PoolId:     user.DefaultPoolId,
+		Filename:   request.FileName,
+		Filesize:   request.FileSize,
+		Checksum:   request.FileChecksum,
+		MimeType:   mimetype.Detect(fileData).String(),
+		Identifier: identifier,
+		CreatedAt:  time.Now(),
+		Pool:       user.DefaultPool,
+		User:       user,
 	}
 
 	err = services.CreateUpload(upload, ctx.State)
@@ -114,15 +121,6 @@ func PuushUpload(ctx *app.Context) {
 		WritePuushError(ctx, ServerError)
 		return
 	}
-
-	identifier, err := services.CreateUploadIdentifier(upload.Id, ctx.State)
-	if err != nil {
-		WritePuushError(ctx, ServerError)
-		return
-	}
-
-	// Update upload with the identifier for URL generation
-	upload.Identifier = identifier
 
 	uploadResponse := &UploadResponse{
 		UploadUrl:        ctx.State.Config.Cdn.Url + upload.UrlEncoded(),
