@@ -28,11 +28,6 @@ func Thumbnail(ctx *app.Context) {
 		return
 	}
 
-	if !upload.IsImage() {
-		WriteResponse(415, "", ctx)
-		return
-	}
-
 	data, err := ctx.State.Storage.ReadThumbnail(upload.Key())
 	if err != nil {
 		WriteResponse(404, "That puush does not have a thumbnail.", ctx)

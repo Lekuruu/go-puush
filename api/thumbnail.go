@@ -35,11 +35,6 @@ func PuushThumbnail(ctx *app.Context) {
 		return
 	}
 
-	if !upload.IsImage() {
-		ctx.Response.WriteHeader(http.StatusNotFound)
-		return
-	}
-
 	thumbnail, err := ctx.State.Storage.ReadThumbnail(upload.Key())
 	if err != nil {
 		ctx.Response.WriteHeader(http.StatusNotFound)
