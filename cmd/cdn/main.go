@@ -6,9 +6,10 @@ import (
 )
 
 func InitializeRoutes(server *app.Server) {
-	server.Router.HandleFunc("/{identifier}", server.ContextMiddleware(cdn.UploadShortlink)).Methods("GET")
-	server.Router.HandleFunc("/t/{identifier}", server.ContextMiddleware(cdn.ThumbnailShortlink)).Methods("GET")
-	server.Router.HandleFunc("/{pool}/{identifier}", server.ContextMiddleware(cdn.UploadShortlink)).Methods("GET")
+	server.Router.HandleFunc("/{identifier}", server.ContextMiddleware(cdn.Upload)).Methods("GET")
+	server.Router.HandleFunc("/{pool}/{identifier}", server.ContextMiddleware(cdn.Upload)).Methods("GET")
+	server.Router.HandleFunc("/t/{identifier}", server.ContextMiddleware(cdn.Thumbnail)).Methods("GET")
+	server.Router.HandleFunc("/t/{pool}/{identifier}", server.ContextMiddleware(cdn.Thumbnail)).Methods("GET")
 }
 
 func main() {

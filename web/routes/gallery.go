@@ -27,15 +27,9 @@ func NewGalleryFeed(pool *database.Pool) *GalleryFeedResponse {
 	}
 
 	for i, upload := range pool.Uploads {
-		if upload.Link == nil {
-			// NOTE: This should not happen, but just in case if the link
-			// 		 is missing we skip this upload to avoid a crash.
-			continue
-		}
-
 		feed.Objects = append(feed.Objects, GalleryItem{
 			Index:      i + 1,
-			Identifier: upload.Link.Identifier,
+			Identifier: upload.Identifier,
 			Size:       upload.SizeHumanReadable(),
 			Filename:   upload.Filename,
 		})
@@ -84,7 +78,7 @@ func GalleryFeed(ctx *app.Context) {
 		return
 	}
 
-	pool, err := services.FetchPoolByUserAndName(user.Id, GalleryPoolName, ctx.State, "Uploads", "Uploads.Link")
+	pool, err := services.FetchPoolByUserAndName(user.Id, GalleryPoolName, ctx.State, "Uploads")
 	if err != nil || pool == nil {
 		renderText(404, "page not found", ctx)
 		return

@@ -115,17 +115,17 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
-	shortlink, err := services.CreateShortLink(upload.Id, nil, ctx.State)
+	identifier, err := services.CreateUploadIdentifier(upload.Id, ctx.State)
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return
 	}
 
-	// Set upload for link to make url work properly
-	shortlink.Upload = upload
+	// Update upload with the identifier for URL generation
+	upload.Identifier = identifier
 
 	uploadResponse := &UploadResponse{
-		UploadUrl:        ctx.State.Config.Cdn.Url + shortlink.UrlEncoded(),
+		UploadUrl:        ctx.State.Config.Cdn.Url + upload.UrlEncoded(),
 		UpdatedDiskUsage: user.DiskUsage,
 	}
 	WritePuushResponse(ctx, uploadResponse)

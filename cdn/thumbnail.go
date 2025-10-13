@@ -7,24 +7,23 @@ import (
 )
 
 func Thumbnail(ctx *app.Context) {
-	poolPassword := ctx.Vars["password"]
 	poolIdentifier := ctx.Vars["pool"]
-	filename := ctx.Vars["filename"]
+	poolPassword := ctx.Vars["password"]
+	identifier := ctx.Vars["identifier"]
 
-	pool, err := services.FetchPoolByIdentifier(poolIdentifier, ctx.State)
+	upload, err := services.FetchUploadByIdentifier(identifier, ctx.State)
 	if err != nil {
 		WriteResponse(404, "That puush could not be found.", ctx)
 		return
 	}
 
-	if pool.Type == database.PoolTypePasswordProtected && poolPassword != pool.PasswordHash() {
+	if upload.Pool.Type == database.PoolTypePrivate && upload.Pool.Identifier != poolIdentifier {
+		WriteResponse(404, "That puush could not be found.", ctx)
+		return
+	}
+
+	if upload.Pool.Type == database.PoolTypePasswordProtected && poolPassword != upload.Pool.PasswordHash() {
 		WriteResponse(403, "Incorrect password for this puush.", ctx)
-		return
-	}
-
-	upload, err := services.FetchUploadByFilenameAndPool(filename, pool.Id, ctx.State)
-	if err != nil {
-		WriteResponse(404, "That puush could not be found.", ctx)
 		return
 	}
 

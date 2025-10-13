@@ -57,19 +57,19 @@ func (user *User) RequiresUsernameSetup() bool {
 }
 
 type Upload struct {
-	Id        int       `gorm:"primaryKey;autoIncrement;not null"`
-	UserId    int       `gorm:"not null"`
-	PoolId    int       `gorm:"not null"`
-	Filename  string    `gorm:"size:256;not null"`
-	Filesize  int64     `gorm:"not null"`
-	Checksum  string    `gorm:"size:32;not null"`
-	CreatedAt time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
-	Views     int       `gorm:"default:0;not null"`
-	MimeType  string    `gorm:"size:64;default:''"`
+	Id         int       `gorm:"primaryKey;autoIncrement;not null"`
+	UserId     int       `gorm:"not null"`
+	PoolId     int       `gorm:"not null"`
+	Filename   string    `gorm:"size:256;not null"`
+	Filesize   int64     `gorm:"not null"`
+	Checksum   string    `gorm:"size:32;not null"`
+	CreatedAt  time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
+	Views      int       `gorm:"default:0;not null"`
+	MimeType   string    `gorm:"size:64;default:''"`
+	Identifier string    `gorm:"size:16;not null;default:'';index"`
 
-	User *User      `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
-	Pool *Pool      `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
-	Link *ShortLink `gorm:"foreignKey:UploadId;constraint:OnDelete:CASCADE"`
+	User *User `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
+	Pool *Pool `gorm:"foreignKey:PoolId;constraint:OnDelete:CASCADE"`
 }
 
 func (upload *Upload) Key() string {
@@ -93,23 +93,17 @@ func (upload *Upload) SizeHumanReadable() string {
 }
 
 func (upload *Upload) Url() string {
-	if upload.Link != nil {
-		return upload.Link.Url()
+	if upload.Pool != nil && upload.Pool.Type == PoolTypePrivate {
+		return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, upload.Identifier)
 	}
-	if upload.Pool == nil {
-		return ""
-	}
-	return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, upload.Filename)
+	return fmt.Sprintf("/%s", upload.Identifier)
 }
 
 func (upload *Upload) UrlEncoded() string {
-	if upload.Link != nil {
-		return upload.Link.UrlEncoded()
+	if upload.Pool != nil && upload.Pool.Type == PoolTypePrivate {
+		return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, url.PathEscape(upload.Identifier))
 	}
-	if upload.Pool == nil {
-		return ""
-	}
-	return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, upload.FilenameEncoded())
+	return fmt.Sprintf("/%s", url.PathEscape(upload.Identifier))
 }
 
 type Pool struct {
@@ -133,29 +127,6 @@ func (pool *Pool) PasswordHash() string {
 	}
 	sum := md5.Sum([]byte(*pool.Password))
 	return fmt.Sprintf("%x", sum)
-}
-
-type ShortLink struct {
-	Identifier string     `gorm:"primaryKey;size:16;not null"`
-	CreatedAt  time.Time  `gorm:"not null;CURRENT_TIMESTAMP"`
-	ExpiresAt  *time.Time `gorm:"default:NULL"`
-	UploadId   int        `gorm:"not null;unique"`
-
-	Upload *Upload `gorm:"foreignKey:UploadId;constraint:OnDelete:CASCADE"`
-}
-
-func (shortlink *ShortLink) Url() string {
-	return fmt.Sprintf("/%s", shortlink.Identifier)
-}
-
-func (shortlink *ShortLink) UrlEncoded() string {
-	if shortlink.Upload == nil || shortlink.Upload.Pool == nil {
-		return fmt.Sprintf("/%s", url.PathEscape(shortlink.Identifier))
-	}
-	if shortlink.Upload.Pool.Type == PoolTypePrivate {
-		return fmt.Sprintf("/%s/%s", shortlink.Upload.Pool.Identifier, url.PathEscape(shortlink.Identifier))
-	}
-	return fmt.Sprintf("/%s", url.PathEscape(shortlink.Identifier))
 }
 
 type Session struct {

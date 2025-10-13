@@ -343,15 +343,11 @@ func resolveTargetUploadsFromQuery(ctx *app.Context) ([]*database.Upload, error)
 
 	identifiers := strings.Split(identifiersString, ",")
 
-	links, err := services.FetchManyShortLinksByIdentifiers(identifiers, ctx.State, "Upload")
+	uploads, err := services.FetchManyUploadsByIdentifiers(identifiers, ctx.State)
 	if err != nil {
 		return nil, err
 	}
 
-	var uploads []*database.Upload
-	for _, link := range links {
-		uploads = append(uploads, link.Upload)
-	}
 	return uploads, nil
 }
 
@@ -361,14 +357,10 @@ func resolveTargetUploadsFromForm(ctx *app.Context) ([]*database.Upload, error) 
 		return []*database.Upload{}, nil
 	}
 
-	links, err := services.FetchManyShortLinksByIdentifiers(identifiers, ctx.State, "Upload", "Upload.Pool")
+	uploads, err := services.FetchManyUploadsByIdentifiers(identifiers, ctx.State, "Pool")
 	if err != nil {
 		return nil, err
 	}
 
-	var uploads []*database.Upload
-	for _, link := range links {
-		uploads = append(uploads, link.Upload)
-	}
 	return uploads, nil
 }

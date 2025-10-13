@@ -62,7 +62,6 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 		&User{},
 		&Upload{},
 		&Pool{},
-		&ShortLink{},
 		&Session{},
 	}
 
@@ -70,6 +69,12 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Run migration to move shortlink identifiers to uploads
+	if err := MigrateShortLinksToUploads(db); err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }
 
@@ -92,5 +97,48 @@ func applyPerformanceSettings(db *gorm.DB, config DatabaseConfig) error {
 		return err
 	}
 
+	return nil
+}
+
+func MigrateShortLinksToUploads(db *gorm.DB) error {
+	// Check if there are any shortlinks to migrate
+	var count int64
+	if err := db.Table("short_links").Count(&count).Error; err != nil {
+		return nil
+	}
+
+	if count == 0 {
+		log.Println("No shortlinks to migrate, dropping short_links table...")
+		return db.Exec("DROP TABLE IF EXISTS short_links").Error
+	}
+
+	log.Printf("Migrating %d shortlinks to uploads table...\n", count)
+
+	// Update uploads with their shortlink identifiers
+	result := db.Exec(`
+		UPDATE uploads 
+		SET identifier = (
+			SELECT identifier 
+			FROM short_links 
+			WHERE short_links.upload_id = uploads.id
+		)
+		WHERE id IN (
+			SELECT upload_id 
+			FROM short_links
+		)
+	`)
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to migrate shortlinks: %w", result.Error)
+	}
+
+	log.Printf("Successfully migrated %d shortlinks\n", result.RowsAffected)
+
+	// Drop the short_links table after successful migration
+	if err := db.Exec("DROP TABLE IF EXISTS short_links").Error; err != nil {
+		return fmt.Errorf("failed to drop short_links table: %w", err)
+	}
+
+	log.Println("Successfully dropped short_links table")
 	return nil
 }

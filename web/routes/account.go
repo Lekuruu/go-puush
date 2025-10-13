@@ -171,23 +171,19 @@ func resolvePoolUploads(pool *database.Pool, pagination *PaginationData, ctx *ap
 	limit := pagination.Limit()
 
 	if searchQuery != "" {
-		uploads, err = services.SearchUploadsFromPool(searchQuery, pool.Id, offset, limit, ctx.State, "Link")
+		uploads, err = services.SearchUploadsFromPool(searchQuery, pool.Id, offset, limit, ctx.State)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		uploads, err = services.FetchUploadsByPool(pool.Id, offset, limit, ctx.State, "Link")
+		uploads, err = services.FetchUploadsByPool(pool.Id, offset, limit, ctx.State)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	for _, upload := range uploads {
-		if upload.Link == nil {
-			continue
-		}
 		upload.Pool = pool
-		upload.Link.Upload = upload
 	}
 	return uploads, nil
 }
@@ -195,12 +191,12 @@ func resolvePoolUploads(pool *database.Pool, pagination *PaginationData, ctx *ap
 func resolvePoolThumbnails(pools []*database.Pool, ctx *app.Context) (map[int]string, error) {
 	thumbnails := make(map[int]string, len(pools))
 	for _, pool := range pools {
-		lastUpload, err := services.FetchLastPoolUpload(pool.Id, ctx.State, "Link")
-		if err != nil || lastUpload == nil || lastUpload.Link == nil {
+		lastUpload, err := services.FetchLastPoolUpload(pool.Id, ctx.State)
+		if err != nil || lastUpload == nil {
 			thumbnails[pool.Id] = pool.Identifier
 			continue
 		}
-		thumbnails[pool.Id] = lastUpload.Link.Identifier
+		thumbnails[pool.Id] = lastUpload.Identifier
 	}
 	return thumbnails, nil
 }
