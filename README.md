@@ -39,7 +39,7 @@ The following features have been implemented or are planned for the future:
         - [ ] Email activation
         - [ ] Invite codes (unofficial)
     - [ ] Password reset functionality
-    - [x] Account page functionality
+    - [ ] Account page functionality
         - [x] Move uploads
         - [x] Delete uploads
         - [x] Update default pool
@@ -50,3 +50,5 @@ The following features have been implemented or are planned for the future:
         - [x] Username check
         - [x] Username claiming
         - [x] "Stop asking about my username"
+        - [ ] Email request (/ajax/tb_email)
+        - [ ] Exporting pools
