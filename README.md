@@ -34,13 +34,19 @@ The following features have been implemented or are planned for the future:
     - [x] Gallery page
     - [x] Login functionality
     - [x] Logout functionality
-    - [ ] Password reset functionality
     - [ ] Registration functionality
-    - [ ] Account page functionality
+        - [x] Registration
+        - [ ] Email activation
+        - [ ] Invite codes (unofficial)
+    - [ ] Password reset functionality
+    - [x] Account page functionality
         - [x] Move uploads
         - [x] Delete uploads
         - [x] Update default pool
         - [x] Reset API key
         - [x] Switch between views
         - [x] Search for uploads
-        - [ ] Change password
+        - [x] Change password
+        - [x] Username check
+        - [x] Username claiming
+        - [x] "Stop asking about my username"
