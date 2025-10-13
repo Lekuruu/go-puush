@@ -153,6 +153,10 @@ func DeleteUpload(ctx *app.Context) {
 			renderText(500, "Server error", ctx)
 			return
 		}
+
+		// Remove assets from storage, do nothing on error
+		ctx.State.Storage.RemoveThumbnail(upload.Key())
+		ctx.State.Storage.RemoveUpload(upload.Key())
 	}
 
 	err = services.UpdatePoolUploadCounts(user, ctx.State)
