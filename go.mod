@@ -10,7 +10,6 @@ require (
 require (
 	github.com/gabriel-vasile/mimetype v1.4.10
 	github.com/prplecake/go-thumbnail v0.1.6
-	github.com/sytallax/prettylog v0.1.0
 	github.com/u2takey/ffmpeg-go v0.5.0
 	gorm.io/gorm v1.30.0
 )
