@@ -11,10 +11,16 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.10
 	github.com/prplecake/go-thumbnail v0.1.6
 	github.com/sytallax/prettylog v0.1.0
+	github.com/u2takey/ffmpeg-go v0.5.0
 	gorm.io/gorm v1.30.0
 )
 
-require golang.org/x/image v0.0.0-20220302094943-723b81ca9867 // indirect
+require (
+	github.com/aws/aws-sdk-go v1.38.20 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/u2takey/go-utils v0.3.1 // indirect
+	golang.org/x/image v0.0.0-20220302094943-723b81ca9867 // indirect
+)
 
 require (
 	github.com/jinzhu/inflection v1.0.0 // indirect

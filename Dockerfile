@@ -27,7 +27,7 @@ RUN CGO_ENABLED=1 go build -o puush-api ./cmd/api/main.go & \
 FROM alpine AS api
 
 # Install runtime dependencies
-RUN apk add --no-cache ca-certificates sqlite-libs
+RUN apk add --no-cache ca-certificates sqlite-libs ffmpeg
 
 WORKDIR /app
 COPY --from=build /app/puush-api /app/puush

@@ -127,3 +127,16 @@ func UserAuthenticationDynamic(username string, password string, key string, sta
 	}
 	return nil, false
 }
+
+// CreateThumbnailFromUpload creates a thumbnail for the given upload based on its type (image or video).
+func CreateThumbnailFromUpload(upload *database.Upload, data []byte, state *app.State) ([]byte, error) {
+	if upload.IsImage() {
+		return services.CreateThumbnail(upload.Key(), data, state)
+	}
+
+	if upload.IsVideo() {
+		return services.CreateThumbnailFromVideo(upload.Key(), data, upload.MimeType, state)
+	}
+
+	return nil, nil
+}

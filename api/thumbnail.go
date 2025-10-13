@@ -41,23 +41,8 @@ func PuushThumbnail(ctx *app.Context) {
 	}
 
 	thumbnail, err := ctx.State.Storage.ReadThumbnail(upload.Key())
-	if err == nil {
-		ctx.Response.Header().Set("Content-Type", http.DetectContentType(thumbnail))
-		ctx.Response.WriteHeader(http.StatusOK)
-		ctx.Response.Write(thumbnail)
-		return
-	}
-
-	uploadData, err := ctx.State.Storage.ReadUpload(upload.Key())
 	if err != nil {
 		ctx.Response.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	// Try to generate a thumbnail if it doesn't exist
-	thumbnail, err = services.CreateThumbnail(upload.Key(), uploadData, ctx.State)
-	if err != nil {
-		ctx.Response.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 

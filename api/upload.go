@@ -99,10 +99,8 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
-	if upload.IsImage() {
-		// Try to generate a thumbnail & do nothing if it fails
-		services.CreateThumbnail(upload.Key(), fileData, ctx.State)
-	}
+	// Try to generate a thumbnail & do nothing if it fails
+	CreateThumbnailFromUpload(upload, fileData, ctx.State)
 
 	err = services.UpdatePoolUploadCount(upload.Pool.Id, ctx.State)
 	if err != nil {

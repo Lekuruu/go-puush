@@ -34,25 +34,10 @@ func Thumbnail(ctx *app.Context) {
 	}
 
 	data, err := ctx.State.Storage.ReadThumbnail(upload.Key())
-	if err == nil {
-		// We found the thumbnail, serve it
-		WriteThumbnail(ctx, upload, data)
-		return
-	}
-
-	// If thumbnail not found, try to generate it
-	uploadData, err := ctx.State.Storage.ReadUpload(upload.Key())
 	if err != nil {
-		// TODO: Original file was not found, queue for deletion
-		WriteResponse(404, "That puush could not be found.", ctx)
+		WriteResponse(404, "That puush does not have a thumbnail.", ctx)
 		return
 	}
 
-	thumbnail, err := services.CreateThumbnail(upload.Key(), uploadData, ctx.State)
-	if err != nil {
-		WriteResponse(500, "An error occurred while generating the thumbnail.", ctx)
-		return
-	}
-
-	WriteThumbnail(ctx, upload, thumbnail)
+	WriteThumbnail(ctx, upload, data)
 }
