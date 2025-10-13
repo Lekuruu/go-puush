@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"log/slog"
 	"net/http"
 	"time"
 
@@ -16,7 +15,7 @@ type Server struct {
 	Name   string
 	State  *State
 	Router *mux.Router
-	Logger *slog.Logger
+	Logger *Logger
 }
 
 func NewServer(host string, port int, name string, state *State) *Server {
@@ -25,7 +24,7 @@ func NewServer(host string, port int, name string, state *State) *Server {
 		Port:   port,
 		Name:   name,
 		State:  state,
-		Logger: state.Logger,
+		Logger: NewLogger(name),
 		Router: mux.NewRouter(),
 	}
 }
@@ -49,15 +48,13 @@ func (server *Server) Serve() {
 		server.Host,
 		server.Port,
 	)
-	server.Logger.Info(
-		"Starting server",
-		"name", server.Name,
-		"bind", bind,
+	server.Logger.Logf(
+		"Listening on %s", bind,
 	)
 
 	err := http.ListenAndServe(bind, server.LoggingMiddleware(server.Router))
 	if err != nil {
-		slog.Error("Failed to start server", "error", err)
+		server.Logger.Logf("Failed to start server: %v", err)
 		return
 	}
 }
@@ -112,15 +109,12 @@ func (server *Server) LoggingMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(rc, r)
 		time := time.Since(start)
 
-		server.Logger.Info(
-			"HTTP Request",
-			"server", server.Name,
-			"method", r.Method,
-			"uri", r.RequestURI,
-			"remote", r.RemoteAddr,
-			"user-agent", r.UserAgent(),
-			"status", rc.Status(),
-			"duration", time.String(),
+		server.Logger.Logf("%s -> %s \"%s\" %d (%s)",
+			r.RemoteAddr,
+			r.Method,
+			r.RequestURI,
+			rc.Status(),
+			time.String(),
 		)
 	})
 }

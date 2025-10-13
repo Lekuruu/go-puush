@@ -31,7 +31,7 @@ func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]interface
 	err := templates.ExecuteTemplate(ctx.Response, tmpl, data)
 	if err != nil {
 		http.Error(ctx.Response, "Internal server error", http.StatusInternalServerError)
-		log.Println("Template execution error:", err)
+		ctx.State.Logger.Logf("Template execution error: %v", err)
 	}
 }
 
@@ -68,7 +68,7 @@ func renderJson(status int, object any, ctx *app.Context) {
 	ctx.Response.WriteHeader(status)
 	err := json.NewEncoder(ctx.Response).Encode(object)
 	if err != nil {
-		log.Println("JSON marshal error:", err)
+		ctx.State.Logger.Logf("JSON marshal error: %v", err)
 	}
 }
 

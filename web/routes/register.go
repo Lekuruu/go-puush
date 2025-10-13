@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"log"
-
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
@@ -45,7 +43,10 @@ func PerformRegistration(ctx *app.Context) {
 		return
 	}
 
-	log.Printf("New user registered: %s (ID: %d)", user.Email, user.Id)
+	ctx.State.Logger.Logf(
+		"New user registered: %s (%d)",
+		user.Email, user.Id,
+	)
 
 	responseTitle := "Registration complete!"
 	responseMessage := "An email has been sent to your designated address with instructions on how to activate your account."
