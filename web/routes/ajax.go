@@ -15,6 +15,7 @@ type AjaxError struct {
 	Message string `json:"message"`
 }
 
+var ErrorUsernameAlreadySet = AjaxError{Error: true, Message: "You have already set a username."}
 var ErrorPasswordIncorrect = AjaxError{Error: true, Message: "Current password incorrect."}
 var ErrorUsernameTaken = AjaxError{Error: true, Message: "That username is already taken."}
 var ErrorServerError = AjaxError{Error: true, Message: "An internal server error occurred."}
@@ -275,6 +276,11 @@ func ClaimUsername(ctx *app.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	if user.Name != "" {
+		renderJson(200, ErrorUsernameAlreadySet, ctx)
 		return
 	}
 
