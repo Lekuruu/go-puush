@@ -18,9 +18,9 @@
 
 {{ define "account/popups/welcome" }}
 <div class="dialog" id="welcome-dialog">
-    <h1>Your puush Gallery</h1>
+    <h1>Your {{ .Config.Service.Name }} Gallery</h1>
     <img src="/img/welcome-gallery.png" style="margin-bottom: -10px;">
-    <div id="welcome-dialog-msg">To use your puush gallery, you'll need to select a username.</div>
+    <div id="welcome-dialog-msg">To use your {{ .Config.Service.Name }} gallery, you'll need to select a username.</div>
     <div id="sample-gallery-url">
         {{ .Config.Service.Url }}/<span>me</span>/gallery <img id="username-ok" style="display:none;">
     </div>
