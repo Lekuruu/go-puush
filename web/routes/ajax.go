@@ -271,6 +271,23 @@ func CheckUsername(ctx *app.Context) {
 	renderJson(200, NoError, ctx)
 }
 
+func StopAskingAboutUsername(ctx *app.Context) {
+	user, err := GetUserSession(ctx)
+	if err != nil || user == nil {
+		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	user.UsernameSetupReminder = false
+	err = services.UpdateUser(user, ctx.State)
+	if err != nil {
+		renderJson(200, ErrorServerError, ctx)
+		return
+	}
+
+	renderJson(200, NoError, ctx)
+}
+
 func resolveTargetUploadsFromQuery(ctx *app.Context) ([]*database.Upload, error) {
 	identifiersString := ctx.Request.URL.Query().Get("i")
 	if identifiersString == "" {
