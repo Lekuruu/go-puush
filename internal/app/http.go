@@ -110,7 +110,7 @@ func (server *Server) LoggingMiddleware(next http.Handler) http.Handler {
 		time := time.Since(start)
 
 		server.Logger.Logf("%s -> %s \"%s\" %d (%s)",
-			r.RemoteAddr,
+			GetRequestIP(r),
 			r.Method,
 			r.RequestURI,
 			rc.Status(),
