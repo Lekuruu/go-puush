@@ -16,8 +16,10 @@ type AjaxError struct {
 }
 
 var ErrorPasswordIncorrect = AjaxError{Error: true, Message: "Current password incorrect."}
+var ErrorUsernameTaken = AjaxError{Error: true, Message: "That username is already taken."}
 var ErrorServerError = AjaxError{Error: true, Message: "An internal server error occurred."}
 var ErrorBadRequest = AjaxError{Error: true, Message: "Bad request."}
+var NoError = AjaxError{Error: false, Message: ""}
 
 func MoveDialog(ctx *app.Context) {
 	user, err := GetUserSession(ctx, "Pools")
@@ -245,6 +247,28 @@ func ChangePassword(ctx *app.Context) {
 	}
 
 	renderRaw(200, "text/html", []byte{}, ctx)
+}
+
+func CheckUsername(ctx *app.Context) {
+	err := ctx.Request.ParseForm()
+	if err != nil {
+		renderJson(200, ErrorBadRequest, ctx)
+		return
+	}
+
+	username := ctx.Request.FormValue("u")
+	if username == "" {
+		renderJson(200, ErrorBadRequest, ctx)
+		return
+	}
+
+	existingUser, _ := services.FetchUserByName(username, ctx.State)
+	if existingUser != nil {
+		renderJson(200, ErrorUsernameTaken, ctx)
+		return
+	}
+
+	renderJson(200, NoError, ctx)
 }
 
 func resolveTargetUploadsFromQuery(ctx *app.Context) ([]*database.Upload, error) {
