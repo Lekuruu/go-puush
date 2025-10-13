@@ -75,7 +75,8 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
-	identifier, err := services.GenerateUploadIdentifier(ctx.State)
+	identifierLength := user.DefaultPool.UploadIdentifierLength()
+	identifier, err := services.GenerateUploadIdentifier(identifierLength, ctx.State)
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return

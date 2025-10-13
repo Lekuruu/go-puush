@@ -203,7 +203,7 @@ const minimumLinkIdentifierLength = 5
 const maximumLinkIdentifierLength = 16
 
 func CreateUploadIdentifier(uploadId int, state *app.State) (string, error) {
-	identifier, err := GenerateUploadIdentifier(state)
+	identifier, err := GenerateUploadIdentifier(minimumLinkIdentifierLength, state)
 	if err != nil {
 		return "", err
 	}
@@ -255,8 +255,15 @@ func UploadIdentifierExists(identifier string, state *app.State) (bool, error) {
 	return count > 0, nil
 }
 
-func GenerateUploadIdentifier(state *app.State) (string, error) {
-	for i := minimumLinkIdentifierLength; i <= maximumLinkIdentifierLength; i++ {
+func GenerateUploadIdentifier(length int, state *app.State) (string, error) {
+	if length < minimumLinkIdentifierLength {
+		length = minimumLinkIdentifierLength
+	}
+	if length > maximumLinkIdentifierLength {
+		length = maximumLinkIdentifierLength
+	}
+
+	for i := length; i <= maximumLinkIdentifierLength; i++ {
 		identifier := app.RandomString(i)
 		exists, err := UploadIdentifierExists(identifier, state)
 		if err != nil {

@@ -7,7 +7,7 @@ import (
 	"github.com/Lekuruu/go-puush/internal/database"
 )
 
-const minimumPoolIdentifierLength = 8
+const minimumPoolIdentifierLength = 6
 const maximumPoolIdentifierLength = 16
 
 func CreatePool(pool *database.Pool, state *app.State) error {

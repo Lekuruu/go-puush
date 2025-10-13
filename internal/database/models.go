@@ -129,6 +129,17 @@ func (pool *Pool) PasswordHash() string {
 	return fmt.Sprintf("%x", sum)
 }
 
+func (pool *Pool) UploadIdentifierLength() int {
+	switch pool.Type {
+	case PoolTypePrivate:
+		return 10
+	case PoolTypePasswordProtected:
+		return 10
+	default:
+		return 6
+	}
+}
+
 type Session struct {
 	Id        uint      `gorm:"primaryKey"`
 	Token     string    `gorm:"uniqueIndex;not null"`
