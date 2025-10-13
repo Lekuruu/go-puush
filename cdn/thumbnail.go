@@ -27,6 +27,12 @@ func Thumbnail(ctx *app.Context) {
 		return
 	}
 
+	if match := ctx.Request.Header.Get("If-None-Match"); match == "t"+upload.Checksum {
+		// ETag matches, return 304 Not Modified to save bandwidth
+		ctx.Response.WriteHeader(304)
+		return
+	}
+
 	data, err := ctx.State.Storage.ReadThumbnail(upload.Key())
 	if err != nil {
 		WriteResponse(404, "That puush does not have a thumbnail.", ctx)
