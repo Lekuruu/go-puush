@@ -1,6 +1,7 @@
 package cdn
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/Lekuruu/go-puush/internal/app"
@@ -30,6 +31,12 @@ func Upload(ctx *app.Context) {
 	upload, err := services.FetchUploadByFilenameAndPool(filename, pool.Id, ctx.State)
 	if err != nil {
 		WriteResponse(404, "That puush could not be found.", ctx)
+		return
+	}
+
+	if match := ctx.Request.Header.Get("If-None-Match"); match == upload.Checksum {
+		// ETag matches, return 304 Not Modified to save bandwidth
+		ctx.Response.WriteHeader(http.StatusNotModified)
 		return
 	}
 
