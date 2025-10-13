@@ -24,7 +24,10 @@ func Account(ctx *app.Context) {
 		return
 	}
 
-	selectedPool.Uploads, err = resolvePoolUploads(selectedPool, ctx)
+	currentPage := GetPageFromQuery(ctx)
+	pagination := NewPaginationData(currentPage, selectedPool.UploadCount, UploadsPerPage)
+
+	selectedPool.Uploads, err = resolvePoolUploads(selectedPool, pagination, ctx)
 	if err != nil {
 		renderText(500, "Server error", ctx)
 		return
@@ -45,6 +48,11 @@ func Account(ctx *app.Context) {
 		return selectedPool.Uploads[i].CreatedAt.After(selectedPool.Uploads[j].CreatedAt)
 	})
 
+	if len(selectedPool.Uploads) < pagination.PerPage && pagination.CurrentPage <= 1 {
+		// We don't need pagination if all uploads fit on one page
+		pagination = nil
+	}
+
 	searchQuery := ctx.Request.URL.Query().Get("q")
 	if searchQuery != "" {
 		// Always switch to view type when searching
@@ -54,6 +62,7 @@ func Account(ctx *app.Context) {
 	renderTemplate(ctx, "account/home", map[string]interface{}{
 		"Title":          "account",
 		"User":           user,
+		"Pagination":     pagination,
 		"SearchQuery":    searchQuery,
 		"SelectedPool":   selectedPool,
 		"PoolThumbnails": poolThumbnails,
@@ -156,15 +165,18 @@ func resolvePoolFromRequest(user *database.User, ctx *app.Context) (*database.Po
 	return pool, nil
 }
 
-func resolvePoolUploads(pool *database.Pool, ctx *app.Context) (uploads []*database.Upload, err error) {
+func resolvePoolUploads(pool *database.Pool, pagination *PaginationData, ctx *app.Context) (uploads []*database.Upload, err error) {
 	searchQuery := ctx.Request.URL.Query().Get("q")
+	offset := pagination.Offset()
+	limit := pagination.Limit()
+
 	if searchQuery != "" {
-		uploads, err = services.SearchUploadsFromPool(searchQuery, pool.Id, ctx.State, "Link")
+		uploads, err = services.SearchUploadsFromPool(searchQuery, pool.Id, offset, limit, ctx.State, "Link")
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		uploads, err = services.FetchUploadsByPool(pool.Id, ctx.State, "Link")
+		uploads, err = services.FetchUploadsByPool(pool.Id, offset, limit, ctx.State, "Link")
 		if err != nil {
 			return nil, err
 		}
@@ -184,7 +196,7 @@ func resolvePoolThumbnails(pools []*database.Pool, ctx *app.Context) (map[int]st
 	thumbnails := make(map[int]string, len(pools))
 	for _, pool := range pools {
 		lastUpload, err := services.FetchLastPoolUpload(pool.Id, ctx.State, "Link")
-		if err != nil || lastUpload == nil {
+		if err != nil || lastUpload == nil || lastUpload.Link == nil {
 			thumbnails[pool.Id] = pool.Identifier
 			continue
 		}

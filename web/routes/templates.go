@@ -93,6 +93,13 @@ func init() {
 			}
 			return b
 		},
+		"iterate": func(count int) []int {
+			result := make([]int, count)
+			for i := range result {
+				result[i] = i
+			}
+			return result
+		},
 	}
 
 	var err error

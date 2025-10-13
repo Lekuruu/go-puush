@@ -74,9 +74,13 @@ func FetchUploadByFilenameAndPool(filename string, poolId int, state *app.State,
 	return upload, nil
 }
 
-func FetchUploadsByPool(poolId int, state *app.State, preload ...string) ([]*database.Upload, error) {
+func FetchUploadsByPool(poolId int, offset int, limit int, state *app.State, preload ...string) ([]*database.Upload, error) {
 	var uploads []*database.Upload
-	query := preloadQuery(state, preload).Where("pool_id = ?", poolId).Order("created_at DESC")
+	query := preloadQuery(state, preload).
+		Where("pool_id = ?", poolId).
+		Order("created_at DESC").
+		Offset(offset).
+		Limit(limit)
 	result := query.Find(&uploads)
 
 	if result.Error != nil {
@@ -97,11 +101,13 @@ func FetchPoolUploadCount(poolId int, state *app.State) (int64, error) {
 	return count, nil
 }
 
-func SearchUploadsFromPool(queryStr string, poolId int, state *app.State, preload ...string) ([]*database.Upload, error) {
+func SearchUploadsFromPool(queryStr string, poolId int, offset int, limit int, state *app.State, preload ...string) ([]*database.Upload, error) {
 	var uploads []*database.Upload
 	query := preloadQuery(state, preload).Where("pool_id = ?", poolId).
 		Where("filename LIKE ?", "%"+queryStr+"%").
-		Order("created_at DESC")
+		Order("created_at DESC").
+		Offset(offset).
+		Limit(limit)
 	result := query.Find(&uploads)
 
 	if result.Error != nil {

@@ -1,0 +1,70 @@
+{{ define "account/pagination" }}
+<div id="pagination">
+{{ if .Pagination }}
+    {{ $p := .Pagination }}
+    
+    {{ if $p.HasPrevious }}
+    <a class="noborder" href="?page=1{{ if .SearchQuery }}&q={{ .SearchQuery }}{{ end }}&pool={{ .SelectedPool.Id }}">«</a>
+    {{ end }}
+    
+    {{ if le $p.TotalPages 7 }}
+        {{ range $i := iterate $p.TotalPages }}
+        {{ $page := add $i 1 }}
+        {{ if eq $page $p.CurrentPage }}
+        <span class="page">{{ $page }}</span>
+        {{ else }}
+        <a href="?page={{ $page }}{{ if $.SearchQuery }}&q={{ $.SearchQuery }}{{ end }}&pool={{ $.SelectedPool.Id }}">{{ $page }}</a>
+        {{ end }}
+        {{ end }}
+    {{ else }}
+        {{ if eq $p.CurrentPage 1 }}
+        <span class="page">1</span>
+        {{ else }}
+        <a href="?page=1{{ if .SearchQuery }}&q={{ .SearchQuery }}{{ end }}&pool={{ .SelectedPool.Id }}">1</a>
+        {{ end }}
+        
+        {{ if gt $p.CurrentPage 3 }}
+        <span>...</span>
+        {{ end }}
+        
+        {{ $start := max 2 (sub $p.CurrentPage 1) }}
+        {{ $end := min (sub $p.TotalPages 1) (add $p.CurrentPage 1) }}
+        
+        {{ if le $p.CurrentPage 3 }}
+            {{ $start = 2 }}
+            {{ $end = min 5 (sub $p.TotalPages 1) }}
+        {{ else if ge $p.CurrentPage (sub $p.TotalPages 2) }}
+            {{ $start = max 2 (sub $p.TotalPages 4) }}
+            {{ $end = sub $p.TotalPages 1 }}
+        {{ end }}
+        
+        {{ if lt $start $p.TotalPages }}
+        {{ range $i := iterate (add (sub $end $start) 1) }}
+        {{ $page := add $start $i }}
+        {{ if and (gt $page 1) (lt $page $p.TotalPages) }}
+        {{ if eq $page $p.CurrentPage }}
+        <span class="page">{{ $page }}</span>
+        {{ else }}
+        <a href="?page={{ $page }}{{ if $.SearchQuery }}&q={{ $.SearchQuery }}{{ end }}&pool={{ $.SelectedPool.Id }}">{{ $page }}</a>
+        {{ end }}
+        {{ end }}
+        {{ end }}
+        {{ end }}
+        
+        {{ if lt $p.CurrentPage (sub $p.TotalPages 2) }}
+        <span>...</span>
+        {{ end }}
+        
+        {{ if eq $p.CurrentPage $p.TotalPages }}
+        <span class="page">{{ $p.TotalPages }}</span>
+        {{ else }}
+        <a href="?page={{ $p.TotalPages }}{{ if .SearchQuery }}&q={{ .SearchQuery }}{{ end }}&pool={{ .SelectedPool.Id }}">{{ $p.TotalPages }}</a>
+        {{ end }}
+    {{ end }}
+    
+    {{ if $p.HasNext }}
+    <a class="noborder" href="?page={{ add $p.CurrentPage 1 }}{{ if .SearchQuery }}&q={{ .SearchQuery }}{{ end }}&pool={{ .SelectedPool.Id }}">»</a>
+    {{ end }}
+{{ end }}
+</div>
+{{ end }}
