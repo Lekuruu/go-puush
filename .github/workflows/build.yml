@@ -10,7 +10,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+    strategy:
+      matrix:
+        include:
+          - goos: windows
+            goarch: amd64
+            output: puush-windows.exe
+            artifact: puush-windows
+          - goos: linux
+            goarch: amd64
+            output: puush-linux
+            artifact: puush-linux
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -20,28 +31,15 @@ jobs:
       with:
         go-version-file: 'go.mod'
 
-    - name: Build for Windows
+    - name: Build for ${{ matrix.goos }}
       env:
-        GOOS: windows
-        GOARCH: amd64
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
       run: |
-        go build -ldflags="-s -w" -o puush-windows.exe ./cmd/standalone/
+        go build -ldflags="-s -w" -o ${{ matrix.output }} ./cmd/standalone/
 
-    - name: Build for Linux
-      env:
-        GOOS: linux
-        GOARCH: amd64
-      run: |
-        go build -ldflags="-s -w" -o puush-linux ./cmd/standalone/
-
-    - name: Upload Windows Binary
+    - name: Upload Binary
       uses: actions/upload-artifact@v4
       with:
-        name: puush-windows
-        path: puush-windows.exe
-
-    - name: Upload Linux Binary
-      uses: actions/upload-artifact@v4
-      with:
-        name: puush-linux
-        path: puush-linux
+        name: ${{ matrix.artifact }}
+        path: ${{ matrix.output }}
