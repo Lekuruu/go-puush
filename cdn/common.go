@@ -18,7 +18,11 @@ func WriteResponse(status int, message string, ctx *app.Context) {
 }
 
 func WriteXssHeaders(ctx *app.Context) {
-	ctx.Response.Header().Set("Content-Security-Policy", "default-src 'none'; sandbox")
+	// Allow media streaming and basic styling while maintaining XSS protection
+	ctx.Response.Header().Set(
+		"Content-Security-Policy",
+		"default-src 'none'; media-src 'self'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox",
+	)
 	ctx.Response.Header().Set("X-Content-Type-Options", "nosniff")
 	ctx.Response.Header().Set("X-Frame-Options", "DENY")
 }
