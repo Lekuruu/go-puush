@@ -88,6 +88,10 @@ func (upload *Upload) IsVideo() bool {
 	return strings.HasPrefix(upload.MimeType, "video")
 }
 
+func (upload *Upload) IsAudio() bool {
+	return strings.HasPrefix(upload.MimeType, "audio")
+}
+
 func (upload *Upload) SizeHumanReadable() string {
 	return formatBytes(upload.Filesize)
 }

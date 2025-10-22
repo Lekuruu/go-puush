@@ -46,7 +46,7 @@ func Upload(ctx *app.Context) {
 		services.UpdateUpload(upload, ctx.State)
 	}
 
-	if !upload.IsImage() && !upload.IsVideo() {
+	if !upload.IsImage() && !upload.IsVideo() && !upload.IsAudio() {
 		// Avoid xss attacks by sandboxing html files
 		WriteXssHeaders(ctx)
 	}
