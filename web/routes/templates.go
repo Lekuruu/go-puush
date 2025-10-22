@@ -72,7 +72,7 @@ func renderJson(status int, object any, ctx *app.Context) {
 	}
 }
 
-func init() {
+func InitializeTemplates() {
 	funcs := template.FuncMap{
 		"add":   func(a, b int) int { return a + b },
 		"sub":   func(a, b int) int { return a - b },

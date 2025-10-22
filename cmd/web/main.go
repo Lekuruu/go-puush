@@ -8,6 +8,9 @@ import (
 )
 
 func InitializeRoutes(server *app.Server) {
+	// Initialize templates
+	routes.InitializeTemplates()
+
 	// Public pages
 	server.Router.HandleFunc("/", server.ContextMiddleware(routes.Home)).Methods("GET")
 	server.Router.HandleFunc("/faq", server.ContextMiddleware(routes.Faq)).Methods("GET")
