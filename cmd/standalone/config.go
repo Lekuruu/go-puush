@@ -10,10 +10,10 @@ CDN_URL=http://localhost
 
 # Storage configuration
 STORAGE_TYPE=local
-STORAGE_URI=./.data
+STORAGE_URI=./data
 
 # Database configuration
-DB_PATH=./.data/puush.db
+DB_PATH=./data/puush.db
 
 # Service configuration
 SERVICE_URL=http://localhost
