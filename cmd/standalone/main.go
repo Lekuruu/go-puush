@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -98,6 +99,7 @@ func EnsureWebFolder() {
 		if _, err := os.Stat(folder); !os.IsNotExist(err) {
 			continue
 		}
+		fmt.Printf("Required folder '%s' does not exist. Downloading from GitHub...\n", folder)
 
 		// Download the folder from github
 		err := DownloadDirectory(folder)
