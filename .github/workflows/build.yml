@@ -1,0 +1,47 @@
+name: Build Standalone Binaries
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: 'go.mod'
+
+    - name: Build for Windows
+      env:
+        GOOS: windows
+        GOARCH: amd64
+      run: |
+        go build -ldflags="-s -w" -o puush-windows.exe ./cmd/standalone/
+
+    - name: Build for Linux
+      env:
+        GOOS: linux
+        GOARCH: amd64
+      run: |
+        go build -ldflags="-s -w" -o puush-linux ./cmd/standalone/
+
+    - name: Upload Windows Binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: puush-windows
+        path: puush-windows.exe
+
+    - name: Upload Linux Binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: puush-linux
+        path: puush-linux
