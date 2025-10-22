@@ -128,3 +128,6 @@ fabric.properties
 
 # Client data
 web/static/dl/*
+
+# Air hot-reloading temp files
+tmp/
