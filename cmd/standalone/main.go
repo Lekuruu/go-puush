@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/Lekuruu/go-puush/api"
 	"github.com/Lekuruu/go-puush/cdn"
@@ -27,6 +29,9 @@ func InitializeApiRoutes(server *app.Server) {
 }
 
 func InitializeWebRoutes(server *app.Server) {
+	// Initialize templates
+	routes.InitializeTemplates()
+
 	// Public pages
 	server.Router.HandleFunc("/", server.ContextMiddleware(routes.Home)).Methods("GET")
 	server.Router.HandleFunc("/faq", server.ContextMiddleware(routes.Faq)).Methods("GET")
@@ -84,6 +89,27 @@ func InitializeWebRoutes(server *app.Server) {
 	server.Router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "web/static/favicon.ico")
 	})
+}
+
+func EnsureWebFolder() {
+	// Ensure the web folder exists
+	// If it doesn't, create it and populate it with default files
+	for _, folder := range requiredFolders {
+		if _, err := os.Stat(folder); !os.IsNotExist(err) {
+			continue
+		}
+
+		// Download the folder from github
+		err := DownloadDirectory(folder)
+		if err != nil {
+			log.Fatalf("Failed to download required folder %s: %v", folder, err)
+		}
+	}
+}
+
+func init() {
+	// Download web folder if it doesn't exist
+	EnsureWebFolder()
 }
 
 func main() {
