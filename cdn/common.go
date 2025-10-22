@@ -23,17 +23,19 @@ func WriteXssHeaders(ctx *app.Context) {
 	ctx.Response.Header().Set("X-Frame-Options", "DENY")
 }
 
-func WriteUpload(ctx *app.Context, upload *database.Upload, stream io.ReadCloser) {
+func WriteUpload(ctx *app.Context, upload *database.Upload, stream io.ReadSeekCloser) {
 	ctx.Response.Header().Set("Content-Type", upload.MimeType)
-	ctx.Response.Header().Set("Content-Length", strconv.Itoa(int(upload.Filesize)))
 	ctx.Response.Header().Set("Content-Disposition", fmt.Sprintf("filename=\"%s\"", upload.Filename))
 	ctx.Response.Header().Set("Last-Modified", upload.CreatedAt.Format(http.TimeFormat))
 	ctx.Response.Header().Set("Date", time.Now().Format(http.TimeFormat))
 	ctx.Response.Header().Set("ETag", fmt.Sprintf(`"%s"`, upload.Checksum))
-	ctx.Response.WriteHeader(200)
 
-	// Stream the file to the response
-	io.Copy(ctx.Response, stream)
+	// Advertise that we support range requests when possible
+	ctx.Response.Header().Set("Accept-Ranges", "bytes")
+
+	// Serve the content with support for range requests
+	defer stream.Close()
+	http.ServeContent(ctx.Response, ctx.Request, upload.Filename, upload.CreatedAt, stream)
 }
 
 func WriteThumbnail(ctx *app.Context, upload *database.Upload, thumbnail []byte) {

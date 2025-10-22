@@ -39,7 +39,7 @@ func (storage *FileStorage) Read(key string, folder string) ([]byte, error) {
 	return os.ReadFile(path)
 }
 
-func (storage *FileStorage) ReadStream(key string, folder string) (io.ReadCloser, error) {
+func (storage *FileStorage) ReadStream(key string, folder string) (io.ReadSeekCloser, error) {
 	path := fmt.Sprintf("%s/%s/%s", storage.dataPath, folder, key)
 	return os.Open(path)
 }
@@ -78,7 +78,7 @@ func (storage *FileStorage) ReadUpload(key string) ([]byte, error) {
 	return storage.Read(key, "uploads")
 }
 
-func (storage *FileStorage) ReadUploadStream(key string) (io.ReadCloser, error) {
+func (storage *FileStorage) ReadUploadStream(key string) (io.ReadSeekCloser, error) {
 	return storage.ReadStream(key, "uploads")
 }
 
@@ -98,7 +98,7 @@ func (storage *FileStorage) ReadThumbnail(key string) ([]byte, error) {
 	return storage.Read(key, "thumbnails")
 }
 
-func (storage *FileStorage) ReadThumbnailStream(key string) (io.ReadCloser, error) {
+func (storage *FileStorage) ReadThumbnailStream(key string) (io.ReadSeekCloser, error) {
 	return storage.ReadStream(key, "thumbnails")
 }
 
