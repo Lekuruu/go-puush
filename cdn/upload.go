@@ -1,7 +1,6 @@
 package cdn
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/Lekuruu/go-puush/internal/app"
@@ -30,12 +29,6 @@ func Upload(ctx *app.Context) {
 
 	if upload.Pool.Type == database.PoolTypePasswordProtected && poolPassword != upload.Pool.PasswordHash() {
 		WriteResponse(403, "Incorrect password for this puush.", ctx)
-		return
-	}
-
-	if match := ctx.Request.Header.Get("If-None-Match"); match == upload.Checksum {
-		// ETag matches, return 304 Not Modified to save bandwidth
-		ctx.Response.WriteHeader(http.StatusNotModified)
 		return
 	}
 
