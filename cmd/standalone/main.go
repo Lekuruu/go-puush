@@ -110,6 +110,12 @@ func EnsureWebFolder() {
 func init() {
 	// Download web folder if it doesn't exist
 	EnsureWebFolder()
+
+	// Create .env file if it doesn't exist
+	err := CreateDefaultEnvironment()
+	if err != nil {
+		log.Fatalf("Failed to create default .env file: %v", err)
+	}
 }
 
 func main() {

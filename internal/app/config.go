@@ -1,46 +1,51 @@
 package app
 
 import (
+	"github.com/caarlos0/env/v11"
+	"github.com/joho/godotenv"
+
 	"github.com/Lekuruu/go-puush/internal/database"
-	"github.com/kelseyhightower/envconfig"
 )
 
 type Config struct {
 	Api struct {
-		Host string `envconfig:"API_HOST" default:"0.0.0.0"`
-		Port int    `envconfig:"API_PORT" default:"8080"`
+		Host string `env:"API_HOST" envDefault:"0.0.0.0"`
+		Port int    `env:"API_PORT" envDefault:"8080"`
 	}
 	Cdn struct {
-		Host string `envconfig:"CDN_HOST" default:"0.0.0.0"`
-		Port int    `envconfig:"CDN_PORT" default:"8081"`
-		Url  string `envconfig:"CDN_URL" default:"http://puu.sh"`
+		Host string `env:"CDN_HOST" envDefault:"0.0.0.0"`
+		Port int    `env:"CDN_PORT" envDefault:"8081"`
+		Url  string `env:"CDN_URL" envDefault:"http://puu.sh"`
 	}
 	Web struct {
-		Host string `envconfig:"WEB_HOST" default:"0.0.0.0"`
-		Port int    `envconfig:"WEB_PORT" default:"8082"`
+		Host string `env:"WEB_HOST" envDefault:"0.0.0.0"`
+		Port int    `env:"WEB_PORT" envDefault:"8082"`
 	}
 	Storage struct {
-		Type string `envconfig:"STORAGE_TYPE" default:"local"`
-		Uri  string `envconfig:"STORAGE_URI" default:"./.data/"`
+		Type string `env:"STORAGE_TYPE" envDefault:"local"`
+		Uri  string `env:"STORAGE_URI" envDefault:"./.data/"`
 	}
 	Service struct {
-		Url                 string `envconfig:"SERVICE_URL" default:"http://puush.me"`
-		Name                string `envconfig:"SERVICE_NAME" default:"puush"`
-		Email               string `envconfig:"SERVICE_EMAIL" default:"puush@puush.me"`
-		TwitterHandle       string `envconfig:"TWITTER_HANDLE" default:"@puushme"`
-		TwitterUrl          string `envconfig:"TWITTER_URL" default:"https://twitter.com/puushme"`
-		DownloadWindows     string `envconfig:"DOWNLOAD_WINDOWS" default:"/dl/puush-win.zip"`
-		DownloadMac         string `envconfig:"DOWNLOAD_MAC" default:"/dl/puush.zip"`
-		DownloadIOS         string `envconfig:"DOWNLOAD_IOS" default:"https://itunes.apple.com/au/app/puush/id386524126"`
-		RegistrationEnabled bool   `envconfig:"REGISTRATION_ENABLED" default:"true"`
-		RequireActivation   bool   `envconfig:"REQUIRE_ACTIVATION" default:"false"`
+		Url                 string `env:"SERVICE_URL" envDefault:"http://puush.me"`
+		Name                string `env:"SERVICE_NAME" envDefault:"puush"`
+		Email               string `env:"SERVICE_EMAIL" envDefault:"puush@puush.me"`
+		TwitterHandle       string `env:"TWITTER_HANDLE" envDefault:"@puushme"`
+		TwitterUrl          string `env:"TWITTER_URL" envDefault:"https://twitter.com/puushme"`
+		DownloadWindows     string `env:"DOWNLOAD_WINDOWS" envDefault:"/dl/puush-win.zip"`
+		DownloadMac         string `env:"DOWNLOAD_MAC" envDefault:"/dl/puush.zip"`
+		DownloadIOS         string `env:"DOWNLOAD_IOS" envDefault:"https://itunes.apple.com/au/app/puush/id386524126"`
+		RegistrationEnabled bool   `env:"REGISTRATION_ENABLED" envDefault:"true"`
+		RequireActivation   bool   `env:"REQUIRE_ACTIVATION" envDefault:"false"`
 	}
 	Database database.DatabaseConfig
 }
 
 func LoadConfig() (*Config, error) {
+	// Try to apply .env file if it exists
+	godotenv.Load()
+
 	var config Config
-	if err := envconfig.Process("", &config); err != nil {
+	if err := env.Parse(&config); err != nil {
 		return nil, err
 	}
 	return &config, nil

@@ -2,14 +2,13 @@ module github.com/Lekuruu/go-puush
 
 go 1.24.5
 
-require (
-	github.com/gorilla/mux v1.8.1
-	github.com/kelseyhightower/envconfig v1.4.0
-)
+require github.com/gorilla/mux v1.8.1
 
 require (
+	github.com/caarlos0/env/v11 v11.3.1
 	github.com/gabriel-vasile/mimetype v1.4.10
 	github.com/google/go-github v17.0.0+incompatible
+	github.com/joho/godotenv v1.5.1
 	github.com/prplecake/go-thumbnail v0.1.6
 	github.com/u2takey/ffmpeg-go v0.5.0
 	gorm.io/gorm v1.30.0
