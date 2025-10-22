@@ -18,7 +18,6 @@ func (storage *FileStorage) Setup() error {
 	var folders = []string{
 		fmt.Sprintf("%s/uploads", storage.dataPath),
 		fmt.Sprintf("%s/thumbnails", storage.dataPath),
-		fmt.Sprintf("%s/update", storage.dataPath),
 	}
 
 	for _, folder := range folders {
