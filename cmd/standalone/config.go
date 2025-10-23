@@ -19,12 +19,21 @@ DB_PATH=./.data/puush.db
 SERVICE_URL=http://localhost
 SERVICE_NAME=puush
 SERVICE_EMAIL=puush@puush.me
+
+# Twitter handles used on the website
 TWITTER_HANDLE=@puushme
 TWITTER_URL=https://twitter.com/puushme
+
+# Download location used on the front page
 DOWNLOAD_WINDOWS=/dl/puush-win.zip
 DOWNLOAD_MAC=/dl/puush.zip
 DOWNLOAD_IOS=https://itunes.apple.com/au/app/puush/id386524126
+
+# Enable or disable user registration
 REGISTRATION_ENABLED=true
+
+# Setting this to 'true' will require an invitation key for registration
+REQUIRE_INVITATION=false
 `
 
 func CreateDefaultEnvironment() error {

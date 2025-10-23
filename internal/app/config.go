@@ -36,6 +36,7 @@ type Config struct {
 		DownloadIOS         string `env:"DOWNLOAD_IOS" envDefault:"https://itunes.apple.com/au/app/puush/id386524126"`
 		RegistrationEnabled bool   `env:"REGISTRATION_ENABLED" envDefault:"true"`
 		RequireActivation   bool   `env:"REQUIRE_ACTIVATION" envDefault:"false"`
+		RequireInvitation   bool   `env:"REQUIRE_INVITATION" envDefault:"false"`
 	}
 	Database database.DatabaseConfig
 }

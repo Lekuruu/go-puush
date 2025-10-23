@@ -23,6 +23,12 @@
                             <td><label for="confirm_password">confirm password</label></td>
                             <td><input type="password" name="confirm_password" value="" id="confirm_password"></td>
                         </tr>
+                        {{ if .Config.Service.RequireInvitation }}
+                        <tr>
+                            <td><label for="invitation_key">invite key</label></td>
+                            <td><input type="text" name="invitation_key" value="" id="invitation_key"></td>
+                        </tr>
+                        {{ end }}
                         <tr>
                             <td></td>
                             <td><input type="submit" value="Continue →"></td>

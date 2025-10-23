@@ -173,3 +173,17 @@ func formatBytes(bytes int64) string {
 	units := []string{"KB", "MB", "GB", "TB", "PB", "EB"}
 	return fmt.Sprintf("%.2f%s", float64(bytes)/float64(div), units[exp])
 }
+
+type InvitationKey struct {
+	Id        int        `gorm:"primaryKey;autoIncrement;not null"`
+	Key       string     `gorm:"size:16;not null;unique;index"`
+	CreatedAt time.Time  `gorm:"not null;CURRENT_TIMESTAMP"`
+	ExpiresAt *time.Time `gorm:"default:NULL"`
+}
+
+func (key *InvitationKey) IsExpired() bool {
+	if key.ExpiresAt == nil {
+		return false
+	}
+	return time.Now().After(*key.ExpiresAt)
+}

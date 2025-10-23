@@ -37,6 +37,19 @@ func PerformRegistration(ctx *app.Context) {
 		return
 	}
 
+	if ctx.State.Config.Service.RequireInvitation {
+		invitationKey := ctx.Request.FormValue("invitation_key")
+		if invitationKey == "" {
+			renderErrorTemplate("Missing Invitation Key", "An invitation key is required to register.", ctx)
+			return
+		}
+
+		if valid, _ := services.IsValidInvitationKey(invitationKey, ctx.State); !valid {
+			renderErrorTemplate("Invalid Invitation Key", "The provided invitation key is invalid or has expired.", ctx)
+			return
+		}
+	}
+
 	user, err := services.CreateUser(email, password, ctx.State)
 	if err != nil {
 		renderErrorTemplate("Error", "An error occurred while creating your account. Please try again!", ctx)
