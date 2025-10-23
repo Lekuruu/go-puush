@@ -50,7 +50,6 @@ The following features have been implemented or are planned for the future:
         - [x] Username check
         - [x] Username claiming
         - [x] "Stop asking about my username"
-        - [ ] Email request (/ajax/tb_email)
         - [ ] Exporting pools
 
 ## Setup
