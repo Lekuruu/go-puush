@@ -37,7 +37,7 @@ The following features have been implemented or are planned for the future:
     - [ ] Registration functionality
         - [x] Registration
         - [ ] Email activation
-        - [ ] Invite codes (unofficial)
+        - [x] Invite codes
     - [ ] Password reset functionality
     - [ ] Account page functionality
         - [x] Move uploads
