@@ -38,3 +38,25 @@ func FormatActivationEmail(to string, activationKey string) *Message {
 		TextBody: fmt.Sprintf(ActivationTemplate, activationKey),
 	}
 }
+
+// NOTE: This is not the original password reset email, I still have to find one
+const PasswordResetTemplate = `Hello,
+
+A request was made to reset the password of your puush account.
+
+To set a new password, please follow the link below:
+
+https://puush.me/account/reset?key=%s
+
+If you did not request this password reset, just ignore this email and your password will remain unchanged.
+
+Sincerely,
+The puush Team`
+
+func FormatPasswordResetEmail(to string, resetKey string) *Message {
+	return &Message{
+		To:       []string{to},
+		Subject:  "[puush] Password Reset Request",
+		TextBody: fmt.Sprintf(PasswordResetTemplate, resetKey),
+	}
+}
