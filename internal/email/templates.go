@@ -24,7 +24,7 @@ const ActivationTemplate = `Welcome to puush!
 
 Before you can start using your account, please confirm your email address by clicking the link below:
 
-https://puush.me/account/activate?key=%s
+https://puush.me/register/activate?key=%s
 
 Sincerely,
 The puush Team
@@ -46,7 +46,7 @@ A request was made to reset the password of your puush account.
 
 To set a new password, please follow the link below:
 
-https://puush.me/account/reset?key=%s
+https://puush.me/reset_password/go?key=%s
 
 If you did not request this password reset, just ignore this email and your password will remain unchanged.
 
