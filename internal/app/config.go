@@ -25,6 +25,10 @@ type Config struct {
 		Type string `env:"STORAGE_TYPE" envDefault:"local"`
 		Uri  string `env:"STORAGE_URI" envDefault:"./.data/"`
 	}
+	Email struct {
+		Type string `env:"EMAIL_TYPE" envDefault:"noop"`
+		From string `env:"EMAIL_FROM"`
+	}
 	Service struct {
 		Url                 string `env:"SERVICE_URL" envDefault:"http://puush.me"`
 		Name                string `env:"SERVICE_NAME" envDefault:"puush"`

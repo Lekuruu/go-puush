@@ -12,6 +12,18 @@ CDN_URL=http://localhost
 STORAGE_TYPE=local
 STORAGE_URI=./.data
 
+# Email configuration
+EMAIL_TYPE=noop
+EMAIL_FROM=puush@puush.me
+
+# SMTP configuration (used if EMAIL_TYPE is set to 'smtp')
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USERNAME=username
+SMTP_PASSWORD=password
+SMTP_USE_TLS=true
+SMTP_SKIP_TLS_VERIFY=false
+
 # Database configuration
 DB_PATH=./.data/puush.db
 
