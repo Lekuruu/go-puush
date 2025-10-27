@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/email"
 	"github.com/Lekuruu/go-puush/internal/storage"
 	"gorm.io/gorm"
 )
@@ -11,6 +12,7 @@ type State struct {
 	Database *gorm.DB
 	Logger   *Logger
 	Storage  storage.Storage
+	Email    email.Email
 }
 
 func NewState() *State {
@@ -38,10 +40,22 @@ func NewState() *State {
 		return nil
 	}
 
+	mailer, err := email.NewEmailFromConfig(config.Email.Type, config.Email.From)
+	if err != nil {
+		logger.Logf("Failed to create email service: %v", err)
+		return nil
+	}
+
+	if err := mailer.Setup(); err != nil {
+		logger.Logf("Failed to setup email service: %v", err)
+		return nil
+	}
+
 	return &State{
 		Logger:   logger,
 		Config:   config,
 		Database: db,
+		Email:    mailer,
 		Storage:  fs,
 	}
 }
