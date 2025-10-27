@@ -56,3 +56,21 @@ const (
 	ViewTypeGrid ViewType = "grid"
 	ViewTypeList ViewType = "list"
 )
+
+type EmailVerificationAction string
+
+const (
+	EmailVerificationActionActivate      EmailVerificationAction = "Activate"
+	EmailVerificationActionResetPassword EmailVerificationAction = "ResetPassword"
+)
+
+func (action EmailVerificationAction) String() string {
+	switch action {
+	case EmailVerificationActionActivate:
+		return "Activate"
+	case EmailVerificationActionResetPassword:
+		return "ResetPassword"
+	default:
+		return "Unknown"
+	}
+}

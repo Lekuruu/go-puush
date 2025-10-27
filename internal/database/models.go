@@ -187,3 +187,18 @@ func (key *InvitationKey) IsExpired() bool {
 	}
 	return time.Now().After(*key.ExpiresAt)
 }
+
+type EmailVerification struct {
+	Id        int                     `gorm:"primaryKey;autoIncrement;not null"`
+	Key       string                  `gorm:"size:32;not null;unique;index"`
+	Action    EmailVerificationAction `gorm:"size:32;not null"`
+	CreatedAt time.Time               `gorm:"not null;CURRENT_TIMESTAMP"`
+	ExpiresAt *time.Time              `gorm:"default:NULL"`
+}
+
+func (verification *EmailVerification) IsExpired() bool {
+	if verification.ExpiresAt == nil {
+		return false
+	}
+	return time.Now().After(*verification.ExpiresAt)
+}
