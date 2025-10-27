@@ -11,6 +11,7 @@ func Login(ctx *app.Context) {
 	renderTemplate(ctx, "public/login", map[string]interface{}{
 		"Title": "login",
 		"Retry": strings.Contains(ctx.Request.URL.Path, "retry"),
+		"Error": ctx.Request.URL.Query().Get("error"),
 	})
 }
 
@@ -26,13 +27,13 @@ func PerformLogin(ctx *app.Context) {
 	}
 
 	if !user.Active {
-		renderErrorTemplate("Pending Activation", "Please check your email to activate your account.", ctx)
+		http.Redirect(ctx.Response, ctx.Request, "/login/retry/?error=inactive", http.StatusSeeOther)
 		return
 	}
 
 	err := SetUserSession(user, ctx)
 	if err != nil {
-		http.Redirect(ctx.Response, ctx.Request, "/login/retry/", http.StatusSeeOther)
+		http.Redirect(ctx.Response, ctx.Request, "/login/retry/?error=server", http.StatusSeeOther)
 		return
 	}
 

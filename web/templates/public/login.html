@@ -4,10 +4,16 @@
     <div class="content">
         <h1>Login to manage your files</h1>
         {{ if .Retry }}
-        <br>
-        <div class="eyecatch">
-            <br><center>Whoops! An account could not be found with those credentials, please check them and try again!</center><br>
-        </div>
+            <br>
+            {{ if eq .Error "inactive" }}
+            <div class="eyecatch">
+                <br><center>Sorry, that account has not been activated! Please check your email for instructions.</center><br>
+            </div>
+            {{ else }}
+            <div class="eyecatch">
+                <br><center>Whoops! An account could not be found with those credentials, please check them and try again!</center><br>
+            </div>
+            {{ end }}
         {{ end }}
         <div id="login_form">
             <form action="/login/go" method="post">
