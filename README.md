@@ -24,11 +24,11 @@ The following features have been implemented or are planned for the future:
     - [x] History
     - [x] Delete
     - [x] Thumbnail
-    - [ ] Registration (macOS-only)
+<!-- - [ ] Registration (macOS-only & unused) -->
 - [x] CDN
     - [x] Serving uploaded files
     - [x] Serving thumbnails
-- [ ] Web
+- [x] Web
     - [x] Public pages (Home, Login, Register, About, ...)
     - [x] Account page(s)
     - [x] Gallery page
@@ -39,7 +39,7 @@ The following features have been implemented or are planned for the future:
         - [x] Email activation
         - [x] Invite codes
     - [x] Password reset functionality
-    - [ ] Account page functionality
+    - [x] Account page functionality
         - [x] Move uploads
         - [x] Delete uploads
         - [x] Update default pool
@@ -50,7 +50,6 @@ The following features have been implemented or are planned for the future:
         - [x] Username check
         - [x] Username claiming
         - [x] "Stop asking about my username"
-        - [ ] Exporting pools
 
 ## Setup
 
