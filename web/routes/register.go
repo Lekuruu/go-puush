@@ -106,6 +106,7 @@ func PerformActivation(ctx *app.Context) {
 		return
 	}
 
+	go sendWelcomeEmail(verification.User, ctx.State)
 	services.DeleteEmailVerificationById(verification.Id, ctx.State)
 	renderResponseTemplate("Activation complete!", "Your account has been successfully activated. You can now log in.", "activation complete", ctx)
 }
@@ -124,5 +125,13 @@ func createAndSendActivationEmail(user *database.User, state *app.State) {
 	if err != nil {
 		state.Logger.Logf("Failed to send account activation email to user %d: %v", user.Id, err)
 		return
+	}
+}
+
+func sendWelcomeEmail(user *database.User, state *app.State) {
+	message := email.FormatWelcomeEmail(user.Email)
+	err := state.Email.Send(message)
+	if err != nil {
+		state.Logger.Logf("Failed to send welcome email to user %d: %v", user.Id, err)
 	}
 }
