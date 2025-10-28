@@ -34,11 +34,11 @@ The following features have been implemented or are planned for the future:
     - [x] Gallery page
     - [x] Login functionality
     - [x] Logout functionality
-    - [ ] Registration functionality
+    - [x] Registration functionality
         - [x] Registration
-        - [ ] Email activation
+        - [x] Email activation
         - [x] Invite codes
-    - [ ] Password reset functionality
+    - [x] Password reset functionality
     - [ ] Account page functionality
         - [x] Move uploads
         - [x] Delete uploads
