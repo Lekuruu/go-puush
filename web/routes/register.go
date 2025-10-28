@@ -78,31 +78,31 @@ func PerformRegistration(ctx *app.Context) {
 
 func PerformActivation(ctx *app.Context) {
 	if !ctx.State.Config.Service.RegistrationEnabled {
-		renderErrorTemplate("Activation Disabled", "Account activation is currently disabled. Please contact support for assistance.", ctx)
+		renderErrorTemplate("Sorry! Account activation is currently disabled.", "Please contact support for assistance.", ctx)
 		return
 	}
 
 	key := ctx.Request.URL.Query().Get("key")
 	if key == "" {
-		renderErrorTemplate("Invalid Activation Key", "The activation key provided is invalid. Please check your email for the correct link.", ctx)
+		renderErrorTemplate("Uh-oh! Looks like you missed a chunk of your verification link!", "Please make sure you've copied the whole URL from your email and try again.", ctx)
 		return
 	}
 
 	verification, err := services.FetchEmailVerificationByKey(key, ctx.State, "User")
 	if err != nil || verification.Action != database.EmailVerificationActionActivate {
-		renderErrorTemplate("Invalid Activation Key", "The activation key provided is invalid or has already been used.", ctx)
+		renderErrorTemplate("Uh-oh! Looks like this verification link is invalid.", "Please make sure you've entered the URL correctly and try again.", ctx)
 		return
 	}
 
 	if verification.User.Active {
-		renderErrorTemplate("Already Activated", "Your account is already activated. You can log in directly.", ctx)
+		renderErrorTemplate("This account is already verified.", "Please log in to your account.", ctx)
 		return
 	}
 
 	verification.User.Active = true
 	err = services.UpdateUser(verification.User, ctx.State)
 	if err != nil {
-		renderErrorTemplate("Activation Error", "An error occurred while activating your account. Please try again later.", ctx)
+		renderErrorTemplate("Uh-oh! Something went wrong.", "An error occurred while activating your account. Please try again later.", ctx)
 		return
 	}
 
