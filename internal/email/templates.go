@@ -24,7 +24,7 @@ const ActivationTemplate = `Welcome to puush!
 
 Before you can start using your account, please confirm your email address by clicking the link below:
 
-https://puush.me/register/activate?key=%s
+https://puush.me/register/verify?key=%s
 
 Sincerely,
 The puush Team
