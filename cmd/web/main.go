@@ -19,6 +19,9 @@ func InitializeRoutes(server *app.Server) {
 	server.Router.HandleFunc("/register/go", server.ContextMiddleware(routes.PerformRegistration)).Methods("POST")
 	server.Router.HandleFunc("/register/verify", server.ContextMiddleware(routes.PerformActivation)).Methods("GET")
 	server.Router.HandleFunc("/reset_password", server.ContextMiddleware(routes.ResetPassword)).Methods("GET")
+	server.Router.HandleFunc("/reset_password", server.ContextMiddleware(routes.RequestPasswordReset)).Methods("POST")
+	server.Router.HandleFunc("/reset_password/go", server.ContextMiddleware(routes.ShowPasswordResetForm)).Methods("GET")
+	server.Router.HandleFunc("/reset_password/go", server.ContextMiddleware(routes.PerformPasswordReset)).Methods("POST")
 	server.Router.HandleFunc("/tos", server.ContextMiddleware(routes.TermsOfService)).Methods("GET")
 	server.Router.HandleFunc("/dmca", server.ContextMiddleware(routes.Dmca)).Methods("GET")
 
