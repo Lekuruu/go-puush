@@ -24,18 +24,18 @@ const ActivationTemplate = `Welcome to puush!
 
 Before you can start using your account, please confirm your email address by clicking the link below:
 
-https://puush.me/register/verify?key=%s
+%s/register/verify?key=%s
 
 Sincerely,
 The puush Team
 
 (If you didn't request this account, you can safely ignore this email.)`
 
-func FormatActivationEmail(to string, activationKey string) *Message {
+func FormatActivationEmail(to string, activationKey string, url string) *Message {
 	return &Message{
 		To:       []string{to},
 		Subject:  "[puush] Activate Your Account",
-		TextBody: fmt.Sprintf(ActivationTemplate, activationKey),
+		TextBody: fmt.Sprintf(ActivationTemplate, url, activationKey),
 	}
 }
 
@@ -46,17 +46,17 @@ A request was made to reset the password of your puush account.
 
 To set a new password, please follow the link below:
 
-https://puush.me/reset_password/go?key=%s
+%s/reset_password/go?key=%s
 
 If you did not request this password reset, just ignore this email and your password will remain unchanged.
 
 Sincerely,
 The puush Team`
 
-func FormatPasswordResetEmail(to string, resetKey string) *Message {
+func FormatPasswordResetEmail(to string, resetKey string, url string) *Message {
 	return &Message{
 		To:       []string{to},
 		Subject:  "[puush] Password Reset Request",
-		TextBody: fmt.Sprintf(PasswordResetTemplate, resetKey),
+		TextBody: fmt.Sprintf(PasswordResetTemplate, url, resetKey),
 	}
 }

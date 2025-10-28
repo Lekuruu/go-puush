@@ -150,7 +150,7 @@ func createAndSendPasswordResetEmail(user *database.User, state *app.State) {
 		return
 	}
 
-	message := email.FormatPasswordResetEmail(user.Email, verification.Key)
+	message := email.FormatPasswordResetEmail(user.Email, verification.Key, state.Config.Service.Url)
 	if err := state.Email.Send(message); err != nil {
 		state.Logger.Logf("Failed to send password reset email to user %d: %v", user.Id, err)
 	}

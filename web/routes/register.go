@@ -120,7 +120,7 @@ func createAndSendActivationEmail(user *database.User, state *app.State) {
 		return
 	}
 
-	message := email.FormatActivationEmail(user.Email, verification.Key)
+	message := email.FormatActivationEmail(user.Email, verification.Key, state.Config.Service.Url)
 	err = state.Email.Send(message)
 	if err != nil {
 		state.Logger.Logf("Failed to send account activation email to user %d: %v", user.Id, err)
