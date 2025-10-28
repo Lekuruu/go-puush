@@ -82,7 +82,7 @@ func PerformActivation(ctx *app.Context) {
 		return
 	}
 
-	key := ctx.Vars["key"]
+	key := ctx.Request.URL.Query().Get("key")
 	if key == "" {
 		renderErrorTemplate("Invalid Activation Key", "The activation key provided is invalid. Please check your email for the correct link.", ctx)
 		return
