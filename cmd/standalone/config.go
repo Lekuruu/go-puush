@@ -44,6 +44,9 @@ DOWNLOAD_IOS=https://itunes.apple.com/au/app/puush/id386524126
 # Enable or disable user registration
 REGISTRATION_ENABLED=true
 
+# Setting this to 'true' will require email activation for new accounts
+REQUIRE_ACTIVATION=false
+
 # Setting this to 'true' will require an invitation key for registration
 REQUIRE_INVITATION=false
 `
