@@ -27,6 +27,13 @@ func CreateUser(email string, password string, state *app.State) (*database.User
 		return nil, result.Error
 	}
 
+	// force the "active" field to be set correctly, since for some reason
+	// gorm doesn't set boolean fields properly on creation
+	result = state.Database.Model(user).Update("active", !state.Config.Service.RequireActivation)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
 	publicPool := &database.Pool{
 		UserId:     user.Id,
 		Name:       "Public",
