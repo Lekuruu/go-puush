@@ -11,7 +11,7 @@ import (
 
 const verificationKeyLength = 32
 
-func CreateEmailVerification(action database.EmailVerificationAction, expiry time.Duration, state *app.State) (*database.EmailVerification, error) {
+func CreateEmailVerification(userId *int, action database.EmailVerificationAction, expiry time.Duration, state *app.State) (*database.EmailVerification, error) {
 	creationTime := time.Now()
 	var expiresAt *time.Time
 
@@ -23,6 +23,7 @@ func CreateEmailVerification(action database.EmailVerificationAction, expiry tim
 	verification := &database.EmailVerification{
 		Key:       app.RandomString(verificationKeyLength),
 		Action:    action,
+		UserId:    userId,
 		CreatedAt: creationTime,
 		ExpiresAt: expiresAt,
 	}
@@ -59,14 +60,14 @@ func ValidateEmailVerification(key string, action database.EmailVerificationActi
 	}
 
 	if verification.IsExpired() {
-		DeleteEmailVerificationByID(verification.Id, state)
+		DeleteEmailVerificationById(verification.Id, state)
 		return nil, nil
 	}
 
 	return verification, nil
 }
 
-func DeleteEmailVerificationByID(id int, state *app.State) error {
+func DeleteEmailVerificationById(id int, state *app.State) error {
 	result := state.Database.Delete(&database.EmailVerification{}, id)
 
 	if result.Error != nil {

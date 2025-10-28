@@ -192,8 +192,11 @@ type EmailVerification struct {
 	Id        int                     `gorm:"primaryKey;autoIncrement;not null"`
 	Key       string                  `gorm:"size:32;not null;unique;index"`
 	Action    EmailVerificationAction `gorm:"size:32;not null"`
+	UserId    *int                    `gorm:"default:NULL"`
 	CreatedAt time.Time               `gorm:"not null;CURRENT_TIMESTAMP"`
 	ExpiresAt *time.Time              `gorm:"default:NULL"`
+
+	User *User `gorm:"foreignKey:UserId;constraint:OnDelete:SET NULL"`
 }
 
 func (verification *EmailVerification) IsExpired() bool {

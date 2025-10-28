@@ -76,10 +76,44 @@ func PerformRegistration(ctx *app.Context) {
 	renderResponseTemplate(responseTitle, responseMessage, "registration complete", ctx)
 }
 
+func PerformActivation(ctx *app.Context) {
+	if !ctx.State.Config.Service.RegistrationEnabled {
+		renderErrorTemplate("Activation Disabled", "Account activation is currently disabled. Please contact support for assistance.", ctx)
+		return
+	}
+
+	key := ctx.Vars["key"]
+	if key == "" {
+		renderErrorTemplate("Invalid Activation Key", "The activation key provided is invalid. Please check your email for the correct link.", ctx)
+		return
+	}
+
+	verification, err := services.FetchEmailVerificationByKey(key, ctx.State, "User")
+	if err != nil || verification.Action != database.EmailVerificationActionActivate {
+		renderErrorTemplate("Invalid Activation Key", "The activation key provided is invalid or has already been used.", ctx)
+		return
+	}
+
+	if verification.User.Active {
+		renderErrorTemplate("Already Activated", "Your account is already activated. You can log in directly.", ctx)
+		return
+	}
+
+	verification.User.Active = true
+	err = services.UpdateUser(verification.User, ctx.State)
+	if err != nil {
+		renderErrorTemplate("Activation Error", "An error occurred while activating your account. Please try again later.", ctx)
+		return
+	}
+
+	services.DeleteEmailVerificationById(verification.Id, ctx.State)
+	renderResponseTemplate("Activation complete!", "Your account has been successfully activated. You can now log in.", "activation complete", ctx)
+}
+
 const emailVerificationExpiry = time.Hour * 24 * 7
 
 func createAndSendActivationEmail(user *database.User, state *app.State) {
-	verification, err := services.CreateEmailVerification(database.EmailVerificationActionActivate, emailVerificationExpiry, state)
+	verification, err := services.CreateEmailVerification(&user.Id, database.EmailVerificationActionActivate, emailVerificationExpiry, state)
 	if err != nil {
 		state.Logger.Logf("Failed to create email verification for user %d: %v", user.Id, err)
 		return
