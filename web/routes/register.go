@@ -1,7 +1,11 @@
 package routes
 
 import (
+	"time"
+
 	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/email"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
@@ -62,12 +66,29 @@ func PerformRegistration(ctx *app.Context) {
 	)
 
 	responseTitle := "Registration complete!"
-	responseMessage := "An email has been sent to your designated address with instructions on how to activate your account."
+	responseMessage := "You can now log in with your email and password."
 
-	if !ctx.State.Config.Service.RequireActivation {
-		responseMessage = "You can now log in with your email and password."
+	if ctx.State.Config.Service.RequireActivation {
+		responseMessage = "An email has been sent to your designated address with instructions on how to activate your account."
+		go createAndSendActivationEmail(user, ctx.State)
 	}
 
-	// TODO: Send activation email
 	renderResponseTemplate(responseTitle, responseMessage, "registration complete", ctx)
+}
+
+const emailVerificationExpiry = time.Hour * 24 * 7
+
+func createAndSendActivationEmail(user *database.User, state *app.State) {
+	verification, err := services.CreateEmailVerification(database.EmailVerificationActionActivate, emailVerificationExpiry, state)
+	if err != nil {
+		state.Logger.Logf("Failed to create email verification for user %d: %v", user.Id, err)
+		return
+	}
+
+	message := email.FormatActivationEmail(user.Email, verification.Key)
+	err = state.Email.Send(message)
+	if err != nil {
+		state.Logger.Logf("Failed to send account activation email to user %d: %v", user.Id, err)
+		return
+	}
 }
