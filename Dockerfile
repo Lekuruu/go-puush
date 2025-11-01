@@ -24,7 +24,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 FROM alpine AS app
 
 # Install runtime dependencies
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates ffmpeg
 
 WORKDIR /app
 COPY --from=build /app/puush /app/puush
