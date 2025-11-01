@@ -94,3 +94,38 @@ For development with hot reloading support:
    ```
 
    Air will automatically rebuild and restart the application when you make changes to the code.
+
+### Docker Compose
+
+For a docker deployment, you can run the prebuilt container published to [ghcr.io](https://ghcr.io):
+
+1. Copy the example environment file and tweak it as needed:
+
+    ```bash
+    cp .example.env .env
+    ```
+
+2. Create a `docker-compose.yml` file:
+
+    ```yaml
+    services:
+        puush:
+            image: ghcr.io/lekuruu/go-puush:latest
+            container_name: puush
+            restart: unless-stopped
+            env_file:
+                - .env
+            ports:
+                - "${WEB_HOST}:${WEB_PORT}:${WEB_PORT}"
+            volumes:
+                - ./data:/app/.data
+                - ./web:/app/web
+    ```
+
+3. Start the stack:
+
+    ```bash
+    docker compose up -d
+    ```
+
+This setup *won't* require you to have the repository downloaded. The `web` directory will be populated automatically upon first launch, allowing you to edit web assets.
