@@ -15,6 +15,8 @@ type AjaxError struct {
 	Message string `json:"message"`
 }
 
+var ErrorUsernameShort = AjaxError{Error: true, Message: "Username must be at least 3 characters long."}
+var ErrorUsernameLong = AjaxError{Error: true, Message: "Username must be at most 20 characters long."}
 var ErrorUsernameAlreadySet = AjaxError{Error: true, Message: "You have already set a username."}
 var ErrorPasswordIncorrect = AjaxError{Error: true, Message: "Current password incorrect."}
 var ErrorUsernameTaken = AjaxError{Error: true, Message: "That username is already taken."}
@@ -273,6 +275,16 @@ func CheckUsername(ctx *app.Context) {
 		return
 	}
 
+	if len(username) < 3 {
+		renderJson(200, ErrorUsernameShort, ctx)
+		return
+	}
+
+	if len(username) > 20 {
+		renderJson(200, ErrorUsernameLong, ctx)
+		return
+	}
+
 	renderJson(200, NoError, ctx)
 }
 
@@ -306,7 +318,17 @@ func ClaimUsername(ctx *app.Context) {
 		return
 	}
 
-	// TODO: Validate username (allowed characters, length, etc.)
+	if len(username) < 3 {
+		renderJson(200, ErrorUsernameShort, ctx)
+		return
+	}
+
+	if len(username) > 20 {
+		renderJson(200, ErrorUsernameLong, ctx)
+		return
+	}
+
+	// TODO: Validate username (allowed characters)
 	user.Name = username
 	user.UsernameSetupReminder = false
 	err = services.UpdateUser(user, ctx.State)
