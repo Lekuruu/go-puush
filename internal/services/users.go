@@ -210,6 +210,19 @@ func UpdateUserPassword(userId int, passwordHash string, state *app.State) error
 	return nil
 }
 
+func ActivateUser(userId int, state *app.State) error {
+	result := state.Database.Exec(
+		"UPDATE users SET active = ? WHERE id = ?",
+		true, userId,
+	)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func UpdateUser(user *database.User, state *app.State) error {
 	result := state.Database.Save(user)
 

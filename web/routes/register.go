@@ -100,7 +100,7 @@ func PerformActivation(ctx *app.Context) {
 	}
 
 	verification.User.Active = true
-	err = services.UpdateUser(verification.User, ctx.State)
+	err = services.ActivateUser(verification.User.Id, ctx.State)
 	if err != nil {
 		renderErrorTemplate("Uh-oh! Something went wrong.", "An error occurred while activating your account. Please try again later.", ctx)
 		return
