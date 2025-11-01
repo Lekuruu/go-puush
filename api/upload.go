@@ -139,6 +139,10 @@ type UploadRequest struct {
 }
 
 func (request *UploadRequest) CompareChecksum(data []byte) bool {
+	if request.FileChecksum == "" {
+		// No checksum provided, skip comparison
+		return true
+	}
 	checksum := md5.New()
 	checksum.Write(data)
 	checksumBytes := checksum.Sum(nil)
@@ -170,10 +174,8 @@ func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
 		return nil, errors.New("missing file")
 	}
 
+	// This argument is optional (ShareX doesn't provide it)
 	fileChecksum := app.GetMultipartFormValue(request, "c")
-	if fileChecksum == "" {
-		return nil, errors.New("missing file checksum")
-	}
 
 	fileName := file.Filename
 	fileStream, err := file.Open()
