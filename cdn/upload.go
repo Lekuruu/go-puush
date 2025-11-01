@@ -1,6 +1,8 @@
 package cdn
 
 import (
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/Lekuruu/go-puush/internal/app"
@@ -15,6 +17,10 @@ func Upload(ctx *app.Context) {
 	poolIdentifier := ctx.Vars["pool"]
 	poolPassword := ctx.Vars["password"]
 	identifier := ctx.Vars["identifier"]
+
+	// Remove .<extension> from identifier if present
+	fileExtension := filepath.Ext(identifier)
+	identifier = strings.TrimSuffix(identifier, fileExtension)
 
 	upload, err := services.FetchUploadByIdentifier(identifier, ctx.State, "Pool")
 	if err != nil {
