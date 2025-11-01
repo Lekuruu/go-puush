@@ -1,0 +1,26 @@
+# syntax=docker/dockerfile:1.7
+
+# Stage to provide CA certificates without running apk on the final image each time
+FROM alpine:3.20 AS certs
+RUN apk add --no-cache ca-certificates
+
+# Minimal runtime image that copies a prebuilt static binary
+FROM alpine:3.20
+
+WORKDIR /app
+
+# TARGETARCH is provided by buildx for each platform
+ARG TARGETARCH
+
+# Copy the prebuilt binary produced by the CI step
+COPY dist/puush-linux-$TARGETARCH /app/puush
+
+# Add CA certificates
+COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# Volumes used by the application
+VOLUME ["/app/web"]
+VOLUME ["/app/.data"]
+
+# Run the compiled binary
+ENTRYPOINT ["/app/puush"]
