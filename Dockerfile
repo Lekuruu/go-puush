@@ -18,47 +18,16 @@ RUN go mod download
 # Copy the source code
 COPY . .
 
-# Build all binaries in parallel
-RUN CGO_ENABLED=1 go build -o puush-api ./cmd/api/main.go & \
-    CGO_ENABLED=1 go build -o puush-cdn ./cmd/cdn/main.go & \
-    CGO_ENABLED=1 go build -o puush-web ./cmd/web/main.go & \
-    wait
+# Build the server
+RUN CGO_ENABLED=1 go build -o puush ./cmd/standalone/main.go
 
-FROM alpine AS api
-
-# Install runtime dependencies
-RUN apk add --no-cache ca-certificates sqlite-libs ffmpeg
-
-WORKDIR /app
-COPY --from=build /app/puush-api /app/puush
-
-# Create data volume
-VOLUME ["/app/.data"]
-
-# Run the compiled binary
-ENTRYPOINT ["/app/puush"]
-
-FROM alpine AS cdn
+FROM alpine AS app
 
 # Install runtime dependencies
 RUN apk add --no-cache ca-certificates sqlite-libs
 
 WORKDIR /app
-COPY --from=build /app/puush-cdn /app/puush
-
-# Create data volume
-VOLUME ["/app/.data"]
-
-# Run the compiled binary
-ENTRYPOINT ["/app/puush"]
-
-FROM alpine AS web
-
-# Install runtime dependencies
-RUN apk add --no-cache ca-certificates sqlite-libs
-
-WORKDIR /app
-COPY --from=build /app/puush-web /app/puush
+COPY --from=build /app/puush /app/puush
 COPY --from=build /app/web /app/web
 
 # Create data volume
