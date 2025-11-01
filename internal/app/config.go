@@ -8,14 +8,8 @@ import (
 )
 
 type Config struct {
-	Api struct {
-		Host string `env:"API_HOST" envDefault:"0.0.0.0"`
-		Port int    `env:"API_PORT" envDefault:"8080"`
-	}
 	Cdn struct {
-		Host string `env:"CDN_HOST" envDefault:"0.0.0.0"`
-		Port int    `env:"CDN_PORT" envDefault:"8081"`
-		Url  string `env:"CDN_URL" envDefault:"http://puu.sh"`
+		Url string `env:"CDN_URL" envDefault:"http://puu.sh"`
 	}
 	Web struct {
 		Host string `env:"WEB_HOST" envDefault:"0.0.0.0"`
