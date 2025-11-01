@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -20,9 +21,16 @@ var ErrorUsernameLong = AjaxError{Error: true, Message: "Username must be at mos
 var ErrorUsernameAlreadySet = AjaxError{Error: true, Message: "You have already set a username."}
 var ErrorPasswordIncorrect = AjaxError{Error: true, Message: "Current password incorrect."}
 var ErrorUsernameTaken = AjaxError{Error: true, Message: "That username is already taken."}
+var ErrorUsernameInvalid = AjaxError{Error: true, Message: "Username may only contain letters, numbers, hyphens, and underscores."}
 var ErrorServerError = AjaxError{Error: true, Message: "An internal server error occurred."}
 var ErrorBadRequest = AjaxError{Error: true, Message: "Bad request."}
 var NoError = AjaxError{Error: false, Message: ""}
+
+var usernamePattern = regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
+
+func isValidUsername(username string) bool {
+	return usernamePattern.MatchString(username)
+}
 
 func MoveDialog(ctx *app.Context) {
 	user, err := GetUserSession(ctx, "Pools")
@@ -269,12 +277,6 @@ func CheckUsername(ctx *app.Context) {
 		return
 	}
 
-	existingUser, _ := services.FetchUserByName(username, ctx.State)
-	if existingUser != nil {
-		renderJson(200, ErrorUsernameTaken, ctx)
-		return
-	}
-
 	if len(username) < 3 {
 		renderJson(200, ErrorUsernameShort, ctx)
 		return
@@ -282,6 +284,17 @@ func CheckUsername(ctx *app.Context) {
 
 	if len(username) > 20 {
 		renderJson(200, ErrorUsernameLong, ctx)
+		return
+	}
+
+	if !isValidUsername(username) {
+		renderJson(200, ErrorUsernameInvalid, ctx)
+		return
+	}
+
+	existingUser, _ := services.FetchUserByName(username, ctx.State)
+	if existingUser != nil {
+		renderJson(200, ErrorUsernameTaken, ctx)
 		return
 	}
 
@@ -312,12 +325,6 @@ func ClaimUsername(ctx *app.Context) {
 		return
 	}
 
-	existingUser, _ := services.FetchUserByName(username, ctx.State)
-	if existingUser != nil {
-		renderJson(200, ErrorUsernameTaken, ctx)
-		return
-	}
-
 	if len(username) < 3 {
 		renderJson(200, ErrorUsernameShort, ctx)
 		return
@@ -328,7 +335,17 @@ func ClaimUsername(ctx *app.Context) {
 		return
 	}
 
-	// TODO: Validate username (allowed characters)
+	if !isValidUsername(username) {
+		renderJson(200, ErrorUsernameInvalid, ctx)
+		return
+	}
+
+	existingUser, _ := services.FetchUserByName(username, ctx.State)
+	if existingUser != nil {
+		renderJson(200, ErrorUsernameTaken, ctx)
+		return
+	}
+
 	user.Name = username
 	user.UsernameSetupReminder = false
 	err = services.UpdateUser(user, ctx.State)
