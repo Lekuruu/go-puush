@@ -3,16 +3,15 @@ package main
 import "os"
 
 var defaultEnvironment = `
-# Web configuration
+# Server configuration
 WEB_HOST=127.0.0.1
 WEB_PORT=80
-CDN_URL=http://localhost
 
 # Storage configuration
 STORAGE_TYPE=local
 STORAGE_URI=./.data
 
-# Email configuration
+# Email configuration ('noop' or 'smtp')
 EMAIL_TYPE=noop
 EMAIL_FROM=puush@puush.me
 
@@ -28,6 +27,7 @@ SMTP_SKIP_TLS_VERIFY=false
 DB_PATH=./.data/puush.db
 
 # Service configuration
+CDN_URL=http://localhost
 SERVICE_URL=http://localhost
 SERVICE_NAME=puush
 SERVICE_EMAIL=puush@puush.me
@@ -37,7 +37,7 @@ TWITTER_HANDLE=@puushme
 TWITTER_URL=https://twitter.com/puushme
 
 # Download location used on the front page
-DOWNLOAD_WINDOWS=/dl/puush-win.zip
+DOWNLOAD_WINDOWS=/dl/puush.msi
 DOWNLOAD_MAC=/dl/puush.zip
 DOWNLOAD_IOS=https://itunes.apple.com/au/app/puush/id386524126
 
