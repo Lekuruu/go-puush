@@ -11,6 +11,9 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -59,3 +62,25 @@ jobs:
         asset_path: ${{ matrix.output }}
         asset_name: ${{ matrix.output }}
         asset_content_type: application/octet-stream
+
+    - name: Prepare container image metadata
+      if: matrix.goos == 'linux' && github.event_name != 'pull_request'
+      run: |
+        IMAGE_NAME="ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')"
+        echo "IMAGE_NAME=$IMAGE_NAME" >> "$GITHUB_ENV"
+
+    - name: Log in to GitHub Container Registry
+      if: matrix.goos == 'linux' && github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push container image
+      if: matrix.goos == 'linux' && github.event_name != 'pull_request'
+      run: |
+        docker build -f Dockerfile -t "$IMAGE_NAME:sha-${{ github.sha }}" .
+        docker push "$IMAGE_NAME:sha-${{ github.sha }}"
+        docker tag "$IMAGE_NAME:sha-${{ github.sha }}" "$IMAGE_NAME:latest"
+        docker push "$IMAGE_NAME:latest"
