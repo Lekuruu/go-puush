@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7
+
 FROM golang:1.24-alpine AS build
 
 # Install C toolchain + sqlite3 headers
@@ -12,14 +14,18 @@ WORKDIR /app
 COPY ./go.mod .
 COPY ./go.sum .
 
-# Download dependencies
-RUN go mod download
+# Download dependencies (cached between builds)
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
 # Copy the source code
 COPY . .
 
-# Build the server
-RUN CGO_ENABLED=1 go build -o puush ./cmd/puush/
+# Build the server with cached build artifacts
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    CGO_ENABLED=1 go build -o puush ./cmd/puush/
 
 FROM alpine AS app
 
