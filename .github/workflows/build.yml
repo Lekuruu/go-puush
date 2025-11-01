@@ -51,11 +51,8 @@ jobs:
 
     - name: Upload Release Asset
       if: github.event_name == 'release'
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ matrix.output }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ${{ matrix.output }}
-        asset_name: ${{ matrix.output }}
-        asset_content_type: application/octet-stream
