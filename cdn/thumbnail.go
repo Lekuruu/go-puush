@@ -1,6 +1,9 @@
 package cdn
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/services"
@@ -10,6 +13,10 @@ func Thumbnail(ctx *app.Context) {
 	poolIdentifier := ctx.Vars["pool"]
 	poolPassword := ctx.Vars["password"]
 	identifier := ctx.Vars["identifier"]
+
+	// Remove .<extension> from identifier if present
+	fileExtension := filepath.Ext(identifier)
+	identifier = strings.TrimSuffix(identifier, fileExtension)
 
 	upload, err := services.FetchUploadByIdentifier(identifier, ctx.State, "Pool")
 	if err != nil {
