@@ -4,7 +4,7 @@ tmp_dir = "tmp"
 [build]
 args_bin = []
 bin = "./tmp/main"
-cmd = "go build -o ./tmp/main ./cmd/standalone"
+cmd = "go build -o ./tmp/main ./cmd/puush"
 delay = 1000
 exclude_dir = ["assets", "tmp", "vendor", "testdata", "web/static"]
 exclude_file = []

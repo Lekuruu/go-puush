@@ -19,7 +19,7 @@ RUN go mod download
 COPY . .
 
 # Build the server
-RUN CGO_ENABLED=1 go build -o puush ./cmd/standalone/
+RUN CGO_ENABLED=1 go build -o puush ./cmd/puush/
 
 FROM alpine AS app
 
