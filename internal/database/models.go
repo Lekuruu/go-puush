@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"net/url"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -76,6 +77,10 @@ func (upload *Upload) Key() string {
 	return strconv.Itoa(upload.Id)
 }
 
+func (upload *Upload) FilenameExtension() string {
+	return filepath.Ext(upload.Filename)
+}
+
 func (upload *Upload) FilenameEncoded() string {
 	return url.PathEscape(upload.Filename)
 }
@@ -98,16 +103,16 @@ func (upload *Upload) SizeHumanReadable() string {
 
 func (upload *Upload) Url() string {
 	if upload.Pool != nil && upload.Pool.Type == PoolTypePrivate {
-		return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, upload.Identifier)
+		return fmt.Sprintf("/%s/%s", upload.Pool.Identifier, upload.Identifier) + upload.FilenameExtension()
 	}
-	return fmt.Sprintf("/%s", upload.Identifier)
+	return fmt.Sprintf("/%s", upload.Identifier) + upload.FilenameExtension()
 }
 
 func (upload *Upload) UrlEncoded() string {
 	if upload.Pool != nil && upload.Pool.Type == PoolTypePrivate {
-		return fmt.Sprintf("/%s/%s", url.PathEscape(upload.Pool.Identifier), url.PathEscape(upload.Identifier))
+		return fmt.Sprintf("/%s/%s", url.PathEscape(upload.Pool.Identifier), url.PathEscape(upload.Identifier)) + upload.FilenameExtension()
 	}
-	return fmt.Sprintf("/%s", url.PathEscape(upload.Identifier))
+	return fmt.Sprintf("/%s", url.PathEscape(upload.Identifier)) + upload.FilenameExtension()
 }
 
 type Pool struct {
