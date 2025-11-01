@@ -1,5 +1,6 @@
-.gitignore
+.air.toml
 .github
+.git
 .data
 .env
 tmp
