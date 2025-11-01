@@ -13,7 +13,6 @@ jobs:
   build:
     permissions:
       contents: read
-      packages: write
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -62,34 +61,3 @@ jobs:
         asset_path: ${{ matrix.output }}
         asset_name: ${{ matrix.output }}
         asset_content_type: application/octet-stream
-
-  docker:
-    needs: build
-    if: github.event_name != 'pull_request'
-    permissions:
-      contents: read
-      packages: write
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Build and push container image
-      env:
-        IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/go-puush
-      run: |
-        IMAGE_NAME="ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')"
-        docker build -f Dockerfile -t "$IMAGE_NAME:sha-${{ github.sha }}" .
-        docker push "$IMAGE_NAME:sha-${{ github.sha }}"
-        docker tag "$IMAGE_NAME:sha-${{ github.sha }}" "$IMAGE_NAME:latest"
-        docker push "$IMAGE_NAME:latest"
