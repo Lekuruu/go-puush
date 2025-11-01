@@ -2,12 +2,6 @@
 
 FROM golang:1.24-alpine AS build
 
-# Install C toolchain + sqlite3 headers
-RUN apk add --no-cache \
-      gcc \
-      musl-dev \
-      sqlite-dev
-
 WORKDIR /app
 
 # Copy module files
@@ -25,12 +19,12 @@ COPY . .
 # Build the server with cached build artifacts
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
-    CGO_ENABLED=1 go build -o puush ./cmd/puush/
+    CGO_ENABLED=0 go build -o puush ./cmd/puush/
 
 FROM alpine AS app
 
 # Install runtime dependencies
-RUN apk add --no-cache ca-certificates sqlite-libs
+RUN apk add --no-cache ca-certificates
 
 WORKDIR /app
 COPY --from=build /app/puush /app/puush
