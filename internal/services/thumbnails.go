@@ -3,9 +3,9 @@ package services
 import (
 	"bytes"
 
+	ffmpeg "github.com/Lekuruu/ffmpeg-go"
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/prplecake/go-thumbnail"
-	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
 func CreateThumbnail(key string, data []byte, state *app.State) ([]byte, error) {
