@@ -6,7 +6,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -36,7 +35,7 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 		config.CacheMode,
 	)
 
-	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{
+	db, err := gorm.Open(openDatabase(dsn), &gorm.Config{
 		Logger: gormLogger,
 	})
 	if err != nil {
