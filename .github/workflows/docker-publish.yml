@@ -28,12 +28,6 @@ jobs:
         cache: true
         cache-dependency-path: go.sum
 
-    - name: Cache cross-compilers
-      uses: awalsh128/cache-apt-pkgs-action@v1
-      with:
-        packages: build-essential gcc-aarch64-linux-gnu
-        version: 1
-
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -47,14 +41,6 @@ jobs:
         else
           echo "publish=false" >> "$GITHUB_OUTPUT"
         fi
-
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v3
-      if: steps.publish.outputs.publish == 'true'
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Prepare image metadata
       id: meta
@@ -70,30 +56,25 @@ jobs:
         echo "image_name=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
         echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
 
-    - name: Build CGO binaries for amd64 and arm64
+    - name: Build static binaries for amd64 and arm64
       env:
-        CGO_ENABLED: "1"
-        GOOS: "linux"
+        CGO_ENABLED: 0
+        GOOS: linux
       run: |
         set -euo pipefail
         mkdir -p dist
         for ARCH in amd64 arm64; do
           echo "Building for linux/$ARCH"
-          case "$ARCH" in
-            amd64)
-              CC_COMPILER="gcc"
-              ;;
-            arm64)
-              CC_COMPILER="aarch64-linux-gnu-gcc"
-              ;;
-            *)
-              echo "Unsupported architecture: $ARCH"
-              exit 1
-              ;;
-          esac
-          GOARCH=$ARCH CC="$CC_COMPILER" \
-            go build -trimpath -ldflags="-s -w" -o "dist/puush-linux-$ARCH" ./cmd/puush/
+          GOARCH=$ARCH go build -trimpath -ldflags="-s -w" -o "dist/puush-linux-$ARCH" ./cmd/puush/
         done
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      if: steps.publish.outputs.publish == 'true'
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build and push multi-arch image
       uses: docker/build-push-action@v5
