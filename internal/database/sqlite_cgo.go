@@ -1,7 +1,7 @@
-//go:build cgo_sqlite
-// +build cgo_sqlite
+//go:build cgo
+// +build cgo
 
-// Conditional build for database opener - cgo version (for architectures unsupported by native driver, for example MIPS)
+// Conditional build for database opener - cgo version (used when CGO_ENABLED=1)
 
 package database
 

@@ -1,7 +1,7 @@
-//go:build !cgo_sqlite
-// +build !cgo_sqlite
+//go:build !cgo
+// +build !cgo
 
-// Conditional build for database opener - cgo-less version (default)
+// Conditional build for database opener - cgo-less version (used when CGO_ENABLED=0)
 
 package database
 

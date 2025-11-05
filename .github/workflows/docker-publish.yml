@@ -92,7 +92,7 @@ jobs:
               ;;
           esac
           GOARCH=$ARCH CC="$CC_COMPILER" \
-            go build -tags=cgo_sqlite -trimpath -ldflags="-s -w" -o "dist/puush-linux-$ARCH" ./cmd/puush/
+            go build -trimpath -ldflags="-s -w" -o "dist/puush-linux-$ARCH" ./cmd/puush/
         done
 
     - name: Build and push multi-arch image
