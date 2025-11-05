@@ -28,6 +28,11 @@ jobs:
         cache: true
         cache-dependency-path: go.sum
 
+    - name: Install cross-compilers
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential gcc-aarch64-linux-gnu
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -64,14 +69,29 @@ jobs:
         echo "image_name=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
         echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
 
-    - name: Build static binaries for amd64 and arm64
+    - name: Build CGO binaries for amd64 and arm64
+      env:
+        CGO_ENABLED: "1"
+        GOOS: "linux"
       run: |
         set -euo pipefail
         mkdir -p dist
         for ARCH in amd64 arm64; do
           echo "Building for linux/$ARCH"
-          GOOS=linux GOARCH=$ARCH CGO_ENABLED=0 \
-            go build -trimpath -ldflags="-s -w" -o "dist/puush-linux-$ARCH" ./cmd/puush/
+          case "$ARCH" in
+            amd64)
+              CC_COMPILER="gcc"
+              ;;
+            arm64)
+              CC_COMPILER="aarch64-linux-gnu-gcc"
+              ;;
+            *)
+              echo "Unsupported architecture: $ARCH"
+              exit 1
+              ;;
+          esac
+          GOARCH=$ARCH CC="$CC_COMPILER" \
+            go build -tags=cgo_sqlite -trimpath -ldflags="-s -w" -o "dist/puush-linux-$ARCH" ./cmd/puush/
         done
 
     - name: Build and push multi-arch image
