@@ -56,16 +56,17 @@ jobs:
         echo "image_name=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
         echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
 
-    - name: Build static binaries for amd64 and arm64
+    - name: Build static binaries for amd64, arm64 & armv7
       env:
         CGO_ENABLED: 0
         GOOS: linux
       run: |
         set -euo pipefail
         mkdir -p dist
-        for ARCH in amd64 arm64; do
+        for ARCH in amd64 arm64 arm; do
           echo "Building for linux/$ARCH"
-          GOARCH=$ARCH go build -trimpath -ldflags="-s -w" -o "dist/puush-linux-$ARCH" ./cmd/puush/
+          GOARM=7 GOARCH=$ARCH \
+            go build -trimpath -ldflags="-s -w" -o "dist/puush-linux-$ARCH" ./cmd/puush/
         done
 
     - name: Log in to GitHub Container Registry
@@ -82,7 +83,7 @@ jobs:
         context: .
         file: .github/Dockerfile.ci
         push: ${{ steps.publish.outputs.publish == 'true' }}
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64,linux/arm64,linux/arm/v7
         tags: ${{ steps.meta.outputs.tags }}
         provenance: false
         sbom: false
