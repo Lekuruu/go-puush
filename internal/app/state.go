@@ -15,6 +15,20 @@ type State struct {
 	Email    email.Email
 }
 
+func (state *State) ExecuteWalCheckpoint() {
+	if state.Config == nil {
+		return
+	}
+	if !state.Config.Database.EnableWAL {
+		return
+	}
+
+	if state.Database == nil {
+		return
+	}
+	state.Database.Exec("PRAGMA wal_checkpoint(FULL);")
+}
+
 func NewState() *State {
 	config, err := LoadConfig()
 	if err != nil {

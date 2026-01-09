@@ -65,6 +65,9 @@ func PerformRegistration(ctx *app.Context) {
 		user.Email, user.Id,
 	)
 
+	// Write wal contents to disk after registration, if enabled
+	ctx.State.ExecuteWalCheckpoint()
+
 	responseTitle := "Registration complete!"
 	responseMessage := "You can now log in with your email and password."
 
