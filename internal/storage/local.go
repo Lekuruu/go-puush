@@ -56,6 +56,25 @@ func (storage *FileStorage) Save(key string, folder string, data []byte) error {
 	return nil
 }
 
+func (storage *FileStorage) SaveStream(key string, folder string, stream io.Reader) error {
+	path := fmt.Sprintf("%s/%s", storage.dataPath, folder)
+	err := os.MkdirAll(path, 0755)
+	if err != nil {
+		return err
+	}
+
+	filePath := fmt.Sprintf("%s/%s", path, key)
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	buffer := make([]byte, 256*1024)
+	_, err = io.CopyBuffer(file, stream, buffer)
+	return err
+}
+
 func (storage *FileStorage) Exists(key string, folder string) bool {
 	path := fmt.Sprintf("%s/%s/%s", storage.dataPath, folder, key)
 	_, err := os.Stat(path)
@@ -72,6 +91,10 @@ func (storage *FileStorage) Remove(key string, folder string) error {
 
 func (storage *FileStorage) SaveUpload(key string, data []byte) error {
 	return storage.Save(key, "uploads", data)
+}
+
+func (storage *FileStorage) SaveUploadStream(key string, stream io.Reader) error {
+	return storage.SaveStream(key, "uploads", stream)
 }
 
 func (storage *FileStorage) ReadUpload(key string) ([]byte, error) {
