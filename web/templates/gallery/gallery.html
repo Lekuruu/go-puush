@@ -2,7 +2,7 @@
 {{ template "gallery/header" . }}
 <script type="text/javascript" charset="utf-8">
     var feed = "/{{ .User.Name }}/{{ .Pool.Name }}/feed";
-    var base_img_url = "{{ .Config.Cdn.Url }}";
+    var base_img_url = "{{ .Config.Cdn.Url }}".replace(/^https?:/, window.location.protocol);
 </script>
 <script id="galleryThumbs" type="text/x-jquery-text">
     <div id="thumb_${index}" class="puush_tile unselected">
