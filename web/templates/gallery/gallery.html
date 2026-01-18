@@ -7,7 +7,7 @@
 <script id="galleryThumbs" type="text/x-jquery-text">
     <div id="thumb_${index}" class="puush_tile unselected">
         <div class="thumb" style="background-image: url({{ .Config.Cdn.Url }}/t/${id});">
-            <a href="#" onclick="return galleries.view(${index})" title="${name} (${size})"></a>
+            <a href="#" onclick="return galleries.view(${$index})" title="${name} (${size})"></a>
         </div>
     </div>
 </script>
