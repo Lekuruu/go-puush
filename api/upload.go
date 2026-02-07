@@ -1,9 +1,11 @@
 package api
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -31,23 +33,6 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
-	if request.FileSize <= 0 {
-		WritePuushError(ctx, RequestError)
-		return
-	}
-
-	fileData := make([]byte, request.FileSize)
-	_, err = request.File.Read(fileData)
-	if err != nil {
-		WritePuushError(ctx, ServerError)
-		return
-	}
-
-	if !request.CompareChecksum(fileData) {
-		WritePuushError(ctx, ChecksumError)
-		return
-	}
-
 	err = services.UpdateUserLatestActivity(user.Id, ctx.State)
 	if err != nil {
 		WritePuushError(ctx, ServerError)
@@ -65,6 +50,11 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
+	if request.FileSize <= 0 {
+		WritePuushError(ctx, RequestError)
+		return
+	}
+
 	if user.DefaultPool == nil {
 		WritePuushError(ctx, ServerError)
 		return
@@ -75,6 +65,17 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
+	// Read first 512 bytes for MIME detection
+	mimeBuffer := make([]byte, 512)
+	n, err := io.ReadFull(request.File, mimeBuffer)
+	if err != nil && err != io.ErrUnexpectedEOF && err != io.EOF {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+	mimeBuffer = mimeBuffer[:n]
+	mimeType := mimetype.Detect(mimeBuffer).String()
+
+	// Create identifier for the upload
 	identifierLength := user.DefaultPool.UploadIdentifierLength()
 	identifier, err := services.GenerateUploadIdentifier(identifierLength, ctx.State)
 	if err != nil {
@@ -88,29 +89,29 @@ func PuushUpload(ctx *app.Context) {
 		Filename:   request.FileName,
 		Filesize:   request.FileSize,
 		Checksum:   request.FileChecksum,
-		MimeType:   mimetype.Detect(fileData).String(),
+		MimeType:   mimeType,
 		Identifier: identifier,
 		CreatedAt:  time.Now(),
 		Pool:       user.DefaultPool,
 		User:       user,
 	}
 
+	// Stream file to disk while computing checksum at the same time
+	hash := md5.New()
+	combinedReader := io.MultiReader(bytes.NewReader(mimeBuffer), request.File)
+	teeReader := io.TeeReader(combinedReader, hash)
+
+	err = ctx.State.Storage.SaveUploadStream(upload.Key(), teeReader)
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
+	// Perform post-upload actions in a separate goroutine to respond faster
+	go performPostUploadActions(upload, ctx.State)
+
+	upload.Checksum = hex.EncodeToString(hash.Sum(nil))
 	err = services.CreateUpload(upload, ctx.State)
-	if err != nil {
-		WritePuushError(ctx, ServerError)
-		return
-	}
-
-	err = ctx.State.Storage.SaveUpload(upload.Key(), fileData)
-	if err != nil {
-		WritePuushError(ctx, ServerError)
-		return
-	}
-
-	// Perform thumbnail creation asynchronously
-	go CreateThumbnailFromUpload(upload, fileData, ctx.State)
-
-	err = services.UpdatePoolUploadCount(upload.Pool.Id, ctx.State)
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return
@@ -123,11 +124,31 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
+	err = services.UpdatePoolUploadCount(upload.Pool.Id, ctx.State)
+	if err != nil {
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
 	uploadResponse := &UploadResponse{
 		UploadUrl:        ctx.State.Config.Cdn.Url + upload.UrlEncoded(),
 		UpdatedDiskUsage: user.DiskUsage,
 	}
 	WritePuushResponse(ctx, uploadResponse)
+}
+
+func performPostUploadActions(upload *database.Upload, state *app.State) {
+	if !upload.IsImage() && !upload.IsVideo() {
+		return
+	}
+
+	data, err := state.Storage.ReadUpload(upload.Key())
+	if err != nil {
+		state.Logger.Logf("Failed to read upload for post-upload actions: %v", err)
+		return
+	}
+
+	CreateThumbnailFromUpload(upload, data, state)
 }
 
 type UploadRequest struct {
@@ -136,18 +157,6 @@ type UploadRequest struct {
 	FileName     string
 	FileSize     int64
 	File         multipart.File
-}
-
-func (request *UploadRequest) CompareChecksum(data []byte) bool {
-	if request.FileChecksum == "" {
-		// No checksum provided, skip comparison
-		return true
-	}
-	checksum := md5.New()
-	checksum.Write(data)
-	checksumBytes := checksum.Sum(nil)
-	checksumHex := strings.ToLower(hex.EncodeToString(checksumBytes))
-	return checksumHex == request.FileChecksum
 }
 
 func (request *UploadRequest) ExceedsUploadLimit(user *database.User) bool {

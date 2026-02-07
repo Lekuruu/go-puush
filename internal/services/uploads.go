@@ -29,6 +29,10 @@ func FetchUploadById(id int, state *app.State, preload ...string) (*database.Upl
 }
 
 func FetchUploadByChecksum(checksum string, state *app.State, preload ...string) (*database.Upload, error) {
+	if checksum == "" {
+		return nil, errors.New("checksum is empty")
+	}
+
 	upload := &database.Upload{}
 	query := preloadQuery(state, preload).Where("checksum = ?", checksum)
 	result := query.First(upload)
@@ -143,6 +147,17 @@ func UpdateUploadPool(uploadId int, poolId int, state *app.State) error {
 		return result.Error
 	}
 
+	return nil
+}
+
+func UpdateUploadChecksum(uploadId int, checksum string, state *app.State) error {
+	result := state.Database.Exec(
+		"UPDATE uploads SET checksum = ? WHERE id = ?",
+		checksum, uploadId,
+	)
+	if result.Error != nil {
+		return result.Error
+	}
 	return nil
 }
 
