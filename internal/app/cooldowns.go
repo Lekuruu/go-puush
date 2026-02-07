@@ -20,6 +20,13 @@ func NewCooldownManager(ttl time.Duration) *CooldownManager {
 	}
 }
 
+// NewCooldownManagerWithCleanup creates a CooldownManager and starts automatic cleanup
+func NewCooldownManagerWithCleanup(ttl time.Duration, cleanupInterval time.Duration) *CooldownManager {
+	cm := NewCooldownManager(ttl)
+	cm.StartCleanup(cleanupInterval)
+	return cm
+}
+
 // Allow checks if an action is allowed, based on cooldown
 func (cm *CooldownManager) Allow(key string) bool {
 	cm.mutex.Lock()
@@ -35,7 +42,7 @@ func (cm *CooldownManager) Allow(key string) bool {
 	return false
 }
 
-// Cleanup is a routine to clean up old entries to avoid unbounded memory growth
+// Cleanup removes expired entries to avoid unbounded memory growth
 func (cm *CooldownManager) Cleanup() {
 	cm.mutex.Lock()
 	defer cm.mutex.Unlock()
@@ -46,4 +53,15 @@ func (cm *CooldownManager) Cleanup() {
 			delete(cm.data, key)
 		}
 	}
+}
+
+// StartCleanup starts a background goroutine that periodically cleans up expired entries
+func (cm *CooldownManager) StartCleanup(interval time.Duration) {
+	go func() {
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+		for range ticker.C {
+			cm.Cleanup()
+		}
+	}()
 }

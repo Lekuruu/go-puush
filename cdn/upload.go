@@ -11,7 +11,7 @@ import (
 )
 
 // This will limit the view count increase to once per minute per IP
-var uploadViewCooldowns = app.NewCooldownManager(time.Minute)
+var uploadViewCooldowns = app.NewCooldownManagerWithCleanup(time.Minute, 5*time.Minute)
 
 func Upload(ctx *app.Context) {
 	poolIdentifier := ctx.Vars["pool"]
