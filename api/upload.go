@@ -96,6 +96,13 @@ func PuushUpload(ctx *app.Context) {
 		User:       user,
 	}
 
+	err = services.CreateUpload(upload, ctx.State)
+	if err != nil {
+		ctx.State.Logger.Logf("Failed to create upload: %v", err)
+		WritePuushError(ctx, ServerError)
+		return
+	}
+
 	// Stream file to disk while computing checksum at the same time
 	hash := md5.New()
 	combinedReader := io.MultiReader(bytes.NewReader(mimeBuffer), request.File)
@@ -103,6 +110,8 @@ func PuushUpload(ctx *app.Context) {
 
 	err = ctx.State.Storage.SaveUploadStream(upload.Key(), teeReader)
 	if err != nil {
+		ctx.State.Logger.Logf("Failed to save upload stream: %v", err)
+		services.DeleteUpload(upload, ctx.State)
 		WritePuushError(ctx, ServerError)
 		return
 	}
@@ -111,23 +120,20 @@ func PuushUpload(ctx *app.Context) {
 	go performPostUploadActions(upload, ctx.State)
 
 	upload.Checksum = hex.EncodeToString(hash.Sum(nil))
-	err = services.CreateUpload(upload, ctx.State)
+	err = services.UpdateUploadChecksum(upload.Id, upload.Checksum, ctx.State)
 	if err != nil {
-		WritePuushError(ctx, ServerError)
-		return
+		ctx.State.Logger.Logf("Failed to update upload checksum: %v", err)
 	}
 
 	user.DiskUsage += upload.Filesize
 	err = services.UpdateUserDiskUsage(user.Id, upload.Filesize, ctx.State)
 	if err != nil {
-		WritePuushError(ctx, ServerError)
-		return
+		ctx.State.Logger.Logf("Failed to update user disk usage: %v", err)
 	}
 
 	err = services.UpdatePoolUploadCount(upload.Pool.Id, ctx.State)
 	if err != nil {
-		WritePuushError(ctx, ServerError)
-		return
+		ctx.State.Logger.Logf("Failed to update pool upload count: %v", err)
 	}
 
 	uploadResponse := &UploadResponse{
