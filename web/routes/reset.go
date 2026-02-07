@@ -42,6 +42,9 @@ func RequestPasswordReset(ctx *app.Context) {
 
 	go createAndSendPasswordResetEmail(user, ctx.State)
 
+	// Write wal contents to disk, if enabled
+	ctx.State.ExecuteWalCheckpoint()
+
 	renderResponseTemplate(
 		"Password reset request received!",
 		"We'll send an email with your password reset link shortly.",
@@ -132,6 +135,9 @@ func PerformPasswordReset(ctx *app.Context) {
 	if err := services.DeleteEmailVerificationById(verification.Id, ctx.State); err != nil {
 		ctx.State.Logger.Logf("Failed to delete password reset verification %d: %v", verification.Id, err)
 	}
+
+	// Write wal contents to disk, if enabled
+	ctx.State.ExecuteWalCheckpoint()
 
 	renderResponseTemplate(
 		"Password reset complete!",
