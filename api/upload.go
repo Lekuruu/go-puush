@@ -107,9 +107,8 @@ func PuushUpload(ctx *app.Context) {
 		return
 	}
 
-	// Perform post-upload actions asynchronously
-	// This only includes thumbnail generation for now
-	go performPostUploadActions(upload, ctx)
+	// Perform thumbnail creation asynchronously
+	go CreateThumbnailFromUpload(upload, fileData, ctx.State)
 
 	err = services.UpdatePoolUploadCount(upload.Pool.Id, ctx.State)
 	if err != nil {
@@ -129,15 +128,6 @@ func PuushUpload(ctx *app.Context) {
 		UpdatedDiskUsage: user.DiskUsage,
 	}
 	WritePuushResponse(ctx, uploadResponse)
-}
-
-func performPostUploadActions(upload *database.Upload, ctx *app.Context) {
-	data, err := ctx.State.Storage.ReadUpload(upload.Key())
-	if err != nil {
-		return
-	}
-
-	CreateThumbnailFromUpload(upload, data, ctx.State)
 }
 
 type UploadRequest struct {
