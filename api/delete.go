@@ -24,7 +24,7 @@ func PuushDelete(ctx *app.Context) {
 		return
 	}
 
-	upload, err := services.FetchUploadById(request.UploadId, ctx.State, "Pool", "Pool.Uploads")
+	upload, err := services.FetchUploadById(request.UploadId, ctx.State, "Pool")
 	if err != nil {
 		WritePuushError(ctx, ServerError)
 		return

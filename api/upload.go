@@ -25,7 +25,7 @@ func PuushUpload(ctx *app.Context) {
 	}
 	defer request.File.Close()
 
-	user, err := UserAuthenticationFromKey(request.Key, ctx.State, "DefaultPool", "DefaultPool.Uploads")
+	user, err := UserAuthenticationFromKey(request.Key, ctx.State, "DefaultPool")
 	if err != nil {
 		WritePuushError(ctx, AuthenticationFailure)
 		return
