@@ -27,7 +27,7 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 		journalMode = "DELETE"
 	}
 
-	dsn := fmt.Sprintf("%s?_journal_mode=%s&_busy_timeout=%d&_synchronous=%s&cache=%s",
+	dsn := fmt.Sprintf("%s?_journal_mode=%s&_busy_timeout=%d&_synchronous=%s&cache=%s&_time_format=sqlite",
 		config.Path,
 		journalMode,
 		config.BusyTimeout,
