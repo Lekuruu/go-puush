@@ -12,8 +12,8 @@ import (
 )
 
 func WriteResponse(status int, message string, ctx *app.Context) {
-	ctx.Response.WriteHeader(status)
 	ctx.Response.Header().Set("Content-Type", "text/plain")
+	ctx.Response.WriteHeader(status)
 	ctx.Response.Write([]byte(message))
 }
 
