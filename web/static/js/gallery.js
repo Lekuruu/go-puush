@@ -105,18 +105,22 @@
         var $video = $('#gallery_image > a > video');
         $video.one('loadedmetadata', galleries.resizeCanvas);
         $video[0].load();
-      } else if (galleries.isAudio(galleries.selected)) {
+        return;
+      }
+      
+      if (galleries.isAudio(galleries.selected)) {
         parent.append(
           "<audio style='width:" + max_width + "px;' controls>" +
           "<source src='" + targetUrl + "' type='" + mimeType + "'>" +
           "</audio>"
         );
         galleries.resizeCanvas();
-      } else {
-        parent.append("<img style='max-width:" + max_width + "px;max-height:" + max_height + "px;'/>");
-        $('#gallery_image > a > img').imagesLoaded(galleries.resizeCanvas);
-        parent.find('img')[0].src = targetUrl;
+        return;
       }
+
+      parent.append("<img style='max-width:" + max_width + "px;max-height:" + max_height + "px;'/>");
+      $('#gallery_image > a > img').imagesLoaded(galleries.resizeCanvas);
+      parent.find('img')[0].src = targetUrl;
     },
 
     handleResize: function() {
