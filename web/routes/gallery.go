@@ -18,6 +18,7 @@ type GalleryItem struct {
 	Identifier string `json:"id"`
 	Size       string `json:"size"`
 	Filename   string `json:"name"`
+	MimeType   string `json:"mime_type"`
 }
 
 func NewGalleryFeed(pool *database.Pool) *GalleryFeedResponse {
@@ -32,6 +33,7 @@ func NewGalleryFeed(pool *database.Pool) *GalleryFeedResponse {
 			Identifier: upload.Identifier,
 			Size:       upload.SizeHumanReadable(),
 			Filename:   upload.Filename,
+			MimeType:   upload.MimeType,
 		})
 	}
 
