@@ -112,7 +112,7 @@ a.last-page { color: #7992a2; text-decoration: none;  }
 	border: 1px solid #ffae00;
 }
 
-#gallery_thumbs .thumb		{ float: left; margin-top: 4px; margin-left: 4px; width: 72px; height: 72px; }
+#gallery_thumbs .thumb		{ float: left; margin-top: 4px; margin-left: 4px; width: 72px; height: 72px; background-size: cover; background-position: 50%; }
 #gallery_thumbs .thumb a	{ float: left; width: 72px; height: 72px; }
 
 #user_meta {

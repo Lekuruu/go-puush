@@ -166,7 +166,7 @@ a.nivo-prevNav {
 }
 
 #puush_history .check		{ float: left; width: 20px; }
-#puush_history .thumb		{ float: left; width: 100px; height: 100px; background: #1d2124; background-position: 50%; background-repeat: no-repeat; }
+#puush_history .thumb		{ float: left; width: 100px; height: 100px; background: #1d2124; background-size: cover; background-position: 50%; background-repeat: no-repeat; }
 #puush_history .thumb a		{ float: left; width: 100px; height: 100px; }
 
 #puush_pools				{ float: left; text-align: center; background-color: #697175; width: 100%; }
@@ -205,11 +205,11 @@ a.nivo-prevNav {
   top:  60px;
 }
 
-#puush_pools .thumb         { float: left; margin-top: 4px; margin-left: 4px; width: 72px; height: 72px; border: 1px solid #bac0c6; }
+#puush_pools .thumb         { float: left; margin-top: 4px; margin-left: 4px; width: 72px; height: 72px; border: 1px solid #bac0c6; background-size: cover; background-position: 50%; }
 
 /* move puush popup */
 #puush_pools_dialog			{ float: left; text-align: center; background-color: white; width: 100%; margin-left: 5px; }
-#puush_pools_dialog .thumb  { float: left; margin-top: 4px; margin-left: 4px; width: 72px; height: 72px; border: 1px solid #bac0c6; }
+#puush_pools_dialog .thumb  { float: left; margin-top: 4px; margin-left: 4px; width: 72px; height: 72px; border: 1px solid #bac0c6; background-size: cover; background-position: 50%; }
 
 .puush_pool a				{ width: 82px; height: 92px; display: block; font-size: 9pt; text-decoration: none; }
 .puush_pool span			{ position: absolute; left: 0px; bottom: 0px; text-align: center; width: 82px; }
