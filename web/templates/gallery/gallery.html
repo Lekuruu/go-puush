@@ -5,9 +5,9 @@
     var base_img_url = "{{ .Config.Cdn.Url }}".replace(/^https?:/, window.location.protocol);
 </script>
 <script id="galleryThumbs" type="text/x-jquery-text">
-    <div id="thumb_${index - 1}" class="puush_tile unselected">
-        <div class="thumb" style="background-image: url({{ .Config.Cdn.Url }}/t/${id});">
-            <a href="#" onclick="return galleries.view(${index - 1})" title="${name} (${size})"></a>
+    <div id="thumb_${index}" class="puush_tile unselected">
+        <div class="thumb" style="background-image: url(http://puu.sh/t/${id});">
+            <a href="#" onclick="return galleries.view(${index})" title="${name} (${size})"></a>
         </div>
     </div>
 </script>

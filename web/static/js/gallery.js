@@ -9,7 +9,9 @@
     resize_timeout: null,
 
     buildViewURL: function(id) {
-      return galleries.base_url + galleries.items[id].id;
+      var item = galleries.items[id];
+      if (!item) return "#";
+      return galleries.base_url + item.id;
     },
 
     isVideo: function(id) {
