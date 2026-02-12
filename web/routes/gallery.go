@@ -29,7 +29,7 @@ func NewGalleryFeed(pool *database.Pool) *GalleryFeedResponse {
 
 	for i, upload := range pool.Uploads {
 		feed.Objects = append(feed.Objects, GalleryItem{
-			Index:      i + 1,
+			Index:      i,
 			Identifier: upload.Identifier,
 			Size:       upload.SizeHumanReadable(),
 			Filename:   upload.Filename,
