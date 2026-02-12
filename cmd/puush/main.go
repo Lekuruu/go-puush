@@ -129,6 +129,7 @@ func main() {
 	if state == nil {
 		return
 	}
+	defer state.Close()
 
 	server := app.NewServer(
 		state.Config.Web.Host,

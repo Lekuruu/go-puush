@@ -29,6 +29,18 @@ func (state *State) ExecuteWalCheckpoint() {
 	state.Database.Exec("PRAGMA wal_checkpoint(FULL);")
 }
 
+func (state *State) Close() {
+	if state.Database == nil {
+		return
+	}
+	state.ExecuteWalCheckpoint()
+	db, err := state.Database.DB()
+	if err != nil {
+		return
+	}
+	db.Close()
+}
+
 func NewState() *State {
 	config, err := LoadConfig()
 	if err != nil {
