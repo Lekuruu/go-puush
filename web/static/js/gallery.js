@@ -7,7 +7,23 @@
     base_url: "",
 
     buildViewURL: function(id) {
-      return galleries.base_url + galleries.items[id].id
+      return galleries.base_url + galleries.items[id].id;
+    },
+
+    isVideo: function(id) {
+      var item = galleries.items[id];
+      if (!item) return false;
+
+      // Check mime type if available
+      if (item.mime_type) {
+        return item.mime_type.indexOf('video/') === 0;
+      }
+
+      // Fallback to URL extension
+      var url = galleries.buildViewURL(id);
+      var ext = url.split('.').pop().toLowerCase().split('?')[0];
+      var videoExts = ['mp4', 'webm', 'mov', 'ogv'];
+      return videoExts.indexOf(ext) !== -1;
     },
 
     refreshItems: function() {
@@ -19,24 +35,32 @@
     },
 
     resizeCanvas: function() {
-      var node = $('#gallery_image > a > img')[0];
+      var node = $('#gallery_image > a > img')[0] || $('#gallery_image > a > video')[0];
+      if (!node) return;
 
-      // This is so we can get the base dimensions of the image.
-      var image = new Image();
-      image.src = galleries.buildViewURL(galleries.selected);
+      var nodeWidth, nodeHeight;
+
+      if (node.tagName === 'VIDEO') {
+        nodeWidth = node.videoWidth || node.offsetWidth;
+        nodeHeight = node.videoHeight || node.offsetHeight;
+      } else {
+        nodeWidth = node.naturalWidth || node.width;
+        nodeHeight = node.naturalHeight || node.height;
+      }
 
       var max_height = w.innerHeight - 96;
       var max_width = Math.max(w.innerWidth - 150, 550);
 
-      var ar = image.height / image.width;
-      var scale = Math.min(1, (max_width/image.width), (max_height/image.height));
+      if (nodeWidth > 0) {
+        var ar = nodeHeight / nodeWidth;
+        var scale = Math.min(1, (max_width / nodeWidth), (max_height / nodeHeight));
+        var new_width = nodeWidth * scale;
+        var new_height = nodeWidth * ar * scale;
+        node.height = new_height;
+        node.width = new_width;
+      }
 
-      var new_width = image.width * scale;
-      var new_height = image.width * ar * scale;
-
-      node.height = new_height;
-      node.width  = new_width;
-      $(node).attr("style", "position:absolute;top:74px;left:10px;"); // Remove the temporary max-width and max-height
+      $(node).attr("style", "position:absolute;top:74px;left:10px;");
     },
 
     redrawSelected: function() {
@@ -46,9 +70,20 @@
       var max_height = w.innerHeight - 96;
       var max_width = Math.max(w.innerWidth - 150, 550);
 
-      parent.append("<img style='max-width:"+max_width+"px;max-height:"+max_height+"px;'/>");
-      $('#gallery_image > a > img').imagesLoaded(galleries.resizeCanvas);
-      parent.find('img')[0].src = galleries.buildViewURL(galleries.selected);
+      if (galleries.isVideo(galleries.selected)) {
+        var videoUrl = galleries.buildViewURL(galleries.selected);
+        parent.append(
+          "<video style='max-width:" + max_width + "px;max-height:" + max_height + "px;' " +
+          "controls autoplay loop muted playsinline>" +
+          "<source src='" + videoUrl + "' type='video/mp4'>" +
+          "</video>"
+        );
+        $('#gallery_image > a > video').on('loadedmetadata', galleries.resizeCanvas);
+      } else {
+        parent.append("<img style='max-width:" + max_width + "px;max-height:" + max_height + "px;'/>");
+        $('#gallery_image > a > img').imagesLoaded(galleries.resizeCanvas);
+        parent.find('img')[0].src = galleries.buildViewURL(galleries.selected);
+      }
     },
 
     redrawThumbs: function() {
@@ -96,7 +131,7 @@
               galleries.view((galleries.selected-1), true);
               return false;
             }
-          break;
+            break;
 
           case 39: // right
           case 40: // down
@@ -104,7 +139,7 @@
               galleries.view((galleries.selected+1), true);
               return false;
             }
-          break;
+            break;
         }
       })
     },
