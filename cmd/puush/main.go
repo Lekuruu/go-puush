@@ -13,10 +13,10 @@ import (
 )
 
 func InitializeCdnRoutes(server *app.Server) {
-	server.Router.HandleFunc("/{identifier}", server.ContextMiddleware(cdn.Upload)).Methods("GET")
-	server.Router.HandleFunc("/{pool}/{identifier}", server.ContextMiddleware(cdn.Upload)).Methods("GET")
 	server.Router.HandleFunc("/t/{identifier}", server.ContextMiddleware(cdn.Thumbnail)).Methods("GET")
 	server.Router.HandleFunc("/t/{pool}/{identifier}", server.ContextMiddleware(cdn.Thumbnail)).Methods("GET")
+	server.Router.HandleFunc("/{identifier}", server.ContextMiddleware(cdn.Upload)).Methods("GET")
+	server.Router.HandleFunc("/{pool}/{identifier}", server.ContextMiddleware(cdn.Upload)).Methods("GET")
 }
 
 func InitializeApiRoutes(server *app.Server) {
