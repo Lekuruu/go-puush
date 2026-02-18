@@ -35,6 +35,7 @@ type Config struct {
 		RegistrationEnabled bool   `env:"REGISTRATION_ENABLED" envDefault:"true"`
 		RequireActivation   bool   `env:"REQUIRE_ACTIVATION" envDefault:"false"`
 		RequireInvitation   bool   `env:"REQUIRE_INVITATION" envDefault:"false"`
+		ExtendedGallery     bool   `env:"EXTENDED_GALLERY" envDefault:"false"`
 	}
 	Database database.DatabaseConfig
 }

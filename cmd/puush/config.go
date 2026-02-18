@@ -49,6 +49,9 @@ REQUIRE_ACTIVATION=false
 
 # Setting this to 'true' will require an invitation key for registration
 REQUIRE_INVITATION=false
+
+# Enable extended gallery features, notably audio & video embeds
+EXTENDED_GALLERY=false
 `
 
 func CreateDefaultEnvironment() error {
