@@ -57,12 +57,12 @@ The following features have been implemented or are planned for the future:
 
 If you want to quickly try out go-puush without setting up a development environment:
 
-1. Go to the [GitHub Actions page](https://github.com/Lekuruu/go-puush/actions)
-2. Click on the latest successful workflow run
-3. Download the artifact for your platform
-4. Extract and run the binary
+1. Go to the [GitHub Releases page](https://github.com/Lekuruu/go-puush/releases)
+2. View the latest release
+3. Download the binary for your os
+4. Run the binary
 
-It will download all the required files off of GitHub automatically.
+It will download all the required assets off of GitHub automatically.
 
 ### Development Setup
 
