@@ -10,7 +10,7 @@ import (
 )
 
 func Register(ctx *app.Context) {
-	renderTemplate(ctx, "public/register", map[string]interface{}{
+	renderTemplate(ctx, "public/register", map[string]any{
 		"Title": "register",
 	})
 }

@@ -12,7 +12,7 @@ import (
 )
 
 func ResetPassword(ctx *app.Context) {
-	renderTemplate(ctx, "public/reset", map[string]interface{}{
+	renderTemplate(ctx, "public/reset", map[string]any{
 		"Title": "reset password",
 	})
 }
@@ -76,7 +76,7 @@ func ShowPasswordResetForm(ctx *app.Context) {
 		return
 	}
 
-	renderTemplate(ctx, "public/reset/password_select", map[string]interface{}{
+	renderTemplate(ctx, "public/reset/password_select", map[string]any{
 		"Title": "reset password",
 		"Key":   verification.Key,
 	})

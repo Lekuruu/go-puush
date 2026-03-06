@@ -59,7 +59,7 @@ func Account(ctx *app.Context) {
 		user.ViewType = database.ViewTypeList
 	}
 
-	renderTemplate(ctx, "account/home", map[string]interface{}{
+	renderTemplate(ctx, "account/home", map[string]any{
 		"Title":          "account",
 		"User":           user,
 		"Pagination":     pagination,
@@ -77,7 +77,7 @@ func AccountSettings(ctx *app.Context) {
 		return
 	}
 
-	renderTemplate(ctx, "account/settings", map[string]interface{}{
+	renderTemplate(ctx, "account/settings", map[string]any{
 		"Title": "account - settings",
 		"User":  user,
 	})
@@ -90,7 +90,7 @@ func AccountSubscription(ctx *app.Context) {
 		return
 	}
 
-	renderTemplate(ctx, "account/subscription", map[string]interface{}{
+	renderTemplate(ctx, "account/subscription", map[string]any{
 		"Title": "account - subscription history",
 		"User":  user,
 	})
@@ -103,7 +103,7 @@ func AccountGoPro(ctx *app.Context) {
 		return
 	}
 
-	renderTemplate(ctx, "account/pro", map[string]interface{}{
+	renderTemplate(ctx, "account/pro", map[string]any{
 		"Title": "go pro",
 		"User":  user,
 	})

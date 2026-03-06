@@ -60,7 +60,7 @@ func Gallery(ctx *app.Context) {
 		return
 	}
 
-	renderTemplate(ctx, "gallery", map[string]interface{}{
+	renderTemplate(ctx, "gallery", map[string]any{
 		"Title": "gallery",
 		"User":  user,
 		"Pool":  pool,

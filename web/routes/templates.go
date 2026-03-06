@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"log"
+	"maps"
 	"net/http"
 	"strings"
 
@@ -15,18 +16,16 @@ import (
 var templates *template.Template
 var printer = message.NewPrinter(language.English)
 
-func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]interface{}) {
+func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]any) {
 	ctx.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
 	ctx.Response.WriteHeader(http.StatusOK)
 
-	data := map[string]interface{}{
+	data := map[string]any{
 		"Config":  ctx.State.Config,
 		"Query":   ctx.Request.URL.Query(),
 		"Printer": printer,
 	}
-	for k, v := range pageData {
-		data[k] = v
-	}
+	maps.Copy(data, pageData)
 
 	err := templates.ExecuteTemplate(ctx.Response, tmpl, data)
 	if err != nil {
@@ -36,7 +35,7 @@ func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]interface
 }
 
 func renderErrorTemplate(title string, message string, ctx *app.Context) {
-	renderTemplate(ctx, "public/response", map[string]interface{}{
+	renderTemplate(ctx, "public/response", map[string]any{
 		"Title":           "error",
 		"ResponseTitle":   title,
 		"ResponseMessage": message,
@@ -44,7 +43,7 @@ func renderErrorTemplate(title string, message string, ctx *app.Context) {
 }
 
 func renderResponseTemplate(title string, message string, siteTitle string, ctx *app.Context) {
-	renderTemplate(ctx, "public/response", map[string]interface{}{
+	renderTemplate(ctx, "public/response", map[string]any{
 		"Title":           siteTitle,
 		"ResponseTitle":   title,
 		"ResponseMessage": message,

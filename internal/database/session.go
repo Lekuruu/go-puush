@@ -57,7 +57,7 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	var models = []interface{}{
+	var models = []any{
 		&User{},
 		&Upload{},
 		&Pool{},

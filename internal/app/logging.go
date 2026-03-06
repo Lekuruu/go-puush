@@ -19,12 +19,12 @@ func (l *Logger) Write(bs []byte) (int, error) {
 	return fmt.Print(logMessage)
 }
 
-func (l *Logger) Log(args ...interface{}) {
+func (l *Logger) Log(args ...any) {
 	logMessage := fmt.Sprint(args...)
 	l.Write([]byte(logMessage + "\n"))
 }
 
-func (l *Logger) Logf(format string, args ...interface{}) {
+func (l *Logger) Logf(format string, args ...any) {
 	logMessage := fmt.Sprintf(format, args...)
 	l.Write([]byte(logMessage + "\n"))
 }

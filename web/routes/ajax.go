@@ -51,7 +51,7 @@ func MoveDialog(ctx *app.Context) {
 		return
 	}
 
-	renderTemplate(ctx, "ajax/move", map[string]interface{}{
+	renderTemplate(ctx, "ajax/move", map[string]any{
 		"PoolThumbnails": poolThumbnails,
 		"TargetUploads":  targetUploads,
 		"User":           user,

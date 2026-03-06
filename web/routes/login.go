@@ -8,7 +8,7 @@ import (
 )
 
 func Login(ctx *app.Context) {
-	renderTemplate(ctx, "public/login", map[string]interface{}{
+	renderTemplate(ctx, "public/login", map[string]any{
 		"Title": "login",
 		"Retry": strings.Contains(ctx.Request.URL.Path, "retry"),
 		"Error": ctx.Request.URL.Query().Get("error"),
