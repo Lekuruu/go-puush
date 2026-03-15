@@ -22,16 +22,16 @@ func CreatePasswordHash(password string) (string, error) {
 }
 
 func VerifyPasswordHash(password string, hash string) bool {
-	if cached, exists := passwordCache[hash]; exists {
+	if cached, exists := passwordCache[password]; exists {
 		return cached
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	if err != nil {
-		passwordCache[hash] = false
+		passwordCache[password] = false
 		return false
 	}
 
-	passwordCache[hash] = true
+	passwordCache[password] = true
 	return true
 }
