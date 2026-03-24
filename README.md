@@ -32,6 +32,7 @@ The following features have been implemented or are planned for the future:
     - [x] Public pages (Home, Login, Register, About, ...)
     - [x] Account page(s)
     - [x] Gallery page
+    - [ ] Changelog page
     - [x] Login functionality
     - [x] Logout functionality
     - [x] Registration functionality
