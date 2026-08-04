@@ -98,7 +98,7 @@ func PuushUpload(ctx *app.Context) {
 
 	err = services.CreateUpload(upload, ctx.State)
 	if err != nil {
-		ctx.State.Logger.Logf("Failed to create upload: %v", err)
+		ctx.Logger.Error("Failed to create upload", "user_id", user.Id, "error", err)
 		WritePuushError(ctx, ServerError)
 		return
 	}
@@ -110,7 +110,7 @@ func PuushUpload(ctx *app.Context) {
 
 	err = ctx.State.Storage.SaveUploadStream(upload.Key(), teeReader)
 	if err != nil {
-		ctx.State.Logger.Logf("Failed to save upload stream: %v", err)
+		ctx.Logger.Error("Failed to save upload stream", "upload_id", upload.Id, "error", err)
 		services.DeleteUpload(upload, ctx.State)
 		WritePuushError(ctx, ServerError)
 		return
@@ -122,18 +122,18 @@ func PuushUpload(ctx *app.Context) {
 	upload.Checksum = hex.EncodeToString(hash.Sum(nil))
 	err = services.UpdateUploadChecksum(upload.Id, upload.Checksum, ctx.State)
 	if err != nil {
-		ctx.State.Logger.Logf("Failed to update upload checksum: %v", err)
+		ctx.Logger.Error("Failed to update upload checksum", "upload_id", upload.Id, "error", err)
 	}
 
 	user.DiskUsage += upload.Filesize
 	err = services.UpdateUserDiskUsage(user.Id, upload.Filesize, ctx.State)
 	if err != nil {
-		ctx.State.Logger.Logf("Failed to update user disk usage: %v", err)
+		ctx.Logger.Error("Failed to update user disk usage", "user_id", user.Id, "error", err)
 	}
 
 	err = services.UpdatePoolUploadCount(upload.Pool.Id, ctx.State)
 	if err != nil {
-		ctx.State.Logger.Logf("Failed to update pool upload count: %v", err)
+		ctx.Logger.Error("Failed to update pool upload count", "pool_id", upload.Pool.Id, "error", err)
 	}
 
 	uploadResponse := &UploadResponse{
@@ -150,7 +150,7 @@ func performPostUploadActions(upload *database.Upload, state *app.State) {
 
 	data, err := state.Storage.ReadUpload(upload.Key())
 	if err != nil {
-		state.Logger.Logf("Failed to read upload for post-upload actions: %v", err)
+		state.Logger.Error("Failed to read upload for post-upload actions", "upload_id", upload.Id, "error", err)
 		return
 	}
 

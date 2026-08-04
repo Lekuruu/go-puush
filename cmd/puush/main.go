@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -103,12 +102,13 @@ func EnsureWebFolder() {
 		if _, err := os.Stat(folder); !os.IsNotExist(err) {
 			continue
 		}
-		fmt.Printf("Required folder '%s' does not exist. Downloading from GitHub...\n", folder)
+		slog.Info("Required folder is missing; downloading it", "folder", folder)
 
 		// Download the folder from github
 		err := DownloadDirectory(folder)
 		if err != nil {
-			log.Fatalf("Failed to download required folder %s: %v", folder, err)
+			slog.Error("Failed to download required folder", "folder", folder, "error", err)
+			os.Exit(1)
 		}
 	}
 }
@@ -120,7 +120,8 @@ func init() {
 	// Create .env file if it doesn't exist
 	err := CreateDefaultEnvironment()
 	if err != nil {
-		log.Fatalf("Failed to create default .env file: %v", err)
+		slog.Error("Failed to create default environment file", "error", err)
+		os.Exit(1)
 	}
 }
 

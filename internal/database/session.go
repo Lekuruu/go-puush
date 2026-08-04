@@ -2,25 +2,12 @@ package database
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"time"
 
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
-	gormLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags),
-		logger.Config{
-			SlowThreshold:             500 * time.Millisecond,
-			LogLevel:                  logger.Warn,
-			IgnoreRecordNotFoundError: true,
-			Colorful:                  true,
-		},
-	)
-
 	// Build DSN with configurable parameters
 	journalMode := config.JournalMode
 	if !config.EnableWAL {
@@ -29,7 +16,7 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 	dsn := buildDatabaseDSN(config, journalMode)
 
 	db, err := gorm.Open(openDatabase(dsn), &gorm.Config{
-		Logger: gormLogger,
+		Logger: NewGormLogger(),
 	})
 	if err != nil {
 		return nil, err

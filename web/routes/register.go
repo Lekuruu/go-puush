@@ -60,10 +60,7 @@ func PerformRegistration(ctx *app.Context) {
 		return
 	}
 
-	ctx.State.Logger.Logf(
-		"New user registered: %s (%d)",
-		user.Email, user.Id,
-	)
+	ctx.Logger.Info("New user registered", "user_id", user.Id)
 
 	// Write wal contents to disk after registration, if enabled
 	ctx.State.ExecuteWalCheckpoint()
@@ -119,14 +116,14 @@ const emailVerificationExpiry = time.Hour * 24 * 7
 func createAndSendActivationEmail(user *database.User, state *app.State) {
 	verification, err := services.CreateEmailVerification(&user.Id, database.EmailVerificationActionActivate, emailVerificationExpiry, state)
 	if err != nil {
-		state.Logger.Logf("Failed to create email verification for user %d: %v", user.Id, err)
+		state.Logger.Error("Failed to create email verification", "user_id", user.Id, "error", err)
 		return
 	}
 
 	message := email.FormatActivationEmail(user.Email, verification.Key, state.Config.Service.Url)
 	err = state.Email.Send(message)
 	if err != nil {
-		state.Logger.Logf("Failed to send account activation email to user %d: %v", user.Id, err)
+		state.Logger.Error("Failed to send account activation email", "user_id", user.Id, "error", err)
 		return
 	}
 }
@@ -135,6 +132,6 @@ func sendWelcomeEmail(user *database.User, state *app.State) {
 	message := email.FormatWelcomeEmail(user.Email)
 	err := state.Email.Send(message)
 	if err != nil {
-		state.Logger.Logf("Failed to send welcome email to user %d: %v", user.Id, err)
+		state.Logger.Error("Failed to send welcome email", "user_id", user.Id, "error", err)
 	}
 }

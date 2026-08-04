@@ -3,9 +3,10 @@ package routes
 import (
 	"encoding/json"
 	"html/template"
-	"log"
+	"log/slog"
 	"maps"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/Lekuruu/go-puush/internal/app"
@@ -30,7 +31,7 @@ func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]any) {
 	err := templates.ExecuteTemplate(ctx.Response, tmpl, data)
 	if err != nil {
 		http.Error(ctx.Response, "Internal server error", http.StatusInternalServerError)
-		ctx.State.Logger.Logf("Template execution error: %v", err)
+		ctx.Logger.Error("Failed to execute template", "template", tmpl, "error", err)
 	}
 }
 
@@ -67,7 +68,7 @@ func renderJson(status int, object any, ctx *app.Context) {
 	ctx.Response.WriteHeader(status)
 	err := json.NewEncoder(ctx.Response).Encode(object)
 	if err != nil {
-		ctx.State.Logger.Logf("JSON marshal error: %v", err)
+		ctx.Logger.Error("Failed to encode JSON response", "path", ctx.Request.URL.Path, "error", err)
 	}
 }
 
@@ -104,6 +105,7 @@ func InitializeTemplates() {
 	var err error
 	templates, err = template.New("").Funcs(funcs).ParseGlob("web/templates/**/*.html")
 	if err != nil {
-		log.Fatalf("Failed to parse templates: %v", err)
+		slog.Error("Failed to parse templates", "error", err)
+		os.Exit(1)
 	}
 }

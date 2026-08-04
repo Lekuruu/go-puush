@@ -66,7 +66,7 @@ func ShowPasswordResetForm(ctx *app.Context) {
 		ctx.State,
 	)
 	if err != nil {
-		ctx.State.Logger.Logf("Failed to validate password reset key %s: %v", key, err)
+		ctx.Logger.Error("Failed to validate password reset key", "error", err)
 		renderErrorTemplate("Uh-oh! Something went wrong.", "Please try requesting a new password reset link.", ctx)
 		return
 	}
@@ -114,26 +114,26 @@ func PerformPasswordReset(ctx *app.Context) {
 		"User",
 	)
 	if err != nil {
-		ctx.State.Logger.Logf("Failed to validate password reset key %s: %v", key, err)
+		ctx.Logger.Error("Failed to validate password reset key", "error", err)
 		renderErrorTemplate("Uh-oh! Something went wrong.", "Please try requesting a new password reset link.", ctx)
 		return
 	}
 
 	newPasswordHash, err := app.CreatePasswordHash(password)
 	if err != nil {
-		ctx.State.Logger.Logf("Failed to hash new password for user %d: %v", verification.User.Id, err)
+		ctx.Logger.Error("Failed to hash new password", "user_id", verification.User.Id, "error", err)
 		renderErrorTemplate("Uh-oh! Something went wrong.", "Please try again later.", ctx)
 		return
 	}
 
 	if err := services.UpdateUserPassword(verification.User.Id, newPasswordHash, ctx.State); err != nil {
-		ctx.State.Logger.Logf("Failed to update password for user %d: %v", verification.User.Id, err)
+		ctx.Logger.Error("Failed to update password", "user_id", verification.User.Id, "error", err)
 		renderErrorTemplate("Uh-oh! Something went wrong.", "Please try again later.", ctx)
 		return
 	}
 
 	if err := services.DeleteEmailVerificationById(verification.Id, ctx.State); err != nil {
-		ctx.State.Logger.Logf("Failed to delete password reset verification %d: %v", verification.Id, err)
+		ctx.Logger.Error("Failed to delete password reset verification", "verification_id", verification.Id, "error", err)
 	}
 
 	// Write wal contents to disk, if enabled
@@ -152,12 +152,12 @@ const passwordResetVerificationExpiry = time.Hour
 func createAndSendPasswordResetEmail(user *database.User, state *app.State) {
 	verification, err := services.CreateEmailVerification(&user.Id, database.EmailVerificationActionResetPassword, passwordResetVerificationExpiry, state)
 	if err != nil {
-		state.Logger.Logf("Failed to create password reset verification for user %d: %v", user.Id, err)
+		state.Logger.Error("Failed to create password reset verification", "user_id", user.Id, "error", err)
 		return
 	}
 
 	message := email.FormatPasswordResetEmail(user.Email, verification.Key, state.Config.Service.Url)
 	if err := state.Email.Send(message); err != nil {
-		state.Logger.Logf("Failed to send password reset email to user %d: %v", user.Id, err)
+		state.Logger.Error("Failed to send password reset email", "user_id", user.Id, "error", err)
 	}
 }
