@@ -33,6 +33,9 @@ func (state *State) Close() {
 	if state.Database == nil {
 		return
 	}
+	if err := state.Database.Exec("PRAGMA optimize;").Error; err != nil && state.Logger != nil {
+		state.Logger.Logf("Failed to optimize database: %v", err)
+	}
 	state.ExecuteWalCheckpoint()
 	db, err := state.Database.DB()
 	if err != nil {
