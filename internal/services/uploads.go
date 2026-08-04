@@ -5,6 +5,7 @@ import (
 
 	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"gorm.io/gorm"
 )
 
 func CreateUpload(upload *database.Upload, state *app.State) error {
@@ -162,46 +163,17 @@ func UpdateUploadChecksum(uploadId int, checksum string, state *app.State) error
 }
 
 func UpdatePoolUploadCount(poolId int, state *app.State) error {
-	count, err := FetchPoolUploadCount(poolId, state)
-	if err != nil {
-		return err
-	}
-
-	pool := &database.Pool{}
-	result := state.Database.First(pool, poolId)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	pool.UploadCount = int(count)
-	err = UpdatePool(pool, state)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	result := state.Database.Model(&database.Pool{}).
+		Where("id = ?", poolId).
+		UpdateColumn("upload_count", gorm.Expr("(SELECT COUNT(*) FROM uploads WHERE uploads.pool_id = pools.id)"))
+	return result.Error
 }
 
 func UpdatePoolUploadCounts(user *database.User, state *app.State) error {
-	var pools []*database.Pool
-	result := state.Database.Where("user_id = ?", user.Id).Find(&pools)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	for _, pool := range pools {
-		count, err := FetchPoolUploadCount(pool.Id, state)
-		if err != nil {
-			return err
-		}
-		pool.UploadCount = int(count)
-		err = UpdatePool(pool, state)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	result := state.Database.Model(&database.Pool{}).
+		Where("user_id = ?", user.Id).
+		UpdateColumn("upload_count", gorm.Expr("(SELECT COUNT(*) FROM uploads WHERE uploads.pool_id = pools.id)"))
+	return result.Error
 }
 
 func DeleteUpload(upload *database.Upload, state *app.State) error {
