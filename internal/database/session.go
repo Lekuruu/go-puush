@@ -56,12 +56,6 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 	if err := applyPerformanceSettings(db, config); err != nil {
 		return nil, err
 	}
-	if err := repairLegacyForeignKeyViolations(db); err != nil {
-		return nil, err
-	}
-	if err := validateUniqueUploadIdentifiers(db); err != nil {
-		return nil, err
-	}
 
 	var models = []any{
 		&User{},
@@ -74,9 +68,6 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 
 	err = db.AutoMigrate(models...)
 	if err != nil {
-		return nil, err
-	}
-	if err := dropObsoleteIndexes(db); err != nil {
 		return nil, err
 	}
 	if err := db.Exec("PRAGMA optimize=0x10002;").Error; err != nil {
