@@ -22,6 +22,7 @@ func buildDatabaseDSN(config DatabaseConfig, journalMode string) string {
 	options.Set("cache", config.CacheMode)
 	options.Set("_time_format", "sqlite")
 	options.Add("_pragma", fmt.Sprintf("busy_timeout(%d)", config.BusyTimeout))
+	options.Add("_pragma", "foreign_keys(ON)")
 	options.Add("_pragma", fmt.Sprintf("journal_mode(%s)", journalMode))
 	options.Add("_pragma", fmt.Sprintf("synchronous(%s)", config.Synchronous))
 	options.Add("_pragma", fmt.Sprintf("cache_size(%d)", config.CacheSize))

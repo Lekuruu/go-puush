@@ -22,6 +22,7 @@ func buildDatabaseDSN(config DatabaseConfig, journalMode string) string {
 	options := url.Values{}
 	options.Set("_journal_mode", journalMode)
 	options.Set("_busy_timeout", strconv.Itoa(config.BusyTimeout))
+	options.Set("_foreign_keys", "on")
 	options.Set("_synchronous", config.Synchronous)
 	options.Set("_cache_size", strconv.Itoa(config.CacheSize))
 	options.Set("cache", config.CacheMode)
