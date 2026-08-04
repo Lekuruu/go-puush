@@ -41,6 +41,13 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 		return nil, err
 	}
 
+	success := false
+	defer func() {
+		if !success {
+			sqlDB.Close()
+		}
+	}()
+
 	sqlDB.SetMaxOpenConns(config.MaxOpenConns)
 	sqlDB.SetMaxIdleConns(config.MaxIdleConns)
 	sqlDB.SetConnMaxLifetime(time.Duration(config.ConnMaxLifetime) * time.Second)
@@ -63,7 +70,11 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err := db.Exec("PRAGMA optimize=0x10002;").Error; err != nil {
+		return nil, err
+	}
 
+	success = true
 	return db, nil
 }
 
