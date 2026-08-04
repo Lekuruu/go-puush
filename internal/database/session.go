@@ -26,14 +26,7 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 	if !config.EnableWAL {
 		journalMode = "DELETE"
 	}
-
-	dsn := fmt.Sprintf("%s?_journal_mode=%s&_busy_timeout=%d&_synchronous=%s&cache=%s&_time_format=sqlite&_loc=auto",
-		config.Path,
-		journalMode,
-		config.BusyTimeout,
-		config.Synchronous,
-		config.CacheMode,
-	)
+	dsn := buildDatabaseDSN(config, journalMode)
 
 	db, err := gorm.Open(openDatabase(dsn), &gorm.Config{
 		Logger: gormLogger,
