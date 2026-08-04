@@ -23,7 +23,7 @@ type User struct {
 	DiskUsage             int64       `gorm:"default:0;not null"`
 	ViewType              ViewType    `gorm:"size:16;default:'list';not null"`
 	SubscriptionEnd       *time.Time  `gorm:"default:NULL"`
-	DefaultPoolId         int         `gorm:"default:NULL"`
+	DefaultPoolId         int         `gorm:"default:NULL;index:idx_users_default_pool_id"`
 	UsernameSetupReminder bool        `gorm:"default:true;not null"`
 
 	DefaultPool *Pool     `gorm:"foreignKey:DefaultPoolId;constraint:OnDelete:SET NULL"`
@@ -61,7 +61,7 @@ type Upload struct {
 	Id         int       `gorm:"primaryKey;autoIncrement;not null;index:idx_uploads_pool_created_at,priority:3,sort:desc;index:idx_uploads_user_created_at,priority:3,sort:desc"`
 	UserId     int       `gorm:"not null;index:idx_uploads_user_created_at,priority:1;index:idx_uploads_user_checksum,priority:1"`
 	PoolId     int       `gorm:"not null;index:idx_uploads_pool_created_at,priority:1;index:idx_uploads_pool_filename,priority:1"`
-	Identifier string    `gorm:"size:16;not null;index"`
+	Identifier string    `gorm:"size:16;not null;uniqueIndex:idx_uploads_identifier_unique"`
 	Filename   string    `gorm:"size:256;not null;index:idx_uploads_pool_filename,priority:2"`
 	Filesize   int64     `gorm:"not null"`
 	Checksum   string    `gorm:"size:32;not null;index:idx_uploads_user_checksum,priority:2"`
@@ -181,7 +181,7 @@ func formatBytes(bytes int64) string {
 
 type InvitationKey struct {
 	Id        int        `gorm:"primaryKey;autoIncrement;not null"`
-	Key       string     `gorm:"size:16;not null;unique;index"`
+	Key       string     `gorm:"size:16;not null;unique"`
 	CreatedAt time.Time  `gorm:"not null;CURRENT_TIMESTAMP"`
 	ExpiresAt *time.Time `gorm:"default:NULL"`
 }
@@ -195,9 +195,9 @@ func (key *InvitationKey) IsExpired() bool {
 
 type EmailVerification struct {
 	Id        int                     `gorm:"primaryKey;autoIncrement;not null"`
-	Key       string                  `gorm:"size:32;not null;unique;index"`
+	Key       string                  `gorm:"size:32;not null;unique"`
 	Action    EmailVerificationAction `gorm:"size:32;not null"`
-	UserId    *int                    `gorm:"default:NULL"`
+	UserId    *int                    `gorm:"default:NULL;index:idx_email_verifications_user_id"`
 	CreatedAt time.Time               `gorm:"not null;CURRENT_TIMESTAMP"`
 	ExpiresAt *time.Time              `gorm:"default:NULL"`
 
