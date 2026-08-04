@@ -12,7 +12,7 @@ import (
 
 type User struct {
 	Id                    int         `gorm:"primaryKey;autoIncrement;not null"`
-	Name                  string      `gorm:"size:16;not null"`
+	Name                  string      `gorm:"size:16;not null;index:idx_users_name"`
 	Email                 string      `gorm:"size:256;not null;unique"`
 	Password              string      `gorm:"size:60;not null"`
 	CreatedAt             time.Time   `gorm:"not null;CURRENT_TIMESTAMP"`
@@ -58,14 +58,14 @@ func (user *User) RequiresUsernameSetup() bool {
 }
 
 type Upload struct {
-	Id         int       `gorm:"primaryKey;autoIncrement;not null"`
-	UserId     int       `gorm:"not null"`
-	PoolId     int       `gorm:"not null"`
+	Id         int       `gorm:"primaryKey;autoIncrement;not null;index:idx_uploads_pool_created_at,priority:3,sort:desc;index:idx_uploads_user_created_at,priority:3,sort:desc"`
+	UserId     int       `gorm:"not null;index:idx_uploads_user_created_at,priority:1;index:idx_uploads_user_checksum,priority:1"`
+	PoolId     int       `gorm:"not null;index:idx_uploads_pool_created_at,priority:1;index:idx_uploads_pool_filename,priority:1"`
 	Identifier string    `gorm:"size:16;not null;index"`
-	Filename   string    `gorm:"size:256;not null"`
+	Filename   string    `gorm:"size:256;not null;index:idx_uploads_pool_filename,priority:2"`
 	Filesize   int64     `gorm:"not null"`
-	Checksum   string    `gorm:"size:32;not null"`
-	CreatedAt  time.Time `gorm:"not null;CURRENT_TIMESTAMP"`
+	Checksum   string    `gorm:"size:32;not null;index:idx_uploads_user_checksum,priority:2"`
+	CreatedAt  time.Time `gorm:"not null;CURRENT_TIMESTAMP;index:idx_uploads_pool_created_at,priority:2,sort:desc;index:idx_uploads_user_created_at,priority:2,sort:desc"`
 	Views      int       `gorm:"default:0;not null"`
 	MimeType   string    `gorm:"size:64;default:''"`
 
@@ -117,8 +117,8 @@ func (upload *Upload) UrlEncoded() string {
 
 type Pool struct {
 	Id          int       `gorm:"primaryKey;autoIncrement;not null"`
-	UserId      int       `gorm:"not null;index"`
-	Name        string    `gorm:"size:32;not null"`
+	UserId      int       `gorm:"not null;index;index:idx_pools_user_name,priority:1"`
+	Name        string    `gorm:"size:32;not null;index:idx_pools_user_name,priority:2"`
 	Identifier  string    `gorm:"size:8;not null;unique"`
 	Password    *string   `gorm:"size:32;default:NULL"`
 	Type        PoolType  `gorm:"not null"`

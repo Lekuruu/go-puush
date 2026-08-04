@@ -28,13 +28,13 @@ func FetchUploadById(id int, state *app.State, preload ...string) (*database.Upl
 	return upload, nil
 }
 
-func FetchUploadByChecksum(checksum string, state *app.State, preload ...string) (*database.Upload, error) {
+func FetchUploadByChecksumForUser(userId int, checksum string, state *app.State, preload ...string) (*database.Upload, error) {
 	if checksum == "" {
 		return nil, errors.New("checksum is empty")
 	}
 
 	upload := &database.Upload{}
-	query := preloadQuery(state, preload).Where("checksum = ?", checksum)
+	query := preloadQuery(state, preload).Where("user_id = ? AND checksum = ?", userId, checksum)
 	result := query.First(upload)
 
 	if result.Error != nil {
@@ -46,7 +46,7 @@ func FetchUploadByChecksum(checksum string, state *app.State, preload ...string)
 
 func FetchRecentUploadsByUser(user *database.User, state *app.State, limit int, preload ...string) ([]*database.Upload, error) {
 	var uploads []*database.Upload
-	query := preloadQuery(state, preload).Where("user_id = ?", user.Id).Order("created_at DESC").Limit(limit)
+	query := preloadQuery(state, preload).Where("user_id = ?", user.Id).Order("created_at DESC, id DESC").Limit(limit)
 	result := query.Find(&uploads)
 
 	if result.Error != nil {
@@ -58,7 +58,7 @@ func FetchRecentUploadsByUser(user *database.User, state *app.State, limit int, 
 
 func FetchLastPoolUpload(poolId int, state *app.State, preload ...string) (*database.Upload, error) {
 	upload := &database.Upload{}
-	query := preloadQuery(state, preload).Where("pool_id = ?", poolId).Order("created_at DESC")
+	query := preloadQuery(state, preload).Where("pool_id = ?", poolId).Order("created_at DESC, id DESC")
 	result := query.First(upload)
 
 	if result.Error != nil {
@@ -84,7 +84,7 @@ func FetchUploadsByPool(poolId int, offset int, limit int, state *app.State, pre
 	var uploads []*database.Upload
 	query := preloadQuery(state, preload).
 		Where("pool_id = ?", poolId).
-		Order("created_at DESC").
+		Order("created_at DESC, id DESC").
 		Offset(offset).
 		Limit(limit)
 	result := query.Find(&uploads)
@@ -111,7 +111,7 @@ func SearchUploadsFromPool(queryStr string, poolId int, offset int, limit int, s
 	var uploads []*database.Upload
 	query := preloadQuery(state, preload).Where("pool_id = ?", poolId).
 		Where("filename LIKE ?", "%"+queryStr+"%").
-		Order("created_at DESC").
+		Order("created_at DESC, id DESC").
 		Offset(offset).
 		Limit(limit)
 	result := query.Find(&uploads)
