@@ -1,6 +1,8 @@
 package cdn
 
 import (
+	"errors"
+	"io/fs"
 	"path/filepath"
 	"strings"
 	"time"
@@ -40,6 +42,11 @@ func Upload(ctx *app.Context) {
 
 	stream, err := ctx.State.Storage.ReadUploadStream(upload.Key())
 	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			ctx.Logger.Warn("Upload asset is missing from storage", "upload_id", upload.Id, "error", err)
+		} else {
+			ctx.Logger.Error("Failed to open upload asset", "upload_id", upload.Id, "error", err)
+		}
 		// TODO: Original file was not found, queue for deletion
 		WriteResponse(404, "That puush could not be found.", ctx)
 		return

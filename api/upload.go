@@ -154,7 +154,14 @@ func performPostUploadActions(upload *database.Upload, state *app.State) {
 		return
 	}
 
-	CreateThumbnailFromUpload(upload, data, state)
+	if _, err := CreateThumbnailFromUpload(upload, data, state); err != nil {
+		state.Logger.Error(
+			"Failed to create upload thumbnail",
+			"upload_id", upload.Id,
+			"mime_type", upload.MimeType,
+			"error", err,
+		)
+	}
 }
 
 type UploadRequest struct {

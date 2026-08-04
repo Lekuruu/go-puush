@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"errors"
+	"io/fs"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -144,6 +146,7 @@ func DeleteUpload(ctx *app.Context) {
 
 	targetUploads, err := resolveTargetUploadsFromForm(ctx)
 	if err != nil {
+		ctx.Logger.Error("Failed to resolve uploads for deletion", "user_id", user.Id, "error", err)
 		renderText(500, "Server error", ctx)
 		return
 	}
@@ -160,16 +163,21 @@ func DeleteUpload(ctx *app.Context) {
 
 		err = services.DeleteUpload(upload, ctx.State)
 		if err != nil {
+			ctx.Logger.Error("Failed to delete upload record", "user_id", user.Id, "upload_id", upload.Id, "error", err)
 			renderText(500, "Server error", ctx)
 			return
 		}
 
-		// Remove assets from storage, do nothing on error
-		ctx.State.Storage.RemoveThumbnail(upload.Key())
-		ctx.State.Storage.RemoveUpload(upload.Key())
+		if err := ctx.State.Storage.RemoveThumbnail(upload.Key()); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			ctx.Logger.Warn("Failed to remove upload thumbnail", "user_id", user.Id, "upload_id", upload.Id, "error", err)
+		}
+		if err := ctx.State.Storage.RemoveUpload(upload.Key()); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			ctx.Logger.Warn("Failed to remove upload from storage", "user_id", user.Id, "upload_id", upload.Id, "error", err)
+		}
 
 		err = services.UpdateUserDiskUsage(user.Id, -upload.Filesize, ctx.State)
 		if err != nil {
+			ctx.Logger.Error("Failed to update disk usage after upload deletion", "user_id", user.Id, "upload_id", upload.Id, "error", err)
 			renderText(500, "Server error", ctx)
 			return
 		}
@@ -177,6 +185,7 @@ func DeleteUpload(ctx *app.Context) {
 
 	err = services.UpdatePoolUploadCounts(user, ctx.State)
 	if err != nil {
+		ctx.Logger.Error("Failed to update pool counts after upload deletion", "user_id", user.Id, "error", err)
 		renderText(500, "Server error", ctx)
 		return
 	}

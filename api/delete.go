@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"io/fs"
 	"net/http"
 	"strconv"
 
@@ -26,6 +27,7 @@ func PuushDelete(ctx *app.Context) {
 
 	upload, err := services.FetchUploadById(request.UploadId, ctx.State, "Pool")
 	if err != nil {
+		ctx.Logger.Error("Failed to fetch upload for deletion", "user_id", user.Id, "upload_id", request.UploadId, "error", err)
 		WritePuushError(ctx, ServerError)
 		return
 	}
@@ -35,12 +37,14 @@ func PuushDelete(ctx *app.Context) {
 		return
 	}
 
-	// Remove thumbnail if it exists, do nothing on error
-	ctx.State.Storage.RemoveThumbnail(upload.Key())
+	if err := ctx.State.Storage.RemoveThumbnail(upload.Key()); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		ctx.Logger.Warn("Failed to remove upload thumbnail", "user_id", user.Id, "upload_id", upload.Id, "error", err)
+	}
 
 	// Remove the upload from storage
 	err = ctx.State.Storage.RemoveUpload(upload.Key())
 	if err != nil {
+		ctx.Logger.Error("Failed to remove upload from storage", "user_id", user.Id, "upload_id", upload.Id, "error", err)
 		WritePuushError(ctx, ServerError)
 		return
 	}
@@ -48,6 +52,7 @@ func PuushDelete(ctx *app.Context) {
 	// Remove the upload from the database
 	err = services.DeleteUpload(upload, ctx.State)
 	if err != nil {
+		ctx.Logger.Error("Failed to delete upload record", "user_id", user.Id, "upload_id", upload.Id, "error", err)
 		WritePuushError(ctx, ServerError)
 		return
 	}
@@ -55,6 +60,7 @@ func PuushDelete(ctx *app.Context) {
 	// Update disk usage for user
 	err = services.UpdateUserDiskUsage(user.Id, -upload.Filesize, ctx.State)
 	if err != nil {
+		ctx.Logger.Error("Failed to update disk usage after upload deletion", "user_id", user.Id, "upload_id", upload.Id, "error", err)
 		WritePuushError(ctx, ServerError)
 		return
 	}
@@ -62,12 +68,14 @@ func PuushDelete(ctx *app.Context) {
 	// Update pool upload count
 	err = services.UpdatePoolUploadCount(upload.Pool.Id, ctx.State)
 	if err != nil {
+		ctx.Logger.Error("Failed to update pool count after upload deletion", "user_id", user.Id, "upload_id", upload.Id, "pool_id", upload.Pool.Id, "error", err)
 		WritePuushError(ctx, ServerError)
 		return
 	}
 
 	recentUploads, err := services.FetchRecentUploadsByUser(user, ctx.State, 5, "Pool")
 	if err != nil {
+		ctx.Logger.Error("Failed to fetch upload history after deletion", "user_id", user.Id, "upload_id", upload.Id, "error", err)
 		WritePuushError(ctx, ServerError)
 		return
 	}
