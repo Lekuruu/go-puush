@@ -13,7 +13,7 @@ type DatabaseConfig struct {
 	BusyTimeout int    `env:"DB_BUSY_TIMEOUT" envDefault:"5000"`  // milliseconds
 	JournalMode string `env:"DB_JOURNAL_MODE" envDefault:"WAL"`   // WAL, DELETE, TRUNCATE, PERSIST, MEMORY, OFF
 	Synchronous string `env:"DB_SYNCHRONOUS" envDefault:"NORMAL"` // OFF, NORMAL, FULL, EXTRA
-	CacheMode   string `env:"DB_CACHE_MODE" envDefault:"shared"`  // shared, private
+	CacheMode   string `env:"DB_CACHE_MODE" envDefault:"private"` // shared, private
 
 	// Performance Tuning
 	CacheSize         int  `env:"DB_CACHE_SIZE" envDefault:"-2000"` // negative = KB, positive = pages
