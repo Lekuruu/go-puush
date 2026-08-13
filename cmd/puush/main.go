@@ -37,6 +37,7 @@ func InitializeWebRoutes(server *app.Server) {
 	server.Router.HandleFunc("/faq", server.ContextMiddleware(routes.Faq)).Methods("GET")
 	server.Router.HandleFunc("/about", server.ContextMiddleware(routes.About)).Methods("GET")
 	server.Router.HandleFunc("/register", server.ContextMiddleware(routes.Register)).Methods("GET")
+	server.Router.HandleFunc("/register/", server.ContextMiddleware(routes.Register)).Methods("GET")
 	server.Router.HandleFunc("/register/go", server.ContextMiddleware(routes.PerformRegistration)).Methods("POST")
 	server.Router.HandleFunc("/register/verify", server.ContextMiddleware(routes.PerformActivation)).Methods("GET")
 	server.Router.HandleFunc("/reset_password", server.ContextMiddleware(routes.ResetPassword)).Methods("GET")
