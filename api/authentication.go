@@ -7,14 +7,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/server"
 )
 
 // /api/auth handles user authentication for the puush api service.
 // It supports both password & api key authentication and returns
 // the user's account type, api key, disk usage, and subscription expiry.
-func PuushAuthentication(ctx *app.Context) {
+func PuushAuthentication(ctx *server.Context) {
 	request, err := NewAuthenticationRequest(ctx.Request)
 	if err != nil {
 		WritePuushError(ctx, RequestError)

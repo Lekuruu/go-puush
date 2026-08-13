@@ -7,18 +7,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/caching"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
 // This will limit the view count increase to once per minute per IP
-var uploadViewCooldowns = app.NewCooldownManagerWithCleanup(time.Minute, 5*time.Minute)
+var uploadViewCooldowns = caching.NewCooldownManagerWithCleanup(time.Minute, 5*time.Minute)
 
-func Upload(ctx *app.Context) {
-	poolIdentifier := ctx.Vars["pool"]
-	poolPassword := ctx.Vars["password"]
-	identifier := ctx.Vars["identifier"]
+func Upload(ctx *server.Context) {
+	poolIdentifier := ctx.PathValue("pool")
+	poolPassword := ctx.PathValue("password")
+	identifier := ctx.PathValue("identifier")
 
 	// Remove .<extension> from identifier if present
 	fileExtension := filepath.Ext(identifier)

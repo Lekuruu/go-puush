@@ -3,19 +3,24 @@ package services
 import (
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/authentication"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/state"
 	"gorm.io/gorm"
 )
 
 const invitationKeyLength = 16
 
-func CreateInvitationKey(expiry time.Duration, state *app.State) (*database.InvitationKey, error) {
+func CreateInvitationKey(expiry time.Duration, state *state.State) (*database.InvitationKey, error) {
 	creationTime := time.Now()
 	expiryTime := creationTime.Add(expiry)
+	key, err := authentication.GenerateToken(invitationKeyLength)
+	if err != nil {
+		return nil, err
+	}
 
 	invitationKey := &database.InvitationKey{
-		Key:       app.RandomString(invitationKeyLength),
+		Key:       key,
 		CreatedAt: creationTime,
 		ExpiresAt: &expiryTime,
 	}
@@ -28,7 +33,7 @@ func CreateInvitationKey(expiry time.Duration, state *app.State) (*database.Invi
 	return invitationKey, nil
 }
 
-func IsValidInvitationKey(key string, state *app.State) (bool, error) {
+func IsValidInvitationKey(key string, state *state.State) (bool, error) {
 	invitationKey := &database.InvitationKey{}
 	result := state.Database.Where("key = ?", key).First(invitationKey)
 
@@ -46,7 +51,7 @@ func IsValidInvitationKey(key string, state *app.State) (bool, error) {
 	return true, nil
 }
 
-func DeleteInvitationKey(key string, state *app.State) error {
+func DeleteInvitationKey(key string, state *state.State) error {
 	result := state.Database.Where("key = ?", key).Delete(&database.InvitationKey{})
 
 	if result.Error != nil {

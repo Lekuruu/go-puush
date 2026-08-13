@@ -4,11 +4,11 @@ import (
 	"bytes"
 
 	ffmpeg "github.com/Lekuruu/ffmpeg-go"
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/state"
 	"github.com/prplecake/go-thumbnail"
 )
 
-func CreateThumbnail(key string, data []byte, state *app.State) ([]byte, error) {
+func CreateThumbnail(key string, data []byte, state *state.State) ([]byte, error) {
 	generator := thumbnail.NewGenerator(thumbnail.Generator{})
 	generator.Scaler = "CatmullRom"
 	generator.Height = 100
@@ -32,7 +32,7 @@ func CreateThumbnail(key string, data []byte, state *app.State) ([]byte, error) 
 	return thumbnailData, nil
 }
 
-func CreateThumbnailFromVideo(key string, data []byte, mimeType string, state *app.State) ([]byte, error) {
+func CreateThumbnailFromVideo(key string, data []byte, mimeType string, state *state.State) ([]byte, error) {
 	// Use ffmpeg to extract a frame from the video data
 	// Here we extract the frame at 1 second into the video
 	frameStream := ffmpeg.Input("pipe:").
@@ -49,6 +49,6 @@ func CreateThumbnailFromVideo(key string, data []byte, mimeType string, state *a
 	return CreateThumbnail(key, outputBuf.Bytes(), state)
 }
 
-func DeleteThumbnail(key string, state *app.State) error {
+func DeleteThumbnail(key string, state *state.State) error {
 	return state.Storage.RemoveThumbnail(key)
 }

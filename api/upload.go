@@ -12,14 +12,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
+	"github.com/Lekuruu/go-puush/internal/state"
 	"github.com/gabriel-vasile/mimetype"
 )
 
 // /api/up is the main endpoint for uploading files to the puush service.
-func PuushUpload(ctx *app.Context) {
+func PuushUpload(ctx *server.Context) {
 	request, err := NewUploadRequest(ctx.Request)
 	if err != nil {
 		WritePuushError(ctx, RequestError)
@@ -143,7 +144,7 @@ func PuushUpload(ctx *app.Context) {
 	WritePuushResponse(ctx, uploadResponse)
 }
 
-func performPostUploadActions(upload *database.Upload, state *app.State) {
+func performPostUploadActions(upload *database.Upload, state *state.State) {
 	if !upload.IsImage() && !upload.IsVideo() {
 		return
 	}
@@ -186,18 +187,18 @@ func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
 		return nil, err
 	}
 
-	key := app.GetMultipartFormValue(request, "k")
+	key := multipartFormValue(request, "k")
 	if key == "" {
 		return nil, errors.New("missing api key")
 	}
 
-	file := app.GetMultipartFormFile(request, "f")
+	file := multipartFormFile(request, "f")
 	if file == nil {
 		return nil, errors.New("missing file")
 	}
 
 	// This argument is optional (ShareX doesn't provide it)
-	fileChecksum := app.GetMultipartFormValue(request, "c")
+	fileChecksum := multipartFormValue(request, "c")
 
 	fileName := file.Filename
 	fileStream, err := file.Open()
@@ -223,6 +224,22 @@ func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
 		FileSize:     file.Size,
 		File:         fileStream,
 	}, nil
+}
+
+func multipartFormValue(request *http.Request, key string) string {
+	values := request.MultipartForm.Value[key]
+	if len(values) == 0 {
+		return ""
+	}
+	return values[0]
+}
+
+func multipartFormFile(request *http.Request, key string) *multipart.FileHeader {
+	files := request.MultipartForm.File[key]
+	if len(files) == 0 {
+		return nil
+	}
+	return files[0]
 }
 
 type UploadResponse struct {

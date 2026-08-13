@@ -6,42 +6,24 @@ import (
 	"fmt"
 	"net/smtp"
 
-	"github.com/caarlos0/env/v11"
+	"github.com/Lekuruu/go-puush/internal/config"
 )
-
-// SMTPConfig describes the configuration required for SMTP delivery
-type SMTPConfig struct {
-	From          string `env:"EMAIL_FROM"`
-	Host          string `env:"SMTP_HOST"`
-	Port          int    `env:"SMTP_PORT" envDefault:"587"`
-	Username      string `env:"SMTP_USERNAME"`
-	Password      string `env:"SMTP_PASSWORD"`
-	EnableTLS     bool   `env:"SMTP_ENABLE_TLS" envDefault:"true"`
-	SkipTLSVerify bool   `env:"SMTP_SKIP_TLS_VERIFY" envDefault:"false"`
-}
-
-func LoadSMTPConfig() (*SMTPConfig, error) {
-	var config SMTPConfig
-	if err := env.Parse(&config); err != nil {
-		return nil, err
-	}
-	return &config, nil
-}
 
 // SMTPEmail delivers messages using an SMTP server
 type SMTPEmail struct {
-	config *SMTPConfig
+	from   string
+	config config.SMTPConfig
 	auth   smtp.Auth
 }
 
 // NewSMTPEmail constructs an SMTP-backed email sender
-func NewSMTPEmail(config *SMTPConfig) Email {
-	return &SMTPEmail{config: config}
+func NewSMTPEmail(from string, smtpConfig config.SMTPConfig) Email {
+	return &SMTPEmail{from: from, config: smtpConfig}
 }
 
 // FromAddress returns the configured default sender address.
 func (s *SMTPEmail) FromAddress() string {
-	return s.config.From
+	return s.from
 }
 
 // Setup validates the SMTP configuration and prepares any required auth
@@ -54,7 +36,7 @@ func (s *SMTPEmail) Setup() error {
 		s.config.Port = 587
 	}
 
-	if s.config.From == "" {
+	if s.from == "" {
 		return errors.New("email: SMTP from address is required")
 	}
 
@@ -71,7 +53,7 @@ func (s *SMTPEmail) Send(message *Message) error {
 		return err
 	}
 
-	mimeMessage, err := message.BuildMimeMessage(s.config.From)
+	mimeMessage, err := message.BuildMimeMessage(s.from)
 	if err != nil {
 		return err
 	}
@@ -83,7 +65,7 @@ func (s *SMTPEmail) Send(message *Message) error {
 	}
 	defer client.Close()
 
-	if s.config.EnableTLS {
+	if s.config.UseTLS {
 		if ok, _ := client.Extension("STARTTLS"); ok {
 			tlsConfig := &tls.Config{
 				ServerName:         s.config.Host,
@@ -103,7 +85,7 @@ func (s *SMTPEmail) Send(message *Message) error {
 		}
 	}
 
-	if err := client.Mail(s.config.From); err != nil {
+	if err := client.Mail(s.from); err != nil {
 		return fmt.Errorf("email: failed to set sender: %w", err)
 	}
 

@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/Lekuruu/go-puush/internal/config"
 	_ "github.com/mattn/go-sqlite3"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -18,7 +19,7 @@ func openDatabase(dsn string) gorm.Dialector {
 	return sqlite.Open(dsn)
 }
 
-func buildDatabaseDSN(config DatabaseConfig, journalMode string) string {
+func buildDatabaseDSN(config config.DatabaseConfig, journalMode string) string {
 	options := url.Values{}
 	options.Set("_journal_mode", journalMode)
 	options.Set("_busy_timeout", strconv.Itoa(config.BusyTimeout))

@@ -1,7 +1,7 @@
 package api
 
-import "github.com/Lekuruu/go-puush/internal/app"
+import "github.com/Lekuruu/go-puush/internal/server"
 
-func PuushErrorSubmission(ctx *app.Context) {
+func PuushErrorSubmission(ctx *server.Context) {
 	WritePuushError(ctx, NotImplementedError)
 }

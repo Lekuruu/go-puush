@@ -3,7 +3,7 @@ package routes
 import (
 	"strconv"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/server"
 )
 
 const UploadsPerPage = 60
@@ -67,7 +67,7 @@ func NewPaginationData(currentPage, totalItems, perPage int) *PaginationData {
 	}
 }
 
-func GetPageFromQuery(ctx *app.Context) int {
+func GetPageFromQuery(ctx *server.Context) int {
 	currentPage := ctx.Request.URL.Query().Get("page")
 	if currentPage == "" {
 		currentPage = "1"

@@ -6,6 +6,8 @@ import (
 	"mime"
 	"strings"
 	"time"
+
+	"github.com/Lekuruu/go-puush/internal/config"
 )
 
 // Email defines the contract for email delivery backends
@@ -16,18 +18,14 @@ type Email interface {
 }
 
 // NewEmailFromConfig constructs an Email implementation based on the provided type
-func NewEmailFromConfig(emailType string, emailFrom string) (Email, error) {
-	switch emailType {
+func NewEmailFromConfig(cfg config.EmailConfig) (Email, error) {
+	switch cfg.Type {
 	case "", "noop":
-		return NewNoopEmail(emailFrom), nil
+		return NewNoopEmail(cfg.From), nil
 	case "smtp":
-		smtpConfig, err := LoadSMTPConfig()
-		if err != nil {
-			return nil, err
-		}
-		return NewSMTPEmail(smtpConfig), nil
+		return NewSMTPEmail(cfg.From, cfg.SMTP), nil
 	default:
-		return nil, fmt.Errorf("email: unsupported email type: %s", emailType)
+		return nil, fmt.Errorf("email: unsupported email type: %s", cfg.Type)
 	}
 }
 

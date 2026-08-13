@@ -3,14 +3,14 @@ package services
 import (
 	"errors"
 
-	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/state"
 )
 
 const minimumPoolIdentifierLength = 6
 const maximumPoolIdentifierLength = 16
 
-func CreatePool(pool *database.Pool, state *app.State) error {
+func CreatePool(pool *database.Pool, state *state.State) error {
 	result := state.Database.Create(pool)
 
 	if result.Error != nil {
@@ -20,7 +20,7 @@ func CreatePool(pool *database.Pool, state *app.State) error {
 	return nil
 }
 
-func FetchPoolById(id int, state *app.State, preload ...string) (*database.Pool, error) {
+func FetchPoolById(id int, state *state.State, preload ...string) (*database.Pool, error) {
 	pool := &database.Pool{}
 	result := preloadQuery(state, preload).First(pool, id)
 
@@ -31,7 +31,7 @@ func FetchPoolById(id int, state *app.State, preload ...string) (*database.Pool,
 	return pool, nil
 }
 
-func FetchPoolByIdentifier(identifier string, state *app.State, preload ...string) (*database.Pool, error) {
+func FetchPoolByIdentifier(identifier string, state *state.State, preload ...string) (*database.Pool, error) {
 	pool := &database.Pool{}
 	query := preloadQuery(state, preload).Where("identifier = ?", identifier)
 	result := query.First(pool)
@@ -43,7 +43,7 @@ func FetchPoolByIdentifier(identifier string, state *app.State, preload ...strin
 	return pool, nil
 }
 
-func FetchPoolByUserAndName(userId int, name string, state *app.State, preload ...string) (*database.Pool, error) {
+func FetchPoolByUserAndName(userId int, name string, state *state.State, preload ...string) (*database.Pool, error) {
 	pool := &database.Pool{}
 	query := preloadQuery(state, preload).Where("user_id = ? AND name = ?", userId, name)
 	result := query.First(pool)
@@ -55,7 +55,7 @@ func FetchPoolByUserAndName(userId int, name string, state *app.State, preload .
 	return pool, nil
 }
 
-func PoolExists(identifier string, state *app.State) (bool, error) {
+func PoolExists(identifier string, state *state.State) (bool, error) {
 	var count int64
 	result := state.Database.Model(&database.Pool{}).Where("identifier = ?", identifier).Count(&count)
 
@@ -66,7 +66,7 @@ func PoolExists(identifier string, state *app.State) (bool, error) {
 	return count > 0, nil
 }
 
-func UpdatePool(pool *database.Pool, state *app.State) error {
+func UpdatePool(pool *database.Pool, state *state.State) error {
 	result := state.Database.Save(pool)
 
 	if result.Error != nil {
@@ -76,9 +76,12 @@ func UpdatePool(pool *database.Pool, state *app.State) error {
 	return nil
 }
 
-func GeneratePoolIdentifier(state *app.State) (string, error) {
+func GeneratePoolIdentifier(state *state.State) (string, error) {
 	for i := minimumPoolIdentifierLength; i <= maximumPoolIdentifierLength; i++ {
-		identifier := app.RandomString(i)
+		identifier, err := randomIdentifier(i)
+		if err != nil {
+			return "", err
+		}
 		exists, err := PoolExists(identifier, state)
 		if err != nil {
 			return "", err

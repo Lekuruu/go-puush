@@ -3,12 +3,17 @@ package services
 import (
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/authentication"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/state"
 )
 
-func CreateUser(email string, password string, state *app.State) (*database.User, error) {
-	passwordHash, err := app.CreatePasswordHash(password)
+func CreateUser(email string, password string, state *state.State) (*database.User, error) {
+	passwordHash, err := authentication.CreatePasswordHash(password)
+	if err != nil {
+		return nil, err
+	}
+	apiKey, err := authentication.GenerateApiKey()
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +25,7 @@ func CreateUser(email string, password string, state *app.State) (*database.User
 		CreatedAt:      time.Now(),
 		LatestActivity: time.Now(),
 		Active:         !state.Config.Service.RequireActivation,
-		ApiKey:         app.GenerateApiKey(),
+		ApiKey:         apiKey,
 	}
 	result := state.Database.Create(user)
 	if result.Error != nil {
@@ -34,39 +39,51 @@ func CreateUser(email string, password string, state *app.State) (*database.User
 		return nil, result.Error
 	}
 
+	publicPoolIdentifier, err := GeneratePoolIdentifier(state)
+	if err != nil {
+		return nil, err
+	}
 	publicPool := &database.Pool{
 		UserId:     user.Id,
 		Name:       "Public",
-		Identifier: app.GeneratePoolIdentifier(),
+		Identifier: publicPoolIdentifier,
 		Type:       database.PoolTypePublic,
 		CreatedAt:  time.Now(),
 		LastUpload: time.Now(),
 	}
-	privatePool := &database.Pool{
-		UserId:     user.Id,
-		Name:       "Private",
-		Identifier: app.GeneratePoolIdentifier(),
-		Type:       database.PoolTypePrivate,
-		CreatedAt:  time.Now(),
-		LastUpload: time.Now(),
-	}
-	galleryPool := &database.Pool{
-		UserId:     user.Id,
-		Name:       "Gallery",
-		Identifier: app.GeneratePoolIdentifier(),
-		Type:       database.PoolTypeGallery,
-		CreatedAt:  time.Now(),
-		LastUpload: time.Now(),
-	}
-
 	result = state.Database.Create(publicPool)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
+	privatePoolIdentifier, err := GeneratePoolIdentifier(state)
+	if err != nil {
+		return nil, err
+	}
+	privatePool := &database.Pool{
+		UserId:     user.Id,
+		Name:       "Private",
+		Identifier: privatePoolIdentifier,
+		Type:       database.PoolTypePrivate,
+		CreatedAt:  time.Now(),
+		LastUpload: time.Now(),
+	}
 	result = state.Database.Create(privatePool)
 	if result.Error != nil {
 		return nil, result.Error
+	}
+
+	galleryPoolIdentifier, err := GeneratePoolIdentifier(state)
+	if err != nil {
+		return nil, err
+	}
+	galleryPool := &database.Pool{
+		UserId:     user.Id,
+		Name:       "Gallery",
+		Identifier: galleryPoolIdentifier,
+		Type:       database.PoolTypeGallery,
+		CreatedAt:  time.Now(),
+		LastUpload: time.Now(),
 	}
 
 	result = state.Database.Create(galleryPool)
@@ -83,7 +100,7 @@ func CreateUser(email string, password string, state *app.State) (*database.User
 	return user, nil
 }
 
-func FetchUserById(id int, state *app.State, preload ...string) (*database.User, error) {
+func FetchUserById(id int, state *state.State, preload ...string) (*database.User, error) {
 	user := &database.User{}
 	result := preloadQuery(state, preload).First(user, id)
 
@@ -94,7 +111,7 @@ func FetchUserById(id int, state *app.State, preload ...string) (*database.User,
 	return user, nil
 }
 
-func FetchUserByName(name string, state *app.State, preload ...string) (*database.User, error) {
+func FetchUserByName(name string, state *state.State, preload ...string) (*database.User, error) {
 	user := &database.User{}
 	query := preloadQuery(state, preload).Where("name = ?", name)
 	result := query.First(user)
@@ -106,7 +123,7 @@ func FetchUserByName(name string, state *app.State, preload ...string) (*databas
 	return user, nil
 }
 
-func FetchUserByEmail(email string, state *app.State, preload ...string) (*database.User, error) {
+func FetchUserByEmail(email string, state *state.State, preload ...string) (*database.User, error) {
 	user := &database.User{}
 	query := preloadQuery(state, preload).Where("email = ?", email)
 	result := query.First(user)
@@ -118,7 +135,7 @@ func FetchUserByEmail(email string, state *app.State, preload ...string) (*datab
 	return user, nil
 }
 
-func FetchUserByNameOrEmail(input string, state *app.State, preload ...string) (*database.User, error) {
+func FetchUserByNameOrEmail(input string, state *state.State, preload ...string) (*database.User, error) {
 	user := &database.User{}
 	query := preloadQuery(state, preload).Where("name = ? OR email = ?", input, input)
 	result := query.First(user)
@@ -130,7 +147,7 @@ func FetchUserByNameOrEmail(input string, state *app.State, preload ...string) (
 	return user, nil
 }
 
-func FetchUserByApiKey(apiKey string, state *app.State, preload ...string) (*database.User, error) {
+func FetchUserByApiKey(apiKey string, state *state.State, preload ...string) (*database.User, error) {
 	user := &database.User{}
 	query := preloadQuery(state, preload).Where("api_key = ?", apiKey)
 	result := query.First(user)
@@ -142,13 +159,17 @@ func FetchUserByApiKey(apiKey string, state *app.State, preload ...string) (*dat
 	return user, nil
 }
 
-func RegenerateUserApiKey(userId int, state *app.State) (string, error) {
+func RegenerateUserApiKey(userId int, state *state.State) (string, error) {
 	user, err := FetchUserById(userId, state)
 	if err != nil {
 		return "", err
 	}
 
-	user.ApiKey = app.GenerateApiKey()
+	apiKey, err := authentication.GenerateApiKey()
+	if err != nil {
+		return "", err
+	}
+	user.ApiKey = apiKey
 	result := state.Database.Save(user)
 
 	if result.Error != nil {
@@ -158,7 +179,7 @@ func RegenerateUserApiKey(userId int, state *app.State) (string, error) {
 	return user.ApiKey, nil
 }
 
-func UpdateUserDiskUsage(userId int, size int64, state *app.State) error {
+func UpdateUserDiskUsage(userId int, size int64, state *state.State) error {
 	result := state.Database.Exec(
 		"UPDATE users SET disk_usage = disk_usage + ? WHERE id = ?",
 		size, userId,
@@ -171,7 +192,7 @@ func UpdateUserDiskUsage(userId int, size int64, state *app.State) error {
 	return nil
 }
 
-func UpdateUserLatestActivity(userId int, state *app.State) error {
+func UpdateUserLatestActivity(userId int, state *state.State) error {
 	result := state.Database.Exec(
 		"UPDATE users SET latest_activity = ? WHERE id = ?",
 		time.Now(), userId,
@@ -184,7 +205,7 @@ func UpdateUserLatestActivity(userId int, state *app.State) error {
 	return nil
 }
 
-func UpdateUserDefaultPool(userId int, poolId int, state *app.State) error {
+func UpdateUserDefaultPool(userId int, poolId int, state *state.State) error {
 	result := state.Database.Exec(
 		"UPDATE users SET default_pool_id = ? WHERE id = ?",
 		poolId, userId,
@@ -197,7 +218,7 @@ func UpdateUserDefaultPool(userId int, poolId int, state *app.State) error {
 	return nil
 }
 
-func UpdateUserPassword(userId int, passwordHash string, state *app.State) error {
+func UpdateUserPassword(userId int, passwordHash string, state *state.State) error {
 	result := state.Database.Exec(
 		"UPDATE users SET password = ? WHERE id = ?",
 		passwordHash, userId,
@@ -210,7 +231,7 @@ func UpdateUserPassword(userId int, passwordHash string, state *app.State) error
 	return nil
 }
 
-func ActivateUser(userId int, state *app.State) error {
+func ActivateUser(userId int, state *state.State) error {
 	result := state.Database.Exec(
 		"UPDATE users SET active = ? WHERE id = ?",
 		true, userId,
@@ -223,7 +244,7 @@ func ActivateUser(userId int, state *app.State) error {
 	return nil
 }
 
-func UpdateUser(user *database.User, state *app.State) error {
+func UpdateUser(user *database.User, state *state.State) error {
 	result := state.Database.Save(user)
 
 	if result.Error != nil {

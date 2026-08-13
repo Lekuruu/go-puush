@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
@@ -41,8 +41,8 @@ func NewGalleryFeed(pool *database.Pool) *GalleryFeedResponse {
 	return feed
 }
 
-func Gallery(ctx *app.Context) {
-	username := ctx.Vars["username"]
+func Gallery(ctx *server.Context) {
+	username := ctx.PathValue("username")
 	if username == "" {
 		renderText(404, "page not found", ctx)
 		return
@@ -67,8 +67,8 @@ func Gallery(ctx *app.Context) {
 	})
 }
 
-func GalleryFeed(ctx *app.Context) {
-	username := ctx.Vars["username"]
+func GalleryFeed(ctx *server.Context) {
+	username := ctx.PathValue("username")
 	if username == "" {
 		renderText(404, "page not found", ctx)
 		return
