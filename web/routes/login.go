@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/server"
 )
 
-func Login(ctx *app.Context) {
+func Login(ctx *server.Context) {
 	renderTemplate(ctx, "public/login", map[string]any{
 		"Title": "login",
 		"Retry": strings.Contains(ctx.Request.URL.Path, "retry"),
@@ -15,7 +15,7 @@ func Login(ctx *app.Context) {
 	})
 }
 
-func PerformLogin(ctx *app.Context) {
+func PerformLogin(ctx *server.Context) {
 	key := ctx.Request.URL.Query().Get("k")
 	email := ctx.Request.FormValue("email")
 	password := ctx.Request.FormValue("password")

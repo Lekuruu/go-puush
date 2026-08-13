@@ -3,10 +3,10 @@ package routes
 import (
 	"net/http"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/server"
 )
 
-func Logout(ctx *app.Context) {
+func Logout(ctx *server.Context) {
 	// TODO: Ensure referer is safe before logging out
 	//		 Else this could lead to CSRF logout "attacks"
 	if err := ClearUserSession(ctx); err != nil {

@@ -6,12 +6,12 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
-func Account(ctx *app.Context) {
+func Account(ctx *server.Context) {
 	user, err := GetUserSession(ctx, "Pools")
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -70,7 +70,7 @@ func Account(ctx *app.Context) {
 	})
 }
 
-func AccountSettings(ctx *app.Context) {
+func AccountSettings(ctx *server.Context) {
 	user, err := GetUserSession(ctx, "Pools")
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -83,7 +83,7 @@ func AccountSettings(ctx *app.Context) {
 	})
 }
 
-func AccountSubscription(ctx *app.Context) {
+func AccountSubscription(ctx *server.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -96,7 +96,7 @@ func AccountSubscription(ctx *app.Context) {
 	})
 }
 
-func AccountGoPro(ctx *app.Context) {
+func AccountGoPro(ctx *server.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -109,7 +109,7 @@ func AccountGoPro(ctx *app.Context) {
 	})
 }
 
-func AccountResetApiKey(ctx *app.Context) {
+func AccountResetApiKey(ctx *server.Context) {
 	// TODO: Ensure referer is safe before resetting API key
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
@@ -126,7 +126,7 @@ func AccountResetApiKey(ctx *app.Context) {
 	http.Redirect(ctx.Response, ctx.Request, "/login/go/?k="+newApiKey, http.StatusFound)
 }
 
-func resolveViewTypeFromRequest(user *database.User, ctx *app.Context) database.ViewType {
+func resolveViewTypeFromRequest(user *database.User, ctx *server.Context) database.ViewType {
 	query := ctx.Request.URL.Query()
 
 	if query.Has("list") {
@@ -140,7 +140,7 @@ func resolveViewTypeFromRequest(user *database.User, ctx *app.Context) database.
 	return user.ViewType
 }
 
-func resolvePoolFromRequest(user *database.User, ctx *app.Context) (*database.Pool, error) {
+func resolvePoolFromRequest(user *database.User, ctx *server.Context) (*database.Pool, error) {
 	poolId := ctx.Request.URL.Query().Get("pool")
 	if poolId == "" {
 		return services.FetchPoolById(user.DefaultPoolId, ctx.State)
@@ -165,7 +165,7 @@ func resolvePoolFromRequest(user *database.User, ctx *app.Context) (*database.Po
 	return pool, nil
 }
 
-func resolvePoolUploads(pool *database.Pool, pagination *PaginationData, ctx *app.Context) (uploads []*database.Upload, err error) {
+func resolvePoolUploads(pool *database.Pool, pagination *PaginationData, ctx *server.Context) (uploads []*database.Upload, err error) {
 	searchQuery := ctx.Request.URL.Query().Get("q")
 	offset := pagination.Offset()
 	limit := pagination.Limit()
@@ -188,7 +188,7 @@ func resolvePoolUploads(pool *database.Pool, pagination *PaginationData, ctx *ap
 	return uploads, nil
 }
 
-func resolvePoolThumbnails(pools []*database.Pool, ctx *app.Context) (map[int]string, error) {
+func resolvePoolThumbnails(pools []*database.Pool, ctx *server.Context) (map[int]string, error) {
 	thumbnails := make(map[int]string, len(pools))
 	for _, pool := range pools {
 		lastUpload, err := services.FetchLastPoolUpload(pool.Id, ctx.State)

@@ -4,14 +4,15 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/authentication"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/state"
 	"gorm.io/gorm"
 )
 
 const verificationKeyLength = 32
 
-func CreateEmailVerification(userId *int, action database.EmailVerificationAction, expiry time.Duration, state *app.State) (*database.EmailVerification, error) {
+func CreateEmailVerification(userId *int, action database.EmailVerificationAction, expiry time.Duration, state *state.State) (*database.EmailVerification, error) {
 	creationTime := time.Now()
 	var expiresAt *time.Time
 
@@ -19,9 +20,13 @@ func CreateEmailVerification(userId *int, action database.EmailVerificationActio
 		expiration := creationTime.Add(expiry)
 		expiresAt = &expiration
 	}
+	key, err := authentication.GenerateToken(verificationKeyLength)
+	if err != nil {
+		return nil, err
+	}
 
 	verification := &database.EmailVerification{
-		Key:       app.RandomString(verificationKeyLength),
+		Key:       key,
 		Action:    action,
 		UserId:    userId,
 		CreatedAt: creationTime,
@@ -35,7 +40,7 @@ func CreateEmailVerification(userId *int, action database.EmailVerificationActio
 	return verification, nil
 }
 
-func FetchEmailVerificationByKey(key string, state *app.State, preload ...string) (*database.EmailVerification, error) {
+func FetchEmailVerificationByKey(key string, state *state.State, preload ...string) (*database.EmailVerification, error) {
 	verification := &database.EmailVerification{}
 	query := preloadQuery(state, preload).Where("key = ?", key)
 	result := query.First(verification)
@@ -47,7 +52,7 @@ func FetchEmailVerificationByKey(key string, state *app.State, preload ...string
 	return verification, nil
 }
 
-func ValidateEmailVerification(key string, action database.EmailVerificationAction, state *app.State, preload ...string) (*database.EmailVerification, error) {
+func ValidateEmailVerification(key string, action database.EmailVerificationAction, state *state.State, preload ...string) (*database.EmailVerification, error) {
 	verification := &database.EmailVerification{}
 	query := preloadQuery(state, preload).Where("key = ? AND action = ?", key, action)
 	result := query.First(verification)
@@ -67,7 +72,7 @@ func ValidateEmailVerification(key string, action database.EmailVerificationActi
 	return verification, nil
 }
 
-func DeleteEmailVerificationById(id int, state *app.State) error {
+func DeleteEmailVerificationById(id int, state *state.State) error {
 	result := state.Database.Delete(&database.EmailVerification{}, id)
 
 	if result.Error != nil {
@@ -77,7 +82,7 @@ func DeleteEmailVerificationById(id int, state *app.State) error {
 	return nil
 }
 
-func DeleteEmailVerificationByKey(key string, state *app.State) error {
+func DeleteEmailVerificationByKey(key string, state *state.State) error {
 	result := state.Database.Where("key = ?", key).Delete(&database.EmailVerification{})
 
 	if result.Error != nil {
@@ -87,7 +92,7 @@ func DeleteEmailVerificationByKey(key string, state *app.State) error {
 	return nil
 }
 
-func CleanupExpiredEmailVerifications(state *app.State) error {
+func CleanupExpiredEmailVerifications(state *state.State) error {
 	result := state.Database.Where("expires_at IS NOT NULL AND expires_at < ?", time.Now()).Delete(&database.EmailVerification{})
 
 	if result.Error != nil {

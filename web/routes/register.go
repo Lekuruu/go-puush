@@ -3,19 +3,20 @@ package routes
 import (
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/email"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
+	"github.com/Lekuruu/go-puush/internal/state"
 )
 
-func Register(ctx *app.Context) {
+func Register(ctx *server.Context) {
 	renderTemplate(ctx, "public/register", map[string]any{
 		"Title": "register",
 	})
 }
 
-func PerformRegistration(ctx *app.Context) {
+func PerformRegistration(ctx *server.Context) {
 	if !ctx.State.Config.Service.RegistrationEnabled {
 		renderErrorTemplate("Registrations Disabled", "Registrations are currently disabled. Please check back later!", ctx)
 		return
@@ -63,7 +64,9 @@ func PerformRegistration(ctx *app.Context) {
 	ctx.Logger.Info("New user registered", "user_id", user.Id)
 
 	// Write wal contents to disk after registration, if enabled
-	ctx.State.ExecuteWalCheckpoint()
+	if err := ctx.State.CheckpointWAL(); err != nil {
+		ctx.Logger.Error("Failed to checkpoint database after registration", "error", err)
+	}
 
 	responseTitle := "Registration complete!"
 	responseMessage := "You can now log in with your email and password."
@@ -76,7 +79,7 @@ func PerformRegistration(ctx *app.Context) {
 	renderResponseTemplate(responseTitle, responseMessage, "registration complete", ctx)
 }
 
-func PerformActivation(ctx *app.Context) {
+func PerformActivation(ctx *server.Context) {
 	if !ctx.State.Config.Service.RegistrationEnabled {
 		renderErrorTemplate("Sorry! Account activation is currently disabled.", "Please contact support for assistance.", ctx)
 		return
@@ -113,7 +116,7 @@ func PerformActivation(ctx *app.Context) {
 
 const emailVerificationExpiry = time.Hour * 24 * 7
 
-func createAndSendActivationEmail(user *database.User, state *app.State) {
+func createAndSendActivationEmail(user *database.User, state *state.State) {
 	verification, err := services.CreateEmailVerification(&user.Id, database.EmailVerificationActionActivate, emailVerificationExpiry, state)
 	if err != nil {
 		state.Logger.Error("Failed to create email verification", "user_id", user.Id, "error", err)
@@ -128,7 +131,7 @@ func createAndSendActivationEmail(user *database.User, state *app.State) {
 	}
 }
 
-func sendWelcomeEmail(user *database.User, state *app.State) {
+func sendWelcomeEmail(user *database.User, state *state.State) {
 	message := email.FormatWelcomeEmail(user.Email)
 	err := state.Email.Send(message)
 	if err != nil {

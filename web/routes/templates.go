@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
@@ -17,7 +17,7 @@ import (
 var templates *template.Template
 var printer = message.NewPrinter(language.English)
 
-func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]any) {
+func renderTemplate(ctx *server.Context, tmpl string, pageData map[string]any) {
 	ctx.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
 	ctx.Response.WriteHeader(http.StatusOK)
 
@@ -35,7 +35,7 @@ func renderTemplate(ctx *app.Context, tmpl string, pageData map[string]any) {
 	}
 }
 
-func renderErrorTemplate(title string, message string, ctx *app.Context) {
+func renderErrorTemplate(title string, message string, ctx *server.Context) {
 	renderTemplate(ctx, "public/response", map[string]any{
 		"Title":           "error",
 		"ResponseTitle":   title,
@@ -43,7 +43,7 @@ func renderErrorTemplate(title string, message string, ctx *app.Context) {
 	})
 }
 
-func renderResponseTemplate(title string, message string, siteTitle string, ctx *app.Context) {
+func renderResponseTemplate(title string, message string, siteTitle string, ctx *server.Context) {
 	renderTemplate(ctx, "public/response", map[string]any{
 		"Title":           siteTitle,
 		"ResponseTitle":   title,
@@ -51,19 +51,19 @@ func renderResponseTemplate(title string, message string, siteTitle string, ctx 
 	})
 }
 
-func renderRaw(status int, contentType string, data []byte, ctx *app.Context) {
+func renderRaw(status int, contentType string, data []byte, ctx *server.Context) {
 	ctx.Response.Header().Set("Content-Type", contentType)
 	ctx.Response.WriteHeader(status)
 	ctx.Response.Write(data)
 }
 
-func renderText(status int, text string, ctx *app.Context) {
+func renderText(status int, text string, ctx *server.Context) {
 	ctx.Response.Header().Set("Content-Type", "text/plain")
 	ctx.Response.WriteHeader(status)
 	ctx.Response.Write([]byte(text))
 }
 
-func renderJson(status int, object any, ctx *app.Context) {
+func renderJson(status int, object any, ctx *server.Context) {
 	ctx.Response.Header().Set("Content-Type", "application/json")
 	ctx.Response.WriteHeader(status)
 	err := json.NewEncoder(ctx.Response).Encode(object)

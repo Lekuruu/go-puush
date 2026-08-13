@@ -1,7 +1,9 @@
-package app
+package server
 
 import (
 	"bufio"
+	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -9,7 +11,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/Lekuruu/go-puush/internal/state"
+)
+
+const (
+	httpReadHeaderTimeout = 5 * time.Second
+	httpIdleTimeout       = 2 * time.Minute
+	httpShutdownTimeout   = 30 * time.Second
 )
 
 // Server is the main struct that holds the state for an http server.
@@ -17,12 +25,12 @@ type Server struct {
 	Host   string
 	Port   int
 	Name   string
-	State  *State
-	Router *mux.Router
+	State  *state.State
+	Router *http.ServeMux
 	Logger *slog.Logger
 }
 
-func NewServer(host string, port int, name string, state *State) *Server {
+func NewServer(host string, port int, name string, state *state.State) *Server {
 	logger := slog.Default()
 	if state != nil && state.Logger != nil {
 		logger = state.Logger
@@ -34,46 +42,59 @@ func NewServer(host string, port int, name string, state *State) *Server {
 		Name:   name,
 		State:  state,
 		Logger: logger.With("component", name),
-		Router: mux.NewRouter(),
+		Router: http.NewServeMux(),
 	}
 }
 
-// Context is a struct that holds the request context for each endpoint call.
-type Context struct {
-	Response http.ResponseWriter
-	Request  *http.Request
-	State    *State
-	Logger   *slog.Logger
-	Vars     map[string]string
-}
-
-func (ctx *Context) IP() string {
-	return GetRequestIP(ctx.Request)
+// Handle registers an application handler using a standard-library route pattern.
+func (server *Server) Handle(pattern string, handler func(*Context)) {
+	server.Router.HandleFunc(pattern, server.ContextMiddleware(handler))
 }
 
 // Serve starts the HTTP server and listens for incoming requests.
-func (server *Server) Serve() {
-	bind := fmt.Sprintf(
-		"%s:%d",
-		server.Host,
-		server.Port,
-	)
+func (server *Server) Serve(ctx context.Context) error {
+	httpServer := &http.Server{
+		Addr:              fmt.Sprintf("%s:%d", server.Host, server.Port),
+		Handler:           server.LoggingMiddleware(server.Router),
+		ErrorLog:          slog.NewLogLogger(server.Logger.Handler(), slog.LevelError),
+		ReadHeaderTimeout: httpReadHeaderTimeout,
+		IdleTimeout:       httpIdleTimeout,
+	}
 	server.Logger.Info(
 		"Listening for requests",
 		"host", server.Host,
 		"port", server.Port,
 	)
 
-	httpServer := &http.Server{
-		Addr:     bind,
-		Handler:  server.LoggingMiddleware(server.Router),
-		ErrorLog: slog.NewLogLogger(server.Logger.Handler(), slog.LevelError),
+	serveErrors := make(chan error, 1)
+	go func() {
+		serveErrors <- httpServer.ListenAndServe()
+	}()
+
+	select {
+	case err := <-serveErrors:
+		if errors.Is(err, http.ErrServerClosed) {
+			return nil
+		}
+		return err
+	case <-ctx.Done():
+		server.Logger.Info("Shutting down server")
 	}
-	err := httpServer.ListenAndServe()
-	if err != nil {
-		server.Logger.Error("HTTP server stopped", "error", err)
-		return
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), httpShutdownTimeout)
+	defer cancel()
+
+	if err := httpServer.Shutdown(shutdownCtx); err != nil {
+		closeErr := httpServer.Close()
+		<-serveErrors
+		return errors.Join(fmt.Errorf("server: failed to shut down gracefully: %w", err), closeErr)
 	}
+
+	err := <-serveErrors
+	if errors.Is(err, http.ErrServerClosed) {
+		return nil
+	}
+	return err
 }
 
 // ResponseContext is a wrapper around http.ResponseWriter that
@@ -87,9 +108,9 @@ func (rc *ResponseContext) Header() http.Header {
 	return rc.w.Header()
 }
 
-func (rc *ResponseContext) Write(b []byte) (int, error) {
+func (rc *ResponseContext) Write(data []byte) (int, error) {
 	rc.WriteImplicitStatus()
-	return rc.w.Write(b)
+	return rc.w.Write(data)
 }
 
 func (rc *ResponseContext) WriteHeader(status int) {
@@ -110,7 +131,7 @@ func (rc *ResponseContext) Unwrap() http.ResponseWriter {
 }
 
 func (rc *ResponseContext) Flush() {
-	_ = rc.FlushError()
+	rc.FlushError()
 }
 
 func (rc *ResponseContext) FlushError() error {
@@ -162,16 +183,15 @@ func (rc *ResponseContext) Status() int {
 // ContextMiddleware creates a new Context struct for each request.
 func (server *Server) ContextMiddleware(handler func(*Context)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		context := &Context{
+		ctx := &Context{
 			Response: w,
 			Request:  r,
 			State:    server.State,
 			Logger:   server.Logger,
-			Vars:     mux.Vars(r),
 		}
 
 		w.Header().Set("Server", server.Name)
-		handler(context)
+		handler(ctx)
 	}
 }
 
@@ -181,6 +201,7 @@ func (server *Server) LoggingMiddleware(next http.Handler) http.Handler {
 		rc := &ResponseContext{w: w}
 		start := time.Now()
 		next.ServeHTTP(rc, r)
+
 		server.Logger.Info(
 			fmt.Sprintf("%s %s", r.Method, r.URL.EscapedPath()),
 			"ip", GetRequestIP(r),

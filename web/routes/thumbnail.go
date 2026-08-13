@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
@@ -15,14 +15,14 @@ const DefaultThumbnailPath = "web/static/img/unknown.png"
 
 var defaultThumbnailData []byte
 
-func Thumbnail(ctx *app.Context) {
+func Thumbnail(ctx *server.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
 		return
 	}
 
-	identifier := ctx.Vars["identifier"]
+	identifier := ctx.PathValue("identifier")
 	if identifier == "" {
 		renderRaw(200, "image/png", defaultThumbnailData, ctx)
 		return

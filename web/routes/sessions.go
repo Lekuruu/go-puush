@@ -4,15 +4,17 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/authentication"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
+	"github.com/Lekuruu/go-puush/internal/state"
 )
 
 const sessionCookieName = "PHPSESSID"
 const sessionDuration = time.Hour * 24 * 30
 
-func GetUserSession(ctx *app.Context, preload ...string) (*database.User, error) {
+func GetUserSession(ctx *server.Context, preload ...string) (*database.User, error) {
 	// Try to get the session token from the cookies
 	sessionToken, err := ctx.Request.Cookie(sessionCookieName)
 	if err != nil {
@@ -29,7 +31,7 @@ func GetUserSession(ctx *app.Context, preload ...string) (*database.User, error)
 	return services.FetchUserById(session.UserId, ctx.State, preload...)
 }
 
-func SetUserSession(user *database.User, ctx *app.Context) error {
+func SetUserSession(user *database.User, ctx *server.Context) error {
 	// Create a new session for the user
 	session, err := services.CreateSession(user.Id, sessionDuration, ctx.State)
 	if err != nil {
@@ -46,7 +48,7 @@ func SetUserSession(user *database.User, ctx *app.Context) error {
 	return nil
 }
 
-func ClearUserSession(ctx *app.Context) error {
+func ClearUserSession(ctx *server.Context) error {
 	// Try to get the session token from the cookies
 	sessionToken, err := ctx.Request.Cookie(sessionCookieName)
 	if err != nil {
@@ -66,20 +68,20 @@ func ClearUserSession(ctx *app.Context) error {
 	return nil
 }
 
-func UserPasswordAuthentication(email string, password string, state *app.State) (*database.User, bool) {
+func UserPasswordAuthentication(email string, password string, state *state.State) (*database.User, bool) {
 	user, err := services.FetchUserByNameOrEmail(email, state)
 	if err != nil {
 		return nil, false
 	}
 
-	if !app.VerifyPasswordHash(password, user.Password) {
+	if !authentication.VerifyPasswordHash(password, user.Password) {
 		return nil, false
 	}
 
 	return user, true
 }
 
-func UserKeyAuthentication(key string, state *app.State) (*database.User, bool) {
+func UserKeyAuthentication(key string, state *state.State) (*database.User, bool) {
 	user, err := services.FetchUserByApiKey(key, state)
 	if err != nil {
 		return nil, false
@@ -88,7 +90,7 @@ func UserKeyAuthentication(key string, state *app.State) (*database.User, bool) 
 	return user, true
 }
 
-func UserAuthenticationDynamic(email string, password string, key string, state *app.State) (*database.User, bool) {
+func UserAuthenticationDynamic(email string, password string, key string, state *state.State) (*database.User, bool) {
 	if key != "" {
 		return UserKeyAuthentication(key, state)
 	} else if password != "" {

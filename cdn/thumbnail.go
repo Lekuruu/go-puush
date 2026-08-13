@@ -4,15 +4,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
-func Thumbnail(ctx *app.Context) {
-	poolIdentifier := ctx.Vars["pool"]
-	poolPassword := ctx.Vars["password"]
-	identifier := ctx.Vars["identifier"]
+func Thumbnail(ctx *server.Context) {
+	poolIdentifier := ctx.PathValue("pool")
+	poolPassword := ctx.PathValue("password")
+	identifier := ctx.PathValue("identifier")
 
 	// Remove .<extension> from identifier if present
 	fileExtension := filepath.Ext(identifier)

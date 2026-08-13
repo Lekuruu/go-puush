@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
 // /api/del handles deletion of uploads.
 // Once deleted, it returns a history response.
-func PuushDelete(ctx *app.Context) {
+func PuushDelete(ctx *server.Context) {
 	request, err := NewDeleteRequest(ctx.Request)
 	if err != nil {
 		WritePuushError(ctx, RequestError)

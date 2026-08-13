@@ -6,11 +6,11 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/state"
 )
 
-func CreateSession(userId int, duration time.Duration, state *app.State) (*database.Session, error) {
+func CreateSession(userId int, duration time.Duration, state *state.State) (*database.Session, error) {
 	token, err := generateSessionToken()
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func CreateSession(userId int, duration time.Duration, state *app.State) (*datab
 	return session, nil
 }
 
-func ValidateSession(token string, state *app.State, preload ...string) (*database.Session, error) {
+func ValidateSession(token string, state *state.State, preload ...string) (*database.Session, error) {
 	session := &database.Session{}
 	query := preloadQuery(state, preload).Where("token = ?", token)
 	result := query.First(session)
@@ -45,7 +45,7 @@ func ValidateSession(token string, state *app.State, preload ...string) (*databa
 	return session, nil
 }
 
-func DeleteSession(token string, state *app.State) error {
+func DeleteSession(token string, state *state.State) error {
 	result := state.Database.Where("token = ?", token).Delete(&database.Session{})
 
 	if result.Error != nil {
@@ -59,7 +59,7 @@ func DeleteSession(token string, state *app.State) error {
 	return nil
 }
 
-func DeleteAllSessionsForUser(userId int, state *app.State) error {
+func DeleteAllSessionsForUser(userId int, state *state.State) error {
 	result := state.Database.Where("user_id = ?", userId).Delete(&database.Session{})
 
 	if result.Error != nil {
@@ -69,7 +69,7 @@ func DeleteAllSessionsForUser(userId int, state *app.State) error {
 	return nil
 }
 
-func ExtendSession(session *database.Session, duration time.Duration, state *app.State) error {
+func ExtendSession(session *database.Session, duration time.Duration, state *state.State) error {
 	session.ExpiresAt = time.Now().Add(duration)
 	result := state.Database.Save(session)
 
@@ -80,7 +80,7 @@ func ExtendSession(session *database.Session, duration time.Duration, state *app
 	return nil
 }
 
-func CleanupExpiredSessions(state *app.State) error {
+func CleanupExpiredSessions(state *state.State) error {
 	result := state.Database.Where("expires_at < ?", time.Now()).Delete(&database.Session{})
 
 	if result.Error != nil {

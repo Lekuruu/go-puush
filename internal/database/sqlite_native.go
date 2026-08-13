@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/Lekuruu/go-puush/internal/config"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
@@ -17,7 +18,7 @@ func openDatabase(dsn string) gorm.Dialector {
 	return sqlite.Open(dsn)
 }
 
-func buildDatabaseDSN(config DatabaseConfig, journalMode string) string {
+func buildDatabaseDSN(config config.DatabaseConfig, journalMode string) string {
 	options := url.Values{}
 	options.Set("cache", config.CacheMode)
 	options.Set("_time_format", "sqlite")

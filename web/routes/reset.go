@@ -5,19 +5,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/authentication"
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/email"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
+	"github.com/Lekuruu/go-puush/internal/state"
 )
 
-func ResetPassword(ctx *app.Context) {
+func ResetPassword(ctx *server.Context) {
 	renderTemplate(ctx, "public/reset", map[string]any{
 		"Title": "reset password",
 	})
 }
 
-func RequestPasswordReset(ctx *app.Context) {
+func RequestPasswordReset(ctx *server.Context) {
 	if err := ctx.Request.ParseForm(); err != nil {
 		renderErrorTemplate("Uh-oh! Something went wrong.", "An error occurred while submitting your request. Please try again!", ctx)
 		return
@@ -43,7 +45,9 @@ func RequestPasswordReset(ctx *app.Context) {
 	go createAndSendPasswordResetEmail(user, ctx.State)
 
 	// Write wal contents to disk, if enabled
-	ctx.State.ExecuteWalCheckpoint()
+	if err := ctx.State.CheckpointWAL(); err != nil {
+		ctx.Logger.Error("Failed to checkpoint database after password reset request", "error", err)
+	}
 
 	renderResponseTemplate(
 		"Password reset request received!",
@@ -53,7 +57,7 @@ func RequestPasswordReset(ctx *app.Context) {
 	)
 }
 
-func ShowPasswordResetForm(ctx *app.Context) {
+func ShowPasswordResetForm(ctx *server.Context) {
 	key := strings.TrimSpace(ctx.Request.URL.Query().Get("key"))
 	if key == "" {
 		http.Redirect(ctx.Response, ctx.Request, "/reset_password", http.StatusSeeOther)
@@ -82,7 +86,7 @@ func ShowPasswordResetForm(ctx *app.Context) {
 	})
 }
 
-func PerformPasswordReset(ctx *app.Context) {
+func PerformPasswordReset(ctx *server.Context) {
 	if err := ctx.Request.ParseForm(); err != nil {
 		renderErrorTemplate("Uh-oh! Something went wrong.", "An error occurred while submitting your request. Please try again!", ctx)
 		return
@@ -119,7 +123,7 @@ func PerformPasswordReset(ctx *app.Context) {
 		return
 	}
 
-	newPasswordHash, err := app.CreatePasswordHash(password)
+	newPasswordHash, err := authentication.CreatePasswordHash(password)
 	if err != nil {
 		ctx.Logger.Error("Failed to hash new password", "user_id", verification.User.Id, "error", err)
 		renderErrorTemplate("Uh-oh! Something went wrong.", "Please try again later.", ctx)
@@ -137,7 +141,9 @@ func PerformPasswordReset(ctx *app.Context) {
 	}
 
 	// Write wal contents to disk, if enabled
-	ctx.State.ExecuteWalCheckpoint()
+	if err := ctx.State.CheckpointWAL(); err != nil {
+		ctx.Logger.Error("Failed to checkpoint database after password reset", "error", err)
+	}
 
 	renderResponseTemplate(
 		"Password reset complete!",
@@ -149,7 +155,7 @@ func PerformPasswordReset(ctx *app.Context) {
 
 const passwordResetVerificationExpiry = time.Hour
 
-func createAndSendPasswordResetEmail(user *database.User, state *app.State) {
+func createAndSendPasswordResetEmail(user *database.User, state *state.State) {
 	verification, err := services.CreateEmailVerification(&user.Id, database.EmailVerificationActionResetPassword, passwordResetVerificationExpiry, state)
 	if err != nil {
 		state.Logger.Error("Failed to create password reset verification", "user_id", user.Id, "error", err)

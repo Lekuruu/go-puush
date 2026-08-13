@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/authentication"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
+	"github.com/Lekuruu/go-puush/internal/state"
 )
 
 // Serializable is an interface that requires a "Serialize" method.
@@ -42,7 +44,7 @@ var (
 
 // WritePuushResponse writes a serializable response to the context's response writer.
 // If it fails it proceeds to write a server error.
-func WritePuushResponse(ctx *app.Context, response Serializable) {
+func WritePuushResponse(ctx *server.Context, response Serializable) {
 	ctx.Response.WriteHeader(http.StatusOK)
 	_, err := ctx.Response.Write(response.Serialize())
 	if err != nil {
@@ -52,13 +54,13 @@ func WritePuushResponse(ctx *app.Context, response Serializable) {
 }
 
 // WritePuushError writes the given puush error struct to the response.
-func WritePuushError(ctx *app.Context, error PuushError) {
+func WritePuushError(ctx *server.Context, error PuushError) {
 	ctx.Response.WriteHeader(error.StatusCode)
 	ctx.Response.Write(error.Serialize())
 }
 
 // UserAuthenticationFromKey attempts to authenticate a user using the provided API key.
-func UserAuthenticationFromKey(key string, state *app.State, preload ...string) (*database.User, error) {
+func UserAuthenticationFromKey(key string, state *state.State, preload ...string) (*database.User, error) {
 	user, err := services.FetchUserByApiKey(key, state, preload...)
 	if err != nil {
 		return nil, err
@@ -68,7 +70,7 @@ func UserAuthenticationFromKey(key string, state *app.State, preload ...string) 
 }
 
 // UserAuthenticationFromContext attempts to authenticate a user based on the API key provided in the request.
-func UserAuthenticationFromContext(ctx *app.Context, preload ...string) (*database.User, error) {
+func UserAuthenticationFromContext(ctx *server.Context, preload ...string) (*database.User, error) {
 	err := ctx.Request.ParseForm()
 	if err != nil {
 		return nil, err
@@ -83,13 +85,13 @@ func UserAuthenticationFromContext(ctx *app.Context, preload ...string) (*databa
 }
 
 // UserPasswordAuthentication attempts to authenticate a user using their username and password.
-func UserPasswordAuthentication(username string, password string, state *app.State) (*database.User, bool) {
+func UserPasswordAuthentication(username string, password string, state *state.State) (*database.User, bool) {
 	user, err := services.FetchUserByNameOrEmail(username, state)
 	if err != nil {
 		return nil, false
 	}
 
-	if !app.VerifyPasswordHash(password, user.Password) {
+	if !authentication.VerifyPasswordHash(password, user.Password) {
 		return nil, false
 	}
 
@@ -101,7 +103,7 @@ func UserPasswordAuthentication(username string, password string, state *app.Sta
 }
 
 // UserKeyAuthentication attempts to authenticate a user using an API key.
-func UserKeyAuthentication(username string, key string, state *app.State) (*database.User, bool) {
+func UserKeyAuthentication(username string, key string, state *state.State) (*database.User, bool) {
 	user, err := services.FetchUserByNameOrEmail(username, state)
 	if err != nil {
 		return nil, false
@@ -119,7 +121,7 @@ func UserKeyAuthentication(username string, key string, state *app.State) (*data
 }
 
 // UserAuthenticationDynamic attempts to authenticate a user using either a password or an API key.
-func UserAuthenticationDynamic(username string, password string, key string, state *app.State) (*database.User, bool) {
+func UserAuthenticationDynamic(username string, password string, key string, state *state.State) (*database.User, bool) {
 	if key != "" {
 		return UserKeyAuthentication(username, key, state)
 	} else if password != "" {
@@ -129,7 +131,7 @@ func UserAuthenticationDynamic(username string, password string, key string, sta
 }
 
 // CreateThumbnailFromUpload creates a thumbnail for the given upload based on its type (image or video).
-func CreateThumbnailFromUpload(upload *database.Upload, data []byte, state *app.State) ([]byte, error) {
+func CreateThumbnailFromUpload(upload *database.Upload, data []byte, state *state.State) ([]byte, error) {
 	if upload.IsImage() {
 		return services.CreateThumbnail(upload.Key(), data, state)
 	}

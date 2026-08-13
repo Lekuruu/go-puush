@@ -1,13 +1,15 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/Lekuruu/go-puush/internal/config"
 	"gorm.io/gorm"
 )
 
-func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
+func CreateSession(config config.DatabaseConfig) (*gorm.DB, error) {
 	// Build DSN with configurable parameters
 	journalMode := config.JournalMode
 	if !config.EnableWAL {
@@ -65,7 +67,7 @@ func CreateSession(config DatabaseConfig) (*gorm.DB, error) {
 	return db, nil
 }
 
-func applyPerformanceSettings(db *gorm.DB, config DatabaseConfig) error {
+func applyPerformanceSettings(db *gorm.DB, config config.DatabaseConfig) error {
 	if err := db.Exec(fmt.Sprintf("PRAGMA cache_size = %d;", config.CacheSize)).Error; err != nil {
 		return err
 	}
@@ -84,5 +86,40 @@ func applyPerformanceSettings(db *gorm.DB, config DatabaseConfig) error {
 		return err
 	}
 
+	return nil
+}
+
+// CloseSession applies final SQLite maintenance and closes the connection.
+func CloseSession(db *gorm.DB, config config.DatabaseConfig) error {
+	if db == nil {
+		return nil
+	}
+
+	var maintenanceErr error
+	if err := db.Exec("PRAGMA optimize;").Error; err != nil {
+		maintenanceErr = fmt.Errorf("database: failed to optimize: %w", err)
+	}
+	if err := CheckpointWAL(db, config); err != nil {
+		maintenanceErr = errors.Join(maintenanceErr, err)
+	}
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		return errors.Join(maintenanceErr, fmt.Errorf("database: failed to resolve SQL connection: %w", err))
+	}
+	if err := sqlDB.Close(); err != nil {
+		return errors.Join(maintenanceErr, fmt.Errorf("database: failed to close: %w", err))
+	}
+	return maintenanceErr
+}
+
+// CheckpointWAL flushes the current write-ahead log when WAL mode is enabled.
+func CheckpointWAL(db *gorm.DB, config config.DatabaseConfig) error {
+	if db == nil || !config.EnableWAL {
+		return nil
+	}
+	if err := db.Exec("PRAGMA wal_checkpoint(FULL);").Error; err != nil {
+		return fmt.Errorf("database: failed to checkpoint WAL: %w", err)
+	}
 	return nil
 }

@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Lekuruu/go-puush/internal/app"
+	"github.com/Lekuruu/go-puush/internal/authentication"
 	"github.com/Lekuruu/go-puush/internal/database"
+	"github.com/Lekuruu/go-puush/internal/server"
 	"github.com/Lekuruu/go-puush/internal/services"
 )
 
@@ -34,7 +35,7 @@ func isValidUsername(username string) bool {
 	return usernamePattern.MatchString(username)
 }
 
-func MoveDialog(ctx *app.Context) {
+func MoveDialog(ctx *server.Context) {
 	user, err := GetUserSession(ctx, "Pools")
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -60,7 +61,7 @@ func MoveDialog(ctx *app.Context) {
 	})
 }
 
-func MoveUpload(ctx *app.Context) {
+func MoveUpload(ctx *server.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -131,7 +132,7 @@ func MoveUpload(ctx *app.Context) {
 	renderRaw(200, "text/html", []byte{}, ctx)
 }
 
-func DeleteUpload(ctx *app.Context) {
+func DeleteUpload(ctx *server.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -193,7 +194,7 @@ func DeleteUpload(ctx *app.Context) {
 	renderRaw(200, "text/html", []byte{}, ctx)
 }
 
-func UpdateDefaultPool(ctx *app.Context) {
+func UpdateDefaultPool(ctx *server.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -238,7 +239,7 @@ func UpdateDefaultPool(ctx *app.Context) {
 	renderTemplate(ctx, "ajax/success", nil)
 }
 
-func ChangePassword(ctx *app.Context) {
+func ChangePassword(ctx *server.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -259,12 +260,12 @@ func ChangePassword(ctx *app.Context) {
 		return
 	}
 
-	if !app.VerifyPasswordHash(currentPassword, user.Password) {
+	if !authentication.VerifyPasswordHash(currentPassword, user.Password) {
 		renderJson(200, ErrorPasswordIncorrect, ctx)
 		return
 	}
 
-	newPasswordHash, err := app.CreatePasswordHash(newPassword)
+	newPasswordHash, err := authentication.CreatePasswordHash(newPassword)
 	if err != nil {
 		renderJson(200, ErrorServerError, ctx)
 		return
@@ -279,7 +280,7 @@ func ChangePassword(ctx *app.Context) {
 	renderRaw(200, "text/html", []byte{}, ctx)
 }
 
-func CheckUsername(ctx *app.Context) {
+func CheckUsername(ctx *server.Context) {
 	err := ctx.Request.ParseForm()
 	if err != nil {
 		renderJson(200, ErrorBadRequest, ctx)
@@ -316,7 +317,7 @@ func CheckUsername(ctx *app.Context) {
 	renderJson(200, NoError, ctx)
 }
 
-func ClaimUsername(ctx *app.Context) {
+func ClaimUsername(ctx *server.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -372,7 +373,7 @@ func ClaimUsername(ctx *app.Context) {
 	renderJson(200, NoError, ctx)
 }
 
-func StopAskingAboutUsername(ctx *app.Context) {
+func StopAskingAboutUsername(ctx *server.Context) {
 	user, err := GetUserSession(ctx)
 	if err != nil || user == nil {
 		http.Redirect(ctx.Response, ctx.Request, "/login", http.StatusSeeOther)
@@ -389,7 +390,7 @@ func StopAskingAboutUsername(ctx *app.Context) {
 	renderJson(200, NoError, ctx)
 }
 
-func resolveTargetUploadsFromQuery(ctx *app.Context) ([]*database.Upload, error) {
+func resolveTargetUploadsFromQuery(ctx *server.Context) ([]*database.Upload, error) {
 	identifiersString := ctx.Request.URL.Query().Get("i")
 	if identifiersString == "" {
 		return []*database.Upload{}, nil
@@ -405,7 +406,7 @@ func resolveTargetUploadsFromQuery(ctx *app.Context) ([]*database.Upload, error)
 	return uploads, nil
 }
 
-func resolveTargetUploadsFromForm(ctx *app.Context) ([]*database.Upload, error) {
+func resolveTargetUploadsFromForm(ctx *server.Context) ([]*database.Upload, error) {
 	identifiers := ctx.Request.Form["i[]"]
 	if len(identifiers) == 0 {
 		return []*database.Upload{}, nil
