@@ -27,10 +27,15 @@ SMTP_SKIP_TLS_VERIFY=false
 DB_PATH=./.data/puush.db
 
 # Service configuration
-CDN_URL=http://localhost
-SERVICE_URL=http://localhost
+SERVICE_URL=http://puush.me
 SERVICE_NAME=puush
 SERVICE_EMAIL=puush@puush.me
+
+CDN_URL=http://puu.sh
+# CDN request limit per second (set to 0 to disable)
+CDN_RATE_LIMIT=10
+# Short request bursts allowed before the CDN limit is enforced
+CDN_RATE_LIMIT_BURST=30
 
 # Twitter handles used on the website
 TWITTER_HANDLE=@puushme

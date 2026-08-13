@@ -18,7 +18,9 @@ type Config struct {
 }
 
 type CdnConfig struct {
-	Url string `env:"CDN_URL" envDefault:"http://puu.sh"`
+	Url            string `env:"CDN_URL" envDefault:"http://puu.sh"`
+	RateLimit      int    `env:"CDN_RATE_LIMIT" envDefault:"10"`
+	RateLimitBurst int    `env:"CDN_RATE_LIMIT_BURST" envDefault:"30"`
 }
 
 type WebConfig struct {
