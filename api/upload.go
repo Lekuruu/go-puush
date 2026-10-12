@@ -182,7 +182,7 @@ func (request *UploadRequest) ExceedsUploadLimit(user *database.User) bool {
 }
 
 func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
-	err := request.ParseMultipartForm(100 << 20) // 100 MB
+	err := request.ParseMultipartForm(1 << 20) // ~1 MB in-memory, rest is stored on disk
 	if err != nil {
 		return nil, err
 	}
