@@ -42,13 +42,12 @@ func preloadQuery(state *state.State, preload []string) *gorm.DB {
 	return result
 }
 
-func commonUpdate[T any](db *gorm.DB, updates *T, columns ...string) (int64, error) {
+func updateRecord[T any](db *gorm.DB, updates *T, columns ...string) error {
 	if len(columns) == 0 {
-		return 0, ErrNoUpdateColumns
+		return ErrNoUpdateColumns
 	}
-
 	result := db.Model(updates).Select(columns).Updates(updates)
-	return result.RowsAffected, result.Error
+	return requireUpdatedRows(result.RowsAffected, result.Error)
 }
 
 func requireUpdatedRows(rowsAffected int64, err error) error {
@@ -63,8 +62,4 @@ func requireUpdatedRows(rowsAffected int64, err error) error {
 
 func requireUpdatedRecord(result *gorm.DB) error {
 	return requireUpdatedRows(result.RowsAffected, result.Error)
-}
-
-func commonUpdateRequired[T any](db *gorm.DB, updates *T, columns ...string) error {
-	return requireUpdatedRows(commonUpdate(db, updates, columns...))
 }

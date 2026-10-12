@@ -36,7 +36,7 @@ func CreateUser(email string, password string, state *state.State) (*database.Us
 	// force the "active" field to be set correctly, since for some reason
 	// gorm doesn't set boolean fields properly on creation
 	user.Active = !state.Config.Service.RequireActivation
-	if err := commonUpdateRequired(state.Database, user, "active"); err != nil {
+	if err := updateRecord(state.Database, user, "active"); err != nil {
 		return nil, err
 	}
 
@@ -93,7 +93,7 @@ func CreateUser(email string, password string, state *state.State) (*database.Us
 	}
 
 	user.DefaultPoolId = publicPool.Id
-	if err := commonUpdateRequired(state.Database, user, "default_pool_id"); err != nil {
+	if err := updateRecord(state.Database, user, "default_pool_id"); err != nil {
 		return nil, err
 	}
 
@@ -166,7 +166,7 @@ func RegenerateUserApiKey(userId int, state *state.State) (string, error) {
 	}
 	updates := &database.User{Id: userId, ApiKey: apiKey}
 
-	if err := commonUpdateRequired(state.Database, updates, "api_key"); err != nil {
+	if err := updateRecord(state.Database, updates, "api_key"); err != nil {
 		return "", err
 	}
 	return apiKey, nil
@@ -181,27 +181,27 @@ func UpdateUserDiskUsage(userId int, size int64, state *state.State) error {
 
 func UpdateUserLatestActivity(userId int, state *state.State) error {
 	updates := &database.User{Id: userId, LatestActivity: time.Now()}
-	return commonUpdateRequired(state.Database, updates, "latest_activity")
+	return updateRecord(state.Database, updates, "latest_activity")
 }
 
 func UpdateUserDefaultPool(userId int, poolId int, state *state.State) error {
 	updates := &database.User{Id: userId, DefaultPoolId: poolId}
-	return commonUpdateRequired(state.Database, updates, "default_pool_id")
+	return updateRecord(state.Database, updates, "default_pool_id")
 }
 
 func UpdateUserPassword(userId int, passwordHash string, state *state.State) error {
 	updates := &database.User{Id: userId, Password: passwordHash}
-	return commonUpdateRequired(state.Database, updates, "password")
+	return updateRecord(state.Database, updates, "password")
 }
 
 func ActivateUser(userId int, state *state.State) error {
 	updates := &database.User{Id: userId, Active: true}
-	return commonUpdateRequired(state.Database, updates, "active")
+	return updateRecord(state.Database, updates, "active")
 }
 
 func UpdateUserViewType(userId int, viewType database.ViewType, state *state.State) error {
 	updates := &database.User{Id: userId, ViewType: viewType}
-	return commonUpdateRequired(state.Database, updates, "view_type")
+	return updateRecord(state.Database, updates, "view_type")
 }
 
 func ClaimUsername(userId int, username string, state *state.State) error {
@@ -210,7 +210,7 @@ func ClaimUsername(userId int, username string, state *state.State) error {
 		Name:                  username,
 		UsernameSetupReminder: false,
 	}
-	return commonUpdateRequired(
+	return updateRecord(
 		state.Database.Where("name = ?", ""),
 		updates,
 		"name",
@@ -220,5 +220,5 @@ func ClaimUsername(userId int, username string, state *state.State) error {
 
 func UpdateUsernameSetupReminder(userId int, enabled bool, state *state.State) error {
 	updates := &database.User{Id: userId, UsernameSetupReminder: enabled}
-	return commonUpdateRequired(state.Database, updates, "username_setup_reminder")
+	return updateRecord(state.Database, updates, "username_setup_reminder")
 }

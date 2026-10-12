@@ -134,12 +134,12 @@ func IncrementUploadViews(uploadId int, state *state.State) error {
 
 func UpdateUploadPool(uploadId int, poolId int, state *state.State) error {
 	updates := &database.Upload{Id: uploadId, PoolId: poolId}
-	return commonUpdateRequired(state.Database, updates, "pool_id")
+	return updateRecord(state.Database, updates, "pool_id")
 }
 
 func UpdateUploadChecksum(uploadId int, checksum string, state *state.State) error {
 	updates := &database.Upload{Id: uploadId, Checksum: checksum}
-	return commonUpdateRequired(state.Database, updates, "checksum")
+	return updateRecord(state.Database, updates, "checksum")
 }
 
 func UpdatePoolUploadCount(poolId int, state *state.State) error {
@@ -177,7 +177,7 @@ func CreateUploadIdentifier(uploadId int, state *state.State) (string, error) {
 
 	// Update the upload with the shortlink identifier
 	updates := &database.Upload{Id: uploadId, Identifier: identifier}
-	if err := commonUpdateRequired(state.Database, updates, "identifier"); err != nil {
+	if err := updateRecord(state.Database, updates, "identifier"); err != nil {
 		return "", err
 	}
 

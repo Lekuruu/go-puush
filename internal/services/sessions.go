@@ -71,7 +71,7 @@ func DeleteAllSessionsForUser(userId int, state *state.State) error {
 
 func ExtendSession(session *database.Session, duration time.Duration, state *state.State) error {
 	session.ExpiresAt = time.Now().Add(duration)
-	return commonUpdateRequired(state.Database, session, "expires_at")
+	return updateRecord(state.Database, session, "expires_at")
 }
 
 func CleanupExpiredSessions(state *state.State) error {
