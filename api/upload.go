@@ -26,7 +26,7 @@ func PuushUpload(ctx *server.Context) {
 		WritePuushError(ctx, RequestError)
 		return
 	}
-	defer request.File.Close()
+	defer request.Close()
 
 	user, err := UserAuthenticationFromKey(request.Key, ctx.State, "DefaultPool")
 	if err != nil {
@@ -179,6 +179,13 @@ func (request *UploadRequest) ExceedsUploadLimit(user *database.User) bool {
 		return false
 	}
 	return user.DiskUsage+request.FileSize > user.UploadLimit()
+}
+
+func (request *UploadRequest) Close() error {
+	if request.File == nil {
+		return nil
+	}
+	return request.File.Close()
 }
 
 func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
