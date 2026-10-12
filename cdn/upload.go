@@ -56,8 +56,9 @@ func Upload(ctx *server.Context) {
 
 	// Try to increase views, if cooldown is not active
 	if uploadViewCooldowns.Allow(ctx.IP()) {
-		upload.Views += 1
-		services.UpdateUpload(upload, ctx.State)
+		if err := services.IncrementUploadViews(upload.Id, ctx.State); err != nil {
+			ctx.Logger.Warn("Failed to increment upload views", "upload_id", upload.Id, "error", err)
+		}
 	}
 
 	// Avoid xss attacks by sandboxing html files

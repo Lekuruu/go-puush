@@ -6,6 +6,7 @@ import (
 	"github.com/Lekuruu/go-puush/internal/authentication"
 	"github.com/Lekuruu/go-puush/internal/database"
 	"github.com/Lekuruu/go-puush/internal/state"
+	"gorm.io/gorm"
 )
 
 func CreateUser(email string, password string, state *state.State) (*database.User, error) {
@@ -34,9 +35,9 @@ func CreateUser(email string, password string, state *state.State) (*database.Us
 
 	// force the "active" field to be set correctly, since for some reason
 	// gorm doesn't set boolean fields properly on creation
-	result = state.Database.Model(user).Update("active", !state.Config.Service.RequireActivation)
-	if result.Error != nil {
-		return nil, result.Error
+	user.Active = !state.Config.Service.RequireActivation
+	if err := commonUpdateRequired(state.Database, user, "active"); err != nil {
+		return nil, err
 	}
 
 	publicPoolIdentifier, err := GeneratePoolIdentifier(state)
@@ -92,9 +93,8 @@ func CreateUser(email string, password string, state *state.State) (*database.Us
 	}
 
 	user.DefaultPoolId = publicPool.Id
-	result = state.Database.Save(user)
-	if result.Error != nil {
-		return nil, result.Error
+	if err := commonUpdateRequired(state.Database, user, "default_pool_id"); err != nil {
+		return nil, err
 	}
 
 	return user, nil
@@ -160,96 +160,65 @@ func FetchUserByApiKey(apiKey string, state *state.State, preload ...string) (*d
 }
 
 func RegenerateUserApiKey(userId int, state *state.State) (string, error) {
-	user, err := FetchUserById(userId, state)
-	if err != nil {
-		return "", err
-	}
-
 	apiKey, err := authentication.GenerateApiKey()
 	if err != nil {
 		return "", err
 	}
-	user.ApiKey = apiKey
-	result := state.Database.Save(user)
+	updates := &database.User{Id: userId, ApiKey: apiKey}
 
-	if result.Error != nil {
-		return "", result.Error
+	if err := commonUpdateRequired(state.Database, updates, "api_key"); err != nil {
+		return "", err
 	}
-
-	return user.ApiKey, nil
+	return apiKey, nil
 }
 
 func UpdateUserDiskUsage(userId int, size int64, state *state.State) error {
-	result := state.Database.Exec(
-		"UPDATE users SET disk_usage = disk_usage + ? WHERE id = ?",
-		size, userId,
-	)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	result := state.Database.Model(&database.User{}).
+		Where("id = ?", userId).
+		UpdateColumn("disk_usage", gorm.Expr("disk_usage + ?", size))
+	return requireUpdatedRecord(result)
 }
 
 func UpdateUserLatestActivity(userId int, state *state.State) error {
-	result := state.Database.Exec(
-		"UPDATE users SET latest_activity = ? WHERE id = ?",
-		time.Now(), userId,
-	)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	updates := &database.User{Id: userId, LatestActivity: time.Now()}
+	return commonUpdateRequired(state.Database, updates, "latest_activity")
 }
 
 func UpdateUserDefaultPool(userId int, poolId int, state *state.State) error {
-	result := state.Database.Exec(
-		"UPDATE users SET default_pool_id = ? WHERE id = ?",
-		poolId, userId,
-	)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	updates := &database.User{Id: userId, DefaultPoolId: poolId}
+	return commonUpdateRequired(state.Database, updates, "default_pool_id")
 }
 
 func UpdateUserPassword(userId int, passwordHash string, state *state.State) error {
-	result := state.Database.Exec(
-		"UPDATE users SET password = ? WHERE id = ?",
-		passwordHash, userId,
-	)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	updates := &database.User{Id: userId, Password: passwordHash}
+	return commonUpdateRequired(state.Database, updates, "password")
 }
 
 func ActivateUser(userId int, state *state.State) error {
-	result := state.Database.Exec(
-		"UPDATE users SET active = ? WHERE id = ?",
-		true, userId,
-	)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	updates := &database.User{Id: userId, Active: true}
+	return commonUpdateRequired(state.Database, updates, "active")
 }
 
-func UpdateUser(user *database.User, state *state.State) error {
-	result := state.Database.Save(user)
+func UpdateUserViewType(userId int, viewType database.ViewType, state *state.State) error {
+	updates := &database.User{Id: userId, ViewType: viewType}
+	return commonUpdateRequired(state.Database, updates, "view_type")
+}
 
-	if result.Error != nil {
-		return result.Error
+func ClaimUsername(userId int, username string, state *state.State) error {
+	updates := &database.User{
+		Id:                    userId,
+		Name:                  username,
+		UsernameSetupReminder: false,
 	}
+	return commonUpdateRequired(
+		state.Database.Where("name = ?", ""),
+		updates,
+		"name",
+		"username_setup_reminder",
+	)
+}
 
-	return nil
+func UpdateUsernameSetupReminder(userId int, enabled bool, state *state.State) error {
+	updates := &database.User{Id: userId, UsernameSetupReminder: enabled}
+	return commonUpdateRequired(state.Database, updates, "username_setup_reminder")
 }

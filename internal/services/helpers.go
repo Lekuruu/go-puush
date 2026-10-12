@@ -14,6 +14,24 @@ const identifierCharactersLength = int64(len(identifierCharacters))
 
 var ErrNoUpdateColumns = errors.New("update requires explicit columns")
 
+func randomIdentifier(length int) (string, error) {
+	if length < 0 {
+		return "", errors.New("services: identifier length cannot be negative")
+	}
+
+	result := make([]byte, length)
+	limit := big.NewInt(identifierCharactersLength)
+
+	for i := range result {
+		index, err := rand.Int(rand.Reader, limit)
+		if err != nil {
+			return "", err
+		}
+		result[i] = identifierCharacters[index.Int64()]
+	}
+	return string(result), nil
+}
+
 func preloadQuery(state *state.State, preload []string) *gorm.DB {
 	result := state.Database
 
@@ -47,20 +65,6 @@ func requireUpdatedRecord(result *gorm.DB) error {
 	return requireUpdatedRows(result.RowsAffected, result.Error)
 }
 
-func randomIdentifier(length int) (string, error) {
-	if length < 0 {
-		return "", errors.New("services: identifier length cannot be negative")
-	}
-
-	result := make([]byte, length)
-	limit := big.NewInt(identifierCharactersLength)
-
-	for i := range result {
-		index, err := rand.Int(rand.Reader, limit)
-		if err != nil {
-			return "", err
-		}
-		result[i] = identifierCharacters[index.Int64()]
-	}
-	return string(result), nil
+func commonUpdateRequired[T any](db *gorm.DB, updates *T, columns ...string) error {
+	return requireUpdatedRows(commonUpdate(db, updates, columns...))
 }

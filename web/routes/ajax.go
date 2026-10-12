@@ -362,9 +362,7 @@ func ClaimUsername(ctx *server.Context) {
 		return
 	}
 
-	user.Name = username
-	user.UsernameSetupReminder = false
-	err = services.UpdateUser(user, ctx.State)
+	err = services.ClaimUsername(user.Id, username, ctx.State)
 	if err != nil {
 		renderJson(200, ErrorServerError, ctx)
 		return
@@ -380,8 +378,7 @@ func StopAskingAboutUsername(ctx *server.Context) {
 		return
 	}
 
-	user.UsernameSetupReminder = false
-	err = services.UpdateUser(user, ctx.State)
+	err = services.UpdateUsernameSetupReminder(user.Id, false, ctx.State)
 	if err != nil {
 		renderJson(200, ErrorServerError, ctx)
 		return

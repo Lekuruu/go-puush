@@ -125,41 +125,21 @@ func SearchUploadsFromPool(queryStr string, poolId int, offset int, limit int, s
 	return uploads, nil
 }
 
-func UpdateUpload(upload *database.Upload, state *state.State) error {
-	result := state.Database.Save(upload)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+func IncrementUploadViews(uploadId int, state *state.State) error {
+	result := state.Database.Model(&database.Upload{}).
+		Where("id = ?", uploadId).
+		UpdateColumn("views", gorm.Expr("views + 1"))
+	return requireUpdatedRecord(result)
 }
 
 func UpdateUploadPool(uploadId int, poolId int, state *state.State) error {
-	upload := &database.Upload{}
-	result := state.Database.First(upload, uploadId)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	upload.PoolId = poolId
-	result = state.Database.Save(upload)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	updates := &database.Upload{Id: uploadId, PoolId: poolId}
+	return commonUpdateRequired(state.Database, updates, "pool_id")
 }
 
 func UpdateUploadChecksum(uploadId int, checksum string, state *state.State) error {
-	result := state.Database.Exec(
-		"UPDATE uploads SET checksum = ? WHERE id = ?",
-		checksum, uploadId,
-	)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	updates := &database.Upload{Id: uploadId, Checksum: checksum}
+	return commonUpdateRequired(state.Database, updates, "checksum")
 }
 
 func UpdatePoolUploadCount(poolId int, state *state.State) error {
@@ -196,12 +176,9 @@ func CreateUploadIdentifier(uploadId int, state *state.State) (string, error) {
 	}
 
 	// Update the upload with the shortlink identifier
-	result := state.Database.Model(&database.Upload{}).
-		Where("id = ?", uploadId).
-		Update("identifier", identifier)
-
-	if result.Error != nil {
-		return "", result.Error
+	updates := &database.Upload{Id: uploadId, Identifier: identifier}
+	if err := commonUpdateRequired(state.Database, updates, "identifier"); err != nil {
+		return "", err
 	}
 
 	return identifier, nil

@@ -66,16 +66,6 @@ func PoolExists(identifier string, state *state.State) (bool, error) {
 	return count > 0, nil
 }
 
-func UpdatePool(pool *database.Pool, state *state.State) error {
-	result := state.Database.Save(pool)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
-}
-
 func GeneratePoolIdentifier(state *state.State) (string, error) {
 	for i := minimumPoolIdentifierLength; i <= maximumPoolIdentifierLength; i++ {
 		identifier, err := randomIdentifier(i)

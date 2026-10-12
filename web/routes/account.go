@@ -39,9 +39,13 @@ func Account(ctx *server.Context) {
 		return
 	}
 
+	viewType := resolveViewTypeFromRequest(user, ctx)
+
 	// Update view type if changed in query
-	user.ViewType = resolveViewTypeFromRequest(user, ctx)
-	services.UpdateUser(user, ctx.State)
+	if viewType != user.ViewType {
+		services.UpdateUserViewType(user.Id, viewType, ctx.State)
+		user.ViewType = viewType
+	}
 
 	// Sort uploads in selected pool by created descending
 	sort.SliceStable(selectedPool.Uploads, func(i, j int) bool {
