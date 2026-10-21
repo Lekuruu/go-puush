@@ -19,11 +19,26 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 )
 
+const (
+	multipartMemoryLimit int64 = 1 << 20 // ~1 MB in-memory, rest is stored on disk
+	maxUploadRequestSize int64 = database.UploadLimitRegular + multipartMemoryLimit
+)
+
 // /api/up is the main endpoint for uploading files to the puush service.
 func PuushUpload(ctx *server.Context) {
+	err := limitUploadRequestBody(
+		ctx.Response,
+		ctx.Request,
+		maxUploadRequestSize,
+	)
+	if err != nil {
+		writePuushUploadError(ctx, err)
+		return
+	}
+
 	request, err := NewUploadRequest(ctx.Request)
 	if err != nil {
-		WritePuushError(ctx, RequestError)
+		writePuushUploadError(ctx, err)
 		return
 	}
 	defer request.Close()
@@ -189,7 +204,7 @@ func (request *UploadRequest) Close() error {
 }
 
 func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
-	err := request.ParseMultipartForm(1 << 20) // ~1 MB in-memory, rest is stored on disk
+	err := request.ParseMultipartForm(multipartMemoryLimit)
 	if err != nil {
 		return nil, err
 	}
@@ -233,6 +248,41 @@ func NewUploadRequest(request *http.Request) (*UploadRequest, error) {
 	}, nil
 }
 
+type UploadResponse struct {
+	UploadUrl        string
+	UpdatedDiskUsage int64
+}
+
+func (r *UploadResponse) Serialize() []byte {
+	data := []string{
+		"0", // Status "Success"
+		r.UploadUrl,
+		strconv.Itoa(int(r.UpdatedDiskUsage)),
+		strconv.Itoa(int(r.UpdatedDiskUsage)),
+	}
+	return []byte(strings.Join(data, ","))
+}
+
+func writePuushUploadError(ctx *server.Context, err error) {
+	if _, ok := errors.AsType[*http.MaxBytesError](err); ok {
+		WritePuushError(ctx, PuushError{
+			PuushCode:  -2,
+			StatusCode: http.StatusRequestEntityTooLarge,
+		})
+		return
+	}
+	WritePuushError(ctx, RequestError)
+}
+
+func limitUploadRequestBody(response http.ResponseWriter, request *http.Request, limit int64) error {
+	if request.ContentLength > limit {
+		return &http.MaxBytesError{Limit: limit}
+	}
+
+	request.Body = http.MaxBytesReader(response, request.Body, limit)
+	return nil
+}
+
 func multipartFormValue(request *http.Request, key string) string {
 	values := request.MultipartForm.Value[key]
 	if len(values) == 0 {
@@ -247,19 +297,4 @@ func multipartFormFile(request *http.Request, key string) *multipart.FileHeader 
 		return nil
 	}
 	return files[0]
-}
-
-type UploadResponse struct {
-	UploadUrl        string
-	UpdatedDiskUsage int64
-}
-
-func (r *UploadResponse) Serialize() []byte {
-	data := []string{
-		"0", // Status "Success"
-		r.UploadUrl,
-		strconv.Itoa(int(r.UpdatedDiskUsage)),
-		strconv.Itoa(int(r.UpdatedDiskUsage)),
-	}
-	return []byte(strings.Join(data, ","))
 }
