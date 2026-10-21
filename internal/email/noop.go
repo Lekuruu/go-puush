@@ -1,13 +1,19 @@
 package email
 
+import "log/slog"
+
 // NoopEmail is a development helper that discards all outbound email
 type NoopEmail struct {
-	from string
+	from   string
+	logger *slog.Logger
 }
 
 // NewNoopEmail returns a no-op email implementation
 func NewNoopEmail(from string) Email {
-	return &NoopEmail{from: from}
+	return &NoopEmail{
+		from:   from,
+		logger: slog.Default().With("component", "email"),
+	}
 }
 
 // FromAddress returns the configured sender address
@@ -26,6 +32,6 @@ func (n *NoopEmail) Send(message *Message) error {
 		return err
 	}
 
-	// TODO: Logging?
+	n.logger.Debug("noop email sent", "to", message.To, "subject", message.Subject)
 	return nil
 }

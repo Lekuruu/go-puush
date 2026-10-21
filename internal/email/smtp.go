@@ -4,7 +4,10 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"log/slog"
+	"net"
 	"net/smtp"
+	"strconv"
 
 	"github.com/Lekuruu/go-puush/internal/config"
 )
@@ -13,12 +16,17 @@ import (
 type SMTPEmail struct {
 	from   string
 	config config.SMTPConfig
+	logger *slog.Logger
 	auth   smtp.Auth
 }
 
 // NewSMTPEmail constructs an SMTP-backed email sender
 func NewSMTPEmail(from string, smtpConfig config.SMTPConfig) Email {
-	return &SMTPEmail{from: from, config: smtpConfig}
+	return &SMTPEmail{
+		from:   from,
+		config: smtpConfig,
+		logger: slog.Default().With("component", "email"),
+	}
 }
 
 // FromAddress returns the configured default sender address.
@@ -58,7 +66,7 @@ func (s *SMTPEmail) Send(message *Message) error {
 		return err
 	}
 
-	address := fmt.Sprintf("%s:%d", s.config.Host, s.config.Port)
+	address := net.JoinHostPort(s.config.Host, strconv.Itoa(s.config.Port))
 	client, err := smtp.Dial(address)
 	if err != nil {
 		return fmt.Errorf("email: failed to connect to SMTP server: %w", err)
@@ -113,5 +121,6 @@ func (s *SMTPEmail) Send(message *Message) error {
 		return fmt.Errorf("email: failed to close SMTP connection: %w", err)
 	}
 
+	s.logger.Debug("SMTP email sent", "to", message.To, "subject", message.Subject)
 	return nil
 }
