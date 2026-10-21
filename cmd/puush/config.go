@@ -7,6 +7,9 @@ var defaultEnvironment = `
 WEB_HOST=127.0.0.1
 WEB_PORT=80
 
+# Set to true when the website is served over HTTPS
+WEB_SECURE_COOKIES=false
+
 # Storage configuration
 STORAGE_TYPE=local
 STORAGE_URI=./.data

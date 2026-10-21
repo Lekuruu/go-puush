@@ -22,8 +22,9 @@ type CdnConfig struct {
 }
 
 type WebConfig struct {
-	Host string `env:"WEB_HOST" envDefault:"0.0.0.0"`
-	Port int    `env:"WEB_PORT" envDefault:"8082"`
+	Host          string `env:"WEB_HOST" envDefault:"0.0.0.0"`
+	Port          int    `env:"WEB_PORT" envDefault:"8082"`
+	SecureCookies bool   `env:"WEB_SECURE_COOKIES" envDefault:"false"`
 }
 
 type StorageConfig struct {

@@ -39,12 +39,12 @@ func SetUserSession(user *database.User, ctx *server.Context) error {
 	}
 
 	// Set the session token as a cookie in the response
-	http.SetCookie(ctx.Response, &http.Cookie{
-		Name:    sessionCookieName,
-		Value:   session.Token,
-		Expires: session.ExpiresAt,
-		Path:    "/",
-	})
+	http.SetCookie(ctx.Response, newSessionCookie(
+		session.Token,
+		session.ExpiresAt,
+		0,
+		ctx.State.Config.Web.SecureCookies,
+	))
 	return nil
 }
 
@@ -60,11 +60,12 @@ func ClearUserSession(ctx *server.Context) error {
 	services.DeleteSession(sessionToken.Value, ctx.State)
 
 	// Remove the session cookie from the response
-	http.SetCookie(ctx.Response, &http.Cookie{
-		Name:    sessionCookieName,
-		Value:   "",
-		Expires: time.Unix(0, 0),
-	})
+	http.SetCookie(ctx.Response, newSessionCookie(
+		"",
+		time.Unix(0, 0),
+		-1,
+		ctx.State.Config.Web.SecureCookies,
+	))
 	return nil
 }
 
@@ -97,4 +98,17 @@ func UserAuthenticationDynamic(email string, password string, key string, state 
 		return UserPasswordAuthentication(email, password, state)
 	}
 	return nil, false
+}
+
+func newSessionCookie(value string, expires time.Time, maxAge int, secure bool) *http.Cookie {
+	return &http.Cookie{
+		Name:     sessionCookieName,
+		Value:    value,
+		Path:     "/",
+		Expires:  expires,
+		MaxAge:   maxAge,
+		HttpOnly: true,
+		Secure:   secure,
+		SameSite: http.SameSiteLaxMode,
+	}
 }
