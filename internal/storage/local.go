@@ -4,6 +4,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+)
+
+const (
+	storageDirectoryMode = 0700
+	storageFileMode      = 0600
 )
 
 type FileStorage struct {
@@ -15,9 +21,10 @@ func NewFileStorage(dataPath string) Storage {
 }
 
 func (storage *FileStorage) Setup() error {
-	var folders = []string{
-		fmt.Sprintf("%s/uploads", storage.dataPath),
-		fmt.Sprintf("%s/thumbnails", storage.dataPath),
+	folders := []string{
+		storage.dataPath,
+		filepath.Join(storage.dataPath, "uploads"),
+		filepath.Join(storage.dataPath, "thumbnails"),
 	}
 
 	for _, folder := range folders {
@@ -25,13 +32,33 @@ func (storage *FileStorage) Setup() error {
 			continue
 		}
 
-		err := os.MkdirAll(folder, 0755)
+		err := os.MkdirAll(folder, storageDirectoryMode)
 		if err != nil {
 			return fmt.Errorf("failed to create storage directory %s: %w", folder, err)
 		}
 	}
 
-	return nil
+	// Ensure that all files & directories have the correct permissions
+	return filepath.WalkDir(storage.dataPath, func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if entry.Type()&os.ModeSymlink != 0 {
+			return fmt.Errorf("storage: refusing to follow symbolic link %s", path)
+		}
+		if entry.IsDir() {
+			return os.Chmod(path, storageDirectoryMode)
+		}
+
+		info, err := entry.Info()
+		if err != nil {
+			return err
+		}
+		if !info.Mode().IsRegular() {
+			return fmt.Errorf("storage: unsupported file type at %s", path)
+		}
+		return os.Chmod(path, storageFileMode)
+	})
 }
 
 func (storage *FileStorage) Read(key string, folder string) ([]byte, error) {
@@ -46,18 +73,17 @@ func (storage *FileStorage) ReadStream(key string, folder string) (io.ReadSeekCl
 
 func (storage *FileStorage) Save(key string, folder string, data []byte) error {
 	path := fmt.Sprintf("%s/%s", storage.dataPath, folder)
-	err := os.MkdirAll(path, 0755)
-
+	err := os.MkdirAll(path, storageDirectoryMode)
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile(fmt.Sprintf("%s/%s", path, key), data, os.ModePerm)
+	return os.WriteFile(fmt.Sprintf("%s/%s", path, key), data, storageFileMode)
 }
 
 func (storage *FileStorage) SaveStream(key string, folder string, stream io.Reader) error {
 	path := fmt.Sprintf("%s/%s", storage.dataPath, folder)
-	err := os.MkdirAll(path, 0755)
+	err := os.MkdirAll(path, storageDirectoryMode)
 	if err != nil {
 		return err
 	}
@@ -67,6 +93,7 @@ func (storage *FileStorage) SaveStream(key string, folder string, stream io.Read
 	if err != nil {
 		return err
 	}
+	defer file.Chmod(storageFileMode)
 	defer file.Close()
 
 	buffer := make([]byte, 256*1024)
