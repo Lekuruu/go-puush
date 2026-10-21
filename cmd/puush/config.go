@@ -62,5 +62,5 @@ func CreateDefaultEnvironment() error {
 		return nil
 	}
 
-	return os.WriteFile(".env", []byte(defaultEnvironment), 0644)
+	return os.WriteFile(".env", []byte(defaultEnvironment), 0600)
 }
