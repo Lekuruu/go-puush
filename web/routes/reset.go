@@ -122,6 +122,10 @@ func PerformPasswordReset(ctx *server.Context) {
 		renderErrorTemplate("Uh-oh! Something went wrong.", "Please try requesting a new password reset link.", ctx)
 		return
 	}
+	if verification == nil {
+		renderErrorTemplate("Invalid Reset Key", "It looks like your reset link is invalid or has expired. Please request a new password reset link.", ctx)
+		return
+	}
 
 	newPasswordHash, err := authentication.CreatePasswordHash(password)
 	if err != nil {
