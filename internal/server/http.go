@@ -16,6 +16,7 @@ import (
 
 const (
 	httpReadHeaderTimeout = 5 * time.Second
+	httpReadTimeout       = 8 * time.Minute
 	httpIdleTimeout       = 2 * time.Minute
 	httpShutdownTimeout   = 30 * time.Second
 )
@@ -58,6 +59,7 @@ func (server *Server) Serve(ctx context.Context) error {
 		Handler:           server.LoggingMiddleware(server.Router),
 		ErrorLog:          slog.NewLogLogger(server.Logger.Handler(), slog.LevelError),
 		ReadHeaderTimeout: httpReadHeaderTimeout,
+		ReadTimeout:       httpReadTimeout,
 		IdleTimeout:       httpIdleTimeout,
 	}
 	server.Logger.Info(
