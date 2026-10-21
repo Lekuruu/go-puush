@@ -31,6 +31,7 @@ func PerformRegistration(ctx *server.Context) {
 	email := ctx.Request.FormValue("email")
 	password := ctx.Request.FormValue("password")
 	confirm := ctx.Request.FormValue("confirm_password")
+	invitationKey := ctx.Request.FormValue("invitation_key")
 
 	if password != confirm {
 		renderErrorTemplate("Password Mismatch", "The entered passwords do not match. Please try again!", ctx)
@@ -43,7 +44,6 @@ func PerformRegistration(ctx *server.Context) {
 	}
 
 	if ctx.State.Config.Service.RequireInvitation {
-		invitationKey := ctx.Request.FormValue("invitation_key")
 		if invitationKey == "" {
 			renderErrorTemplate("Missing Invitation Key", "An invitation key is required to register.", ctx)
 			return
@@ -59,6 +59,11 @@ func PerformRegistration(ctx *server.Context) {
 	if err != nil {
 		renderErrorTemplate("Error", "An error occurred while creating your account. Please try again!", ctx)
 		return
+	}
+	if ctx.State.Config.Service.RequireInvitation {
+		if err := services.DeleteInvitationKey(invitationKey, ctx.State); err != nil {
+			ctx.Logger.Error("Failed to delete invitation key after registration", "error", err)
+		}
 	}
 
 	ctx.Logger.Info("New user registered", "user_id", user.Id)
