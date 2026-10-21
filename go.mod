@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/Lekuruu/ffmpeg-go v0.0.0-20251103082554-f0200a557735
 	github.com/caarlos0/env/v11 v11.4.1
-	github.com/gabriel-vasile/mimetype v1.4.15
+	github.com/gabriel-vasile/mimetype v1.4.16
 	github.com/glebarez/sqlite v1.11.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/joho/godotenv v1.5.1
@@ -26,10 +26,10 @@ require (
 	github.com/u2takey/go-utils v0.3.1 // indirect
 	golang.org/x/image v0.47.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
-	modernc.org/libc v1.78.0 // indirect
+	modernc.org/libc v1.79.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
-	modernc.org/sqlite v1.60.1 // indirect
+	modernc.org/sqlite v1.61.0 // indirect
 )
 
 require (
